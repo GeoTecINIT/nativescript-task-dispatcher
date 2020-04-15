@@ -1,4 +1,7 @@
 import * as app from "tns-core-modules/application";
+import { taskDispatcher } from "../../src";
+
+taskDispatcher.init();
 
 app.run({ moduleName: "app-root" });
 
