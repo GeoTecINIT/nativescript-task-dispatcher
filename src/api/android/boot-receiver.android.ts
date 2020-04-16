@@ -1,4 +1,5 @@
-export class BootReceiver implements es.uji.geotec.taskdispatcher.BootReceiver {
+export class BootReceiver
+  implements es.uji.geotec.taskdispatcher.BootReceiverDelegate {
   onReceive(context: android.content.Context, intent: android.content.Intent) {
     this.handleOnReceive();
   }

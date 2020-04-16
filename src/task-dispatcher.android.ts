@@ -1,5 +1,5 @@
 import { Common } from './task-dispatcher.common';
-import { BootReceiver } from './android/boot-receiver.android';
+import { BootReceiver } from './api/android/boot-receiver.android';
 
 const bootReceiver = new BootReceiver();
 
