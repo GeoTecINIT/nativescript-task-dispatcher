@@ -1,4 +1,4 @@
-import { android as androidApp } from 'tns-core-modules/application/application';
+import { android as androidApp } from "tns-core-modules/application/application";
 
 export function uuid() {
   if (androidApp) {

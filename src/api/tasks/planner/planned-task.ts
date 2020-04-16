@@ -1,10 +1,10 @@
-import { uuid } from '../../utils/uuid';
-import { RunnableTask } from '../runnable-task';
-import { TaskParams } from '../task';
+import { uuid } from "../../utils/uuid";
+import { RunnableTask } from "../runnable-task";
+import { TaskParams } from "../task";
 
 export enum PlanningType {
-  Alarm = 'alarm',
-  Immediate = 'immediate',
+  Alarm = "alarm",
+  Immediate = "immediate",
 }
 
 export class PlannedTask {

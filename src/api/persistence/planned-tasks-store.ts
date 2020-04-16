@@ -1,10 +1,10 @@
-import { NativeSQLite } from '@nano-sql/adapter-sqlite-nativescript';
-import { nSQL } from '@nano-sql/core/lib/index';
-import { PlannedTask, PlanningType } from '../tasks/planner/planned-task';
-import { RunnableTask } from '../tasks/runnable-task';
+import { NativeSQLite } from "@nano-sql/adapter-sqlite-nativescript";
+import { nSQL } from "@nano-sql/core/lib/index";
+import { PlannedTask, PlanningType } from "../tasks/planner/planned-task";
+import { RunnableTask } from "../tasks/runnable-task";
 
-const DB_NAME = 'symptoms-mobile';
-const PLANNED_TASKS_TABLE = 'plannedTasks';
+const DB_NAME = "symptoms-mobile";
+const PLANNED_TASKS_TABLE = "plannedTasks";
 
 class PlannedTaskDBStore implements PlannedTasksStore {
   private dbInitialized: boolean = false;
@@ -37,37 +37,37 @@ class PlannedTaskDBStore implements PlannedTasksStore {
     }
 
     await nSQL(PLANNED_TASKS_TABLE)
-      .query('upsert', { ...plannedTask })
+      .query("upsert", { ...plannedTask })
       .exec();
   }
 
   async delete(taskId: string): Promise<void> {
     await this.createDB();
     await nSQL(PLANNED_TASKS_TABLE)
-      .query('delete')
-      .where(['id', '=', taskId])
+      .query("delete")
+      .where(["id", "=", taskId])
       .exec();
   }
 
   async get(task: string | RunnableTask): Promise<PlannedTask> {
     await this.createDB();
 
-    let whereStatement: Array<any> = ['id', '=', task];
-    if (typeof task !== 'string') {
+    let whereStatement: Array<any> = ["id", "=", task];
+    if (typeof task !== "string") {
       const runnableTask = task as RunnableTask;
       whereStatement = [
-        ['name', '=', runnableTask.name],
-        'AND',
-        ['startAt', '=', runnableTask.startAt],
-        'AND',
-        ['interval', '=', runnableTask.interval],
-        'AND',
-        ['recurrent', '=', runnableTask.recurrent],
+        ["name", "=", runnableTask.name],
+        "AND",
+        ["startAt", "=", runnableTask.startAt],
+        "AND",
+        ["interval", "=", runnableTask.interval],
+        "AND",
+        ["recurrent", "=", runnableTask.recurrent],
       ];
     }
 
     const rows = await nSQL(PLANNED_TASKS_TABLE)
-      .query('select')
+      .query("select")
       .where(whereStatement)
       .exec();
     if (rows.length === 0) {
@@ -82,9 +82,9 @@ class PlannedTaskDBStore implements PlannedTasksStore {
   ): Promise<Array<PlannedTask>> {
     await this.createDB();
 
-    let query = nSQL(PLANNED_TASKS_TABLE).query('select');
+    let query = nSQL(PLANNED_TASKS_TABLE).query("select");
     if (planningType) {
-      query = query.where(['planningType', '=', planningType]);
+      query = query.where(["planningType", "=", planningType]);
     }
 
     const rows = await query.exec();
@@ -98,8 +98,8 @@ class PlannedTaskDBStore implements PlannedTasksStore {
     await this.createDB();
 
     const rows = await nSQL(PLANNED_TASKS_TABLE)
-      .query('select')
-      .distinct(['cancelEvent'])
+      .query("select")
+      .distinct(["cancelEvent"])
       .exec();
 
     return rows.map((row) => row.cancelEvent);
@@ -110,8 +110,8 @@ class PlannedTaskDBStore implements PlannedTasksStore {
   ): Promise<Array<PlannedTask>> {
     await this.createDB();
     const rows = await nSQL(PLANNED_TASKS_TABLE)
-      .query('select')
-      .where(['cancelEvent', '=', cancelEvent])
+      .query("select")
+      .where(["cancelEvent", "=", cancelEvent])
       .exec();
 
     return rows.map((row) => this.plannedTaskFromRow(row));
@@ -123,8 +123,8 @@ class PlannedTaskDBStore implements PlannedTasksStore {
 
     if (plannedTask) {
       await nSQL(`${PLANNED_TASKS_TABLE}.errorCount`)
-        .query('upsert', plannedTask.errorCount + 1)
-        .where(['id', '=', taskId])
+        .query("upsert", plannedTask.errorCount + 1)
+        .where(["id", "=", taskId])
         .exec();
     } else {
       throw new Error(`Task not found: ${taskId}`);
@@ -137,8 +137,8 @@ class PlannedTaskDBStore implements PlannedTasksStore {
 
     if (plannedTask) {
       await nSQL(`${PLANNED_TASKS_TABLE}.timeoutCount`)
-        .query('upsert', plannedTask.timeoutCount + 1)
-        .where(['id', '=', taskId])
+        .query("upsert", plannedTask.timeoutCount + 1)
+        .where(["id", "=", taskId])
         .exec();
     } else {
       throw new Error(`Task not found: ${taskId}`);
@@ -151,8 +151,8 @@ class PlannedTaskDBStore implements PlannedTasksStore {
 
     if (plannedTask) {
       await nSQL(`${PLANNED_TASKS_TABLE}.lastRun`)
-        .query('upsert', timestamp)
-        .where(['id', '=', taskId])
+        .query("upsert", timestamp)
+        .where(["id", "=", taskId])
         .exec();
     } else {
       throw new Error(`Task not found: ${taskId}`);
@@ -161,7 +161,7 @@ class PlannedTaskDBStore implements PlannedTasksStore {
 
   async deleteAll(): Promise<void> {
     await this.createDB();
-    await nSQL(PLANNED_TASKS_TABLE).query('delete').exec();
+    await nSQL(PLANNED_TASKS_TABLE).query("delete").exec();
   }
 
   // TODO: Extract to an isolated class
@@ -177,18 +177,18 @@ class PlannedTaskDBStore implements PlannedTasksStore {
           {
             name: PLANNED_TASKS_TABLE,
             model: {
-              'id:uuid': { pk: true },
-              'planningType:string': {},
-              'name:string': {},
-              'startAt:int': {},
-              'params:obj': {},
-              'interval:int': {},
-              'recurrent:boolean': {},
-              'createdAt:int': {},
-              'errorCount:int': {},
-              'timeoutCount:int': {},
-              'lastRun:int': {},
-              'cancelEvent:string': {},
+              "id:uuid": { pk: true },
+              "planningType:string": {},
+              "name:string": {},
+              "startAt:int": {},
+              "params:obj": {},
+              "interval:int": {},
+              "recurrent:boolean": {},
+              "createdAt:int": {},
+              "errorCount:int": {},
+              "timeoutCount:int": {},
+              "lastRun:int": {},
+              "cancelEvent:string": {},
             },
           },
         ],

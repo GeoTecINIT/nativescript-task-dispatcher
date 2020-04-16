@@ -1,18 +1,18 @@
-import { InternalEventManager } from './internal-event-manager';
-import { PlatformEvent } from './events';
-import { EventCallback, EventReceiver } from './event-receivers';
+import { InternalEventManager } from "./internal-event-manager";
+import { PlatformEvent } from "./events";
+import { EventCallback, EventReceiver } from "./event-receivers";
 
 const internalEventManager = new InternalEventManager();
 
-export { CoreEvent, PlatformEvent, createEvent } from './events';
-export { EventCallback, EventReceiver } from './event-receivers';
+export { CoreEvent, PlatformEvent, createEvent } from "./events";
+export { EventCallback, EventReceiver } from "./event-receivers";
 
 export function on(
   eventName: string,
   eventReceiver: EventCallback | EventReceiver
 ): number {
   let receiver = eventReceiver as EventCallback;
-  if ('onReceive' in eventReceiver) {
+  if ("onReceive" in eventReceiver) {
     receiver = (event) => eventReceiver.onReceive(event);
   }
 

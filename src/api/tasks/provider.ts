@@ -1,4 +1,4 @@
-import { Task } from './task';
+import { Task } from "./task";
 
 interface Tasks {
   [key: string]: Task;

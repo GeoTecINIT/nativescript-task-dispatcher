@@ -5,6 +5,6 @@ export class BootReceiver
   }
 
   private handleOnReceive() {
-    console.log('Boot completed!');
+    console.log("Boot completed!");
   }
 }

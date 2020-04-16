@@ -1,4 +1,4 @@
-import { Common } from './task-dispatcher.common';
+import { Common } from "./task-dispatcher.common";
 declare class TaskDispatcher extends Common {
   init(): void;
 }

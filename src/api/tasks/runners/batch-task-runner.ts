@@ -1,5 +1,5 @@
-import { PlannedTasksStore } from '../../persistence/planned-tasks-store';
-import { PlannedTask } from '../planner/planned-task';
+import { PlannedTasksStore } from "../../persistence/planned-tasks-store";
+import { PlannedTask } from "../planner/planned-task";
 import {
   PlatformEvent,
   on,
@@ -7,8 +7,8 @@ import {
   off,
   createEvent,
   emit,
-} from '../../events';
-import { SingleTaskRunner } from './single-task-runner';
+} from "../../events";
+import { SingleTaskRunner } from "./single-task-runner";
 
 export class BatchTaskRunner {
   private taskRunner: SingleTaskRunner;

@@ -1,9 +1,9 @@
-import { PlannedTasksStore } from '../../persistence/planned-tasks-store';
-import { PlannedTask } from '../planner/planned-task';
-import { getTask } from '../provider';
-import { Task, TaskParams } from '../task';
-import { PlatformEvent, on, CoreEvent, off } from '../../events';
-import { Logger, getLogger } from '../../utils/logger';
+import { PlannedTasksStore } from "../../persistence/planned-tasks-store";
+import { PlannedTask } from "../planner/planned-task";
+import { getTask } from "../provider";
+import { Task, TaskParams } from "../task";
+import { PlatformEvent, on, CoreEvent, off } from "../../events";
+import { Logger, getLogger } from "../../utils/logger";
 
 const FAILURE_THRESHOLD = 3;
 
@@ -11,7 +11,7 @@ export class SingleTaskRunner {
   private logger: Logger;
 
   constructor(private taskStore: PlannedTasksStore) {
-    this.logger = getLogger('SingleTaskRunner');
+    this.logger = getLogger("SingleTaskRunner");
   }
 
   async run(

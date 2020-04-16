@@ -1,5 +1,5 @@
-import { Task, TaskConfig, TaskParams, CancelFunction } from './task';
-import { PlatformEvent } from '../events';
+import { Task, TaskConfig, TaskParams, CancelFunction } from "./task";
+import { PlatformEvent } from "../events";
 
 type SimpleTaskFunction = (ctx: SimpleTaskContext) => Promise<void>;
 

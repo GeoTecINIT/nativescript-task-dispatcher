@@ -1,4 +1,4 @@
-import { PlatformEvent } from './events';
+import { PlatformEvent } from "./events";
 
 export type EventCallback = (data: PlatformEvent) => void;
 

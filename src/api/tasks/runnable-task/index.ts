@@ -1,4 +1,4 @@
-import { TaskParams } from '../task';
+import { TaskParams } from "../task";
 
 export interface RunnableTask {
   name: string;

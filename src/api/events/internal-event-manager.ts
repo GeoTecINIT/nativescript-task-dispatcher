@@ -2,9 +2,9 @@ import {
   Observable,
   fromObject,
   EventData as NSEventData,
-} from 'tns-core-modules/data/observable';
-import { EventCallback } from './event-receivers';
-import { PlatformEvent } from './events';
+} from "tns-core-modules/data/observable";
+import { EventCallback } from "./event-receivers";
+import { PlatformEvent } from "./events";
 
 export class InternalEventManager {
   private notificationCenter: Observable;

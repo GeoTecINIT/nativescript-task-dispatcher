@@ -1,6 +1,6 @@
-import { Observable } from 'tns-core-modules/data/observable';
-import * as app from 'tns-core-modules/application';
-import * as dialogs from 'tns-core-modules/ui/dialogs';
+import { Observable } from "tns-core-modules/data/observable";
+import * as app from "tns-core-modules/application";
+import * as dialogs from "tns-core-modules/ui/dialogs";
 
 export abstract class Common extends Observable {
   public message: string;
@@ -13,13 +13,13 @@ export abstract class Common extends Observable {
   public abstract init(): void;
 
   public greet() {
-    return 'Hello, NS';
+    return "Hello, NS";
   }
 }
 
 export class Utils {
   public static SUCCESS_MSG(): string {
-    let msg = `Your plugin is working on ${app.android ? 'Android' : 'iOS'}.`;
+    let msg = `Your plugin is working on ${app.android ? "Android" : "iOS"}.`;
 
     setTimeout(() => {
       dialogs

@@ -4,8 +4,8 @@ import {
   CoreEvent,
   emit,
   hasListeners,
-} from '../events';
-import { Logger, getLogger } from '../utils/logger';
+} from "../events";
+import { Logger, getLogger } from "../utils/logger";
 
 export abstract class Task {
   get name(): string {
@@ -86,7 +86,7 @@ export abstract class Task {
       cancelFunction();
       this.removeCancelFunction();
     }
-    this.log('Cancelled');
+    this.log("Cancelled");
   }
 
   /**
@@ -210,9 +210,9 @@ export interface TaskChainResult {
 }
 
 export enum TaskResultStatus {
-  Ok = 'ok',
-  Error = 'error',
-  Cancelled = 'cancelled',
+  Ok = "ok",
+  Error = "error",
+  Cancelled = "cancelled",
 }
 
 export type CancelFunction = () => void;

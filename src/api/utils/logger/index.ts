@@ -1,6 +1,6 @@
-import { Logger } from './common';
-import { DevLogger } from './dev';
-import { ProdLogger } from './prod';
+import { Logger } from "./common";
+import { DevLogger } from "./dev";
+import { ProdLogger } from "./prod";
 
 let loggingEnabled = false;
 
@@ -29,4 +29,4 @@ export function getLogger(tag: string): Logger {
   return loggerCreator(tag);
 }
 
-export { Logger } from './common';
+export { Logger } from "./common";

@@ -1,8 +1,8 @@
-import { Common } from './task-dispatcher.common';
+import { Common } from "./task-dispatcher.common";
 
 class TaskDispatcher extends Common {
   public init(): void {
-    throw new Error('Method not implemented.');
+    throw new Error("Method not implemented.");
   }
 }
 

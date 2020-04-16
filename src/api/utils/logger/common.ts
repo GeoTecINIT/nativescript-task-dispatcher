@@ -31,8 +31,8 @@ export abstract class Logger {
 }
 
 enum LogType {
-  Debug = 'DEBUG',
-  Info = 'INFO',
-  Warning = 'WARN',
-  Error = 'ERROR',
+  Debug = "DEBUG",
+  Info = "INFO",
+  Warning = "WARN",
+  Error = "ERROR",
 }
