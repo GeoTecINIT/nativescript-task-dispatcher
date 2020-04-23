@@ -1,11 +1,11 @@
 import { TaskScheduler } from ".";
 
-let _taskScheduler: TaskScheduler = null;
+let _taskSchedulerCreator: () => TaskScheduler = () => null;
 
-export function setTaskScheduler(scheduler: TaskScheduler) {
-  _taskScheduler = scheduler;
+export function setTaskSchedulerCreator(creator: () => TaskScheduler) {
+  _taskSchedulerCreator = creator;
 }
 
 export function taskScheduler() {
-  return _taskScheduler;
+  return _taskSchedulerCreator();
 }

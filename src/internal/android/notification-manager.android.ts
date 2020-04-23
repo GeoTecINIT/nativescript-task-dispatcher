@@ -5,8 +5,6 @@ export enum AndroidNotification {
   BehaviorTracking = 1000,
 }
 
-const BEHAVIOR_TRACKING_PREFIX = "notifications.behavior-tracking";
-
 let _notificationChannels: Map<AndroidNotification, NotificationChannel>;
 function notificationChannels(): Map<AndroidNotification, NotificationChannel> {
   if (!_notificationChannels) {

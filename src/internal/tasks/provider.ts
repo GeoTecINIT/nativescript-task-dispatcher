@@ -1,10 +1,6 @@
 import { Task } from "./task";
 
-interface Tasks {
-  [key: string]: Task;
-}
-
-let tasks: Tasks = {};
+let tasks: { [key: string]: Task } = {};
 
 export function getTask(name: string): Task {
   checkIfTaskExists(name);
