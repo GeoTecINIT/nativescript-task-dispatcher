@@ -1,5 +1,9 @@
 import { taskDispatcher } from "nativescript-task-dispatcher";
-console.log(taskDispatcher.message);
+import {
+    emit,
+    createEvent,
+} from "nativescript-task-dispatcher/internal/events";
+
 /*
 In NativeScript, a file with the same name as an XML file is known as
 a code-behind file. The code-behind is a great place to place your view
@@ -14,4 +18,14 @@ export function onNavigatingTo(args: NavigatedData) {
     const page = <Page>args.object;
 
     page.bindingContext = new HomeViewModel();
+
+    emitStartEvent();
+}
+
+async function emitStartEvent() {
+    const isReady = await taskDispatcher.isReady();
+    if (!isReady) {
+        await taskDispatcher.prepare();
+    }
+    emit(createEvent("startEvent"));
 }

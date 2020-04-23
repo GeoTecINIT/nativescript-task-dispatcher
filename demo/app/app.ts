@@ -1,7 +1,9 @@
 import * as app from "tns-core-modules/application";
-import { taskDispatcher } from "../../src";
+import { taskDispatcher } from "nativescript-task-dispatcher";
+import { appTasks } from "./tasks";
+import { demoTaskGraph } from "./tasks/graph";
 
-taskDispatcher.init();
+taskDispatcher.init(appTasks, demoTaskGraph);
 
 app.run({ moduleName: "app-root" });
 
