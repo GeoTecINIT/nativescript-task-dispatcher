@@ -1,11 +1,11 @@
 import {
     setTasks,
     TaskNotFoundError,
-} from "nativescript-task-dispatcher/api/tasks/provider";
+} from "nativescript-task-dispatcher/internal/tasks/provider";
 import { testTasks } from "..";
 import { createPlannedTaskStoreMock } from "../../persistence";
-import { InstantTaskRunner } from "nativescript-task-dispatcher/api/tasks/runners/instant-task-runner";
-import { RunnableTask } from "nativescript-task-dispatcher/api/tasks/runnable-task";
+import { InstantTaskRunner } from "nativescript-task-dispatcher/internal/tasks/runners/instant-task-runner";
+import { RunnableTask } from "nativescript-task-dispatcher/internal/tasks/runnable-task";
 import {
     createEvent,
     CoreEvent,
@@ -13,11 +13,11 @@ import {
     EventCallback,
     on,
     emit,
-} from "nativescript-task-dispatcher/api/events";
+} from "nativescript-task-dispatcher/internal/events";
 import {
     PlannedTask,
     PlanningType,
-} from "nativescript-task-dispatcher/api/tasks/planner/planned-task";
+} from "nativescript-task-dispatcher/internal/tasks/planner/planned-task";
 
 describe("Instant task planner", () => {
     setTasks(testTasks);

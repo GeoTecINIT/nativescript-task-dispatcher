@@ -5,8 +5,8 @@ import {
     on,
     off,
     PlatformEvent,
-} from "nativescript-task-dispatcher/api/events";
-import { SimpleTask } from "nativescript-task-dispatcher/api/tasks/simple-task";
+} from "nativescript-task-dispatcher/internal/events";
+import { SimpleTask } from "nativescript-task-dispatcher/internal/tasks/simple-task";
 
 describe("Task", () => {
     let startEvent: PlatformEvent;

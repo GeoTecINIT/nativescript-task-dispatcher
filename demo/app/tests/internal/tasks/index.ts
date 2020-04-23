@@ -1,8 +1,8 @@
-import { Task } from "nativescript-task-dispatcher/api/tasks/task";
-import { SimpleTask } from "nativescript-task-dispatcher/api/tasks/simple-task";
+import { Task } from "nativescript-task-dispatcher/internal/tasks/task";
+import { SimpleTask } from "nativescript-task-dispatcher/internal/tasks/simple-task";
 
-import { TaskCancelManager } from "nativescript-task-dispatcher/api/tasks/cancel-manager";
-import { PlannedTask } from "nativescript-task-dispatcher/api/tasks/planner/planned-task";
+import { TaskCancelManager } from "nativescript-task-dispatcher/internal/tasks/cancel-manager";
+import { PlannedTask } from "nativescript-task-dispatcher/internal/tasks/planner/planned-task";
 
 export const testTasks: Array<Task> = [
     new SimpleTask("dummyTask", async ({ log }) => log("Dummy Task executed!")),

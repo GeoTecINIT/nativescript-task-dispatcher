@@ -1,12 +1,12 @@
-import { setTasks } from "nativescript-task-dispatcher/api/tasks/provider";
+import { setTasks } from "nativescript-task-dispatcher/internal/tasks/provider";
 import { testTasks } from ".";
 import {
     PlanningType,
     PlannedTask,
-} from "nativescript-task-dispatcher/api/tasks/planner/planned-task";
+} from "nativescript-task-dispatcher/internal/tasks/planner/planned-task";
 import { createPlannedTaskStoreMock } from "../persistence";
-import { TaskManager } from "nativescript-task-dispatcher/api/tasks/manager";
-import { uuid } from "nativescript-task-dispatcher/api/utils/uuid";
+import { TaskManager } from "nativescript-task-dispatcher/internal/tasks/manager";
+import { uuid } from "nativescript-task-dispatcher/internal/utils/uuid";
 
 describe("Task manager", () => {
     setTasks(testTasks);

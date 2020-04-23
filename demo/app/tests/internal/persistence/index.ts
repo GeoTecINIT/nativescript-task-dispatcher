@@ -1,7 +1,7 @@
-import { PlannedTasksStore } from "nativescript-task-dispatcher/api/persistence/planned-tasks-store";
+import { PlannedTasksStore } from "nativescript-task-dispatcher/internal/persistence/planned-tasks-store";
 
-import { PlannedTask } from "nativescript-task-dispatcher/api/tasks/planner/planned-task";
-import { RunnableTask } from "nativescript-task-dispatcher/api/tasks/runnable-task";
+import { PlannedTask } from "nativescript-task-dispatcher/internal/tasks/planner/planned-task";
+import { RunnableTask } from "nativescript-task-dispatcher/internal/tasks/runnable-task";
 
 export function createPlannedTaskStoreMock(): PlannedTasksStore {
     return {

@@ -1,17 +1,17 @@
 import { createPlannedTaskStoreMock } from "../persistence";
-import { TaskCancelManager } from "nativescript-task-dispatcher/api/tasks/cancel-manager";
-import { TaskScheduler } from "nativescript-task-dispatcher/api/tasks/scheduler";
-import { RunnableTask } from "nativescript-task-dispatcher/api/tasks/runnable-task";
+import { TaskCancelManager } from "nativescript-task-dispatcher/internal/tasks/cancel-manager";
+import { TaskScheduler } from "nativescript-task-dispatcher/internal/tasks/scheduler";
+import { RunnableTask } from "nativescript-task-dispatcher/internal/tasks/runnable-task";
 import {
     hasListeners,
     off,
     createEvent,
     emit,
-} from "nativescript-task-dispatcher/api/events";
+} from "nativescript-task-dispatcher/internal/events";
 import {
     PlannedTask,
     PlanningType,
-} from "nativescript-task-dispatcher/api/tasks/planner/planned-task";
+} from "nativescript-task-dispatcher/internal/tasks/planner/planned-task";
 
 describe("Task cancel manager", () => {
     const taskStore = createPlannedTaskStoreMock();

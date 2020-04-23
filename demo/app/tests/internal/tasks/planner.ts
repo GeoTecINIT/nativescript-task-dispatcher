@@ -1,7 +1,7 @@
-import { TaskPlanner } from "nativescript-task-dispatcher/api/tasks/planner";
-import { TaskScheduler } from "nativescript-task-dispatcher/api/tasks/scheduler";
-import { RunnableTask } from "nativescript-task-dispatcher/api/tasks/runnable-task";
-import { RunnableTaskBuilder } from "nativescript-task-dispatcher/api/tasks/runnable-task/builder";
+import { TaskPlanner } from "nativescript-task-dispatcher/internal/tasks/planner";
+import { TaskScheduler } from "nativescript-task-dispatcher/internal/tasks/scheduler";
+import { RunnableTask } from "nativescript-task-dispatcher/internal/tasks/runnable-task";
+import { RunnableTaskBuilder } from "nativescript-task-dispatcher/internal/tasks/runnable-task/builder";
 import {
     PlatformEvent,
     CoreEvent,
@@ -9,15 +9,15 @@ import {
     on,
     createEvent,
     off,
-} from "nativescript-task-dispatcher/api/events";
+} from "nativescript-task-dispatcher/internal/events";
 import {
     PlannedTask,
     PlanningType,
-} from "nativescript-task-dispatcher/api/tasks/planner/planned-task";
+} from "nativescript-task-dispatcher/internal/tasks/planner/planned-task";
 import { createPlannedTaskStoreMock } from "../persistence";
 import { createTaskCancelManagerMock } from ".";
-import { TaskNotFoundError } from "nativescript-task-dispatcher/api/tasks/provider";
-import { TaskRunner } from "nativescript-task-dispatcher/api/tasks/runners/instant-task-runner";
+import { TaskNotFoundError } from "nativescript-task-dispatcher/internal/tasks/provider";
+import { TaskRunner } from "nativescript-task-dispatcher/internal/tasks/runners/instant-task-runner";
 
 describe("Task planner", () => {
     const taskScheduler = createTaskSchedulerMock();

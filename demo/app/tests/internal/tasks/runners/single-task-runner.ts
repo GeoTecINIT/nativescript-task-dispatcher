@@ -1,17 +1,17 @@
-import { setTasks } from "nativescript-task-dispatcher/api/tasks/provider";
+import { setTasks } from "nativescript-task-dispatcher/internal/tasks/provider";
 import { testTasks } from "..";
 import { createPlannedTaskStoreMock } from "../../persistence";
 import {
     PlannedTask,
     PlanningType,
-} from "nativescript-task-dispatcher/api/tasks/planner/planned-task";
-import { SingleTaskRunner } from "nativescript-task-dispatcher/api/tasks/runners/single-task-runner";
+} from "nativescript-task-dispatcher/internal/tasks/planner/planned-task";
+import { SingleTaskRunner } from "nativescript-task-dispatcher/internal/tasks/runners/single-task-runner";
 import {
     CoreEvent,
     emit,
     createEvent,
     PlatformEvent,
-} from "nativescript-task-dispatcher/api/events";
+} from "nativescript-task-dispatcher/internal/events";
 
 describe("Single task runner", () => {
     setTasks(testTasks);

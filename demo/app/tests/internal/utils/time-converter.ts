@@ -1,4 +1,4 @@
-import { toSeconds } from "nativescript-task-dispatcher/api/utils/time-converter";
+import { toSeconds } from "nativescript-task-dispatcher/internal/utils/time-converter";
 
 describe("Time converter", () => {
     it("should convert seconds to seconds", () => {

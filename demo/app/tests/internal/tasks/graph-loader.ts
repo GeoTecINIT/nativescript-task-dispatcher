@@ -1,19 +1,19 @@
-import { SimpleTask } from "nativescript-task-dispatcher/api/tasks/simple-task";
+import { SimpleTask } from "nativescript-task-dispatcher/internal/tasks/simple-task";
 import {
     TaskGraph,
     RunnableTaskDescriptor,
-} from "nativescript-task-dispatcher/api/tasks/graph";
-import { Task } from "nativescript-task-dispatcher/api/tasks/task";
-import { TaskGraphLoader } from "nativescript-task-dispatcher/api/tasks/graph/loader";
+} from "nativescript-task-dispatcher/internal/tasks/graph";
+import { Task } from "nativescript-task-dispatcher/internal/tasks/task";
+import { TaskGraphLoader } from "nativescript-task-dispatcher/internal/tasks/graph/loader";
 import {
     RunnableTaskBuilder,
     ReadyRunnableTaskBuilder,
-} from "nativescript-task-dispatcher/api/tasks/runnable-task/builder";
+} from "nativescript-task-dispatcher/internal/tasks/runnable-task/builder";
 import {
     CoreEvent,
     emit,
     createEvent,
-} from "nativescript-task-dispatcher/api/events";
+} from "nativescript-task-dispatcher/internal/events";
 import { createTaskCancelManagerMock } from ".";
 
 describe("Task tree loader", () => {

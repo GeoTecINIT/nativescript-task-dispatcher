@@ -1,5 +1,5 @@
-import { InternalEventManager } from "nativescript-task-dispatcher/api/events/internal-event-manager";
-import { EventCallback } from "nativescript-task-dispatcher/api/events";
+import { InternalEventManager } from "nativescript-task-dispatcher/internal/events/internal-event-manager";
+import { EventCallback } from "nativescript-task-dispatcher/internal/events";
 
 describe("Event manager", () => {
     const eventName = "dummyEvent";

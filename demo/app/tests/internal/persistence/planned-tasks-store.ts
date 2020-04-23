@@ -1,12 +1,12 @@
 import {
     plannedTasksDB,
     PlannedTaskAlreadyExistsError,
-} from "nativescript-task-dispatcher/api/persistence/planned-tasks-store";
+} from "nativescript-task-dispatcher/internal/persistence/planned-tasks-store";
 import {
     PlannedTask,
     PlanningType,
-} from "nativescript-task-dispatcher/api/tasks/planner/planned-task";
-import { RunnableTask } from "nativescript-task-dispatcher/api/tasks/runnable-task";
+} from "nativescript-task-dispatcher/internal/tasks/planner/planned-task";
+import { RunnableTask } from "nativescript-task-dispatcher/internal/tasks/runnable-task";
 
 describe("Planned Tasks Store", () => {
     const store = plannedTasksDB;

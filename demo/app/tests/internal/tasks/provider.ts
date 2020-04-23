@@ -3,9 +3,9 @@ import {
     TaskNotFoundError,
     setTasks,
     registerTasks,
-} from "nativescript-task-dispatcher/api/tasks/provider";
+} from "nativescript-task-dispatcher/internal/tasks/provider";
 import { testTasks } from ".";
-import { SimpleTask } from "nativescript-task-dispatcher/api/tasks/simple-task";
+import { SimpleTask } from "nativescript-task-dispatcher/internal/tasks/simple-task";
 
 describe("Task provider", () => {
     setTasks(testTasks);

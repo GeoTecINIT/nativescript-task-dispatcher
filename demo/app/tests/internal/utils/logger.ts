@@ -2,9 +2,9 @@ import {
     getLogger,
     enableLogging,
     disableLogging,
-} from "nativescript-task-dispatcher/api/utils/logger";
-import { DevLogger } from "nativescript-task-dispatcher/api/utils/logger/dev";
-import { ProdLogger } from "nativescript-task-dispatcher/api/utils/logger/prod";
+} from "nativescript-task-dispatcher/internal/utils/logger";
+import { DevLogger } from "nativescript-task-dispatcher/internal/utils/logger/dev";
+import { ProdLogger } from "nativescript-task-dispatcher/internal/utils/logger/prod";
 
 describe("Get logger", () => {
     it("returns a development logger when loging is enabled", () => {
