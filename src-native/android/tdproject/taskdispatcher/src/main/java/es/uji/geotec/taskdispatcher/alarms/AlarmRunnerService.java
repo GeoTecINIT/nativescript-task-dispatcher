@@ -21,6 +21,7 @@ public class AlarmRunnerService extends Service {
         if (delegate != null) {
             delegate.onCreate(this);
         } else {
+            Log.w(tag, "Service delegate was not set! Caching method call...");
             activationCache.onCreateEarlyCalled(this);
         }
     }
@@ -33,6 +34,7 @@ public class AlarmRunnerService extends Service {
             return delegate.onStartCommand(intent, flags, startId);
         }
 
+        Log.w(tag, "Service delegate was not set! Caching method call...");
         activationCache.onStartCommandEarlyCalled(intent, flags, startId);
         return START_REDELIVER_INTENT;
     }
@@ -43,6 +45,7 @@ public class AlarmRunnerService extends Service {
         if (delegate != null) {
             delegate.onDestroy();
         } else {
+            Log.w(tag, "Service delegate was not set! Caching method call...");
             activationCache.onDestroyEarlyCalled();
         }
         super.onDestroy();

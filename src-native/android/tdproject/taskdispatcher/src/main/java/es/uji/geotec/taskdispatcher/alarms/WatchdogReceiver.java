@@ -8,6 +8,9 @@ import android.util.Log;
 import es.uji.geotec.taskdispatcher.common.ReceiverActivationCache;
 
 public class WatchdogReceiver extends BroadcastReceiver {
+
+    private static String tag = "WatchdogReceiver";
+
     private static WatchdogReceiverDelegate delegate;
     private static ReceiverActivationCache activationCache;
 
@@ -17,10 +20,11 @@ public class WatchdogReceiver extends BroadcastReceiver {
             return;
         }
 
-        Log.d("WatchdogReceiver", "Native watchdog triggered! Wait for it...");
+        Log.d(tag, "Native watchdog triggered! Wait for it...");
         if (delegate != null) {
             delegate.onReceive(context, intent);
         } else {
+            Log.w(tag, "Receiver delegate was not set! Caching method call...");
             activationCache = new ReceiverActivationCache(context, intent);
         }
     }

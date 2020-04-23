@@ -8,6 +8,9 @@ import android.util.Log;
 import es.uji.geotec.taskdispatcher.common.ReceiverActivationCache;
 
 public class AlarmReceiver extends BroadcastReceiver {
+
+    private static String tag = "AlarmReceiver";
+
     private static AlarmReceiverDelegate delegate;
     private static ReceiverActivationCache activationCache;
 
@@ -17,10 +20,11 @@ public class AlarmReceiver extends BroadcastReceiver {
             return;
         }
 
-        Log.d("AlarmReceiver", "Native alarm triggered! Wait for it...");
+        Log.d(tag, "Native alarm triggered! Wait for it...");
         if (delegate != null) {
             delegate.onReceive(context, intent);
         } else {
+            Log.w(tag, "Receiver delegate was not set! Caching method call...");
             activationCache = new ReceiverActivationCache(context, intent);
         }
     }

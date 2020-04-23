@@ -9,6 +9,8 @@ import es.uji.geotec.taskdispatcher.common.ReceiverActivationCache;
 
 public class BootReceiver extends BroadcastReceiver {
 
+    private static String tag = "BootReceive";
+
     private static BootReceiverDelegate delegate;
     private static ReceiverActivationCache activationCache;
 
@@ -18,10 +20,11 @@ public class BootReceiver extends BroadcastReceiver {
             return;
         }
 
-        Log.d("BootReceiver", "Native boot completed! Wait for it...");
+        Log.d(tag, "Native boot completed! Wait for it...");
         if (delegate != null) {
             delegate.onReceive(context, intent);
         } else {
+            Log.w(tag, "Receiver delegate was not set! Caching method call...");
             activationCache = new ReceiverActivationCache(context, intent);
         }
     }
