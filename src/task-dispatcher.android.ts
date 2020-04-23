@@ -1,4 +1,6 @@
 import { Common } from "./task-dispatcher.common";
+import { Task } from "./internal/tasks/task";
+import { TaskGraph } from "./internal/tasks/graph";
 import { BootReceiver } from "./internal/android/boot-receiver.android";
 import { AlarmReceiver } from "./internal/tasks/scheduler/android/alarms/alarm/receiver.android";
 import { AlarmRunnerService } from "./internal/tasks/scheduler/android/alarms/alarm/runner-service.android";
@@ -12,9 +14,10 @@ const alarmRunnerService = new AlarmRunnerService();
 const watchdogReceiver = new WatchdogReceiver();
 
 class TaskDispatcher extends Common {
-  public init(): void {
+  public init(appTasks: Array<Task>, appTaskGraph: TaskGraph): Promise<void> {
     this.wireUpNativeComponents();
     setTaskScheduler(new AndroidTaskScheduler());
+    return super.init(appTasks, appTaskGraph);
   }
 
   private wireUpNativeComponents() {

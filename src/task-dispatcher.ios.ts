@@ -1,9 +1,5 @@
 import { Common } from "./task-dispatcher.common";
 
-class TaskDispatcher extends Common {
-  public init(): void {
-    throw new Error("Method not implemented.");
-  }
-}
+class TaskDispatcher extends Common {}
 
 export const taskDispatcher = new TaskDispatcher();
