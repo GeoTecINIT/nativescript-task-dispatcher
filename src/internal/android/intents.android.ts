@@ -25,10 +25,10 @@ export function createWatchdogReceiverIntent(
   });
 }
 
-export function createSavingsDeactivationIntent() {
+export function createSavingsDeactivationIntent(appPackage: string) {
   return new android.content.Intent(
     android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
-    android.net.Uri.parse(`package:${libPackage}`)
+    android.net.Uri.parse(`package:${appPackage}`)
   );
 }
 
