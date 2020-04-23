@@ -1,8 +1,10 @@
 import { Common } from "./task-dispatcher.common";
 import { BootReceiver } from "./internal/android/boot-receiver.android";
+import { AlarmReceiver } from "./internal/tasks/scheduler/android/alarms/alarm/receiver.android";
 import { WatchdogReceiver } from "./internal/tasks/scheduler/android/alarms/watchdog/receiver.android";
 
 const bootReceiver = new BootReceiver();
+const alarmReceiver = new AlarmReceiver();
 const watchdogReceiver = new WatchdogReceiver();
 
 class TaskDispatcher extends Common {
@@ -12,6 +14,7 @@ class TaskDispatcher extends Common {
 
   private wireUpNativeComponents() {
     this.wireUpBootReceiver();
+    this.wireUpAlarmReceiver();
     this.wireUpWatchdogReceiver();
   }
 
@@ -23,6 +26,14 @@ class TaskDispatcher extends Common {
         },
       })
     );
+  }
+
+  private wireUpAlarmReceiver() {
+    es.uji.geotec.taskdispatcher.alarms.AlarmReceiver.setAlarmReceiverDelegate({
+      onReceive(context, intent) {
+        alarmReceiver.onReceive(context, intent);
+      },
+    });
   }
 
   private wireUpWatchdogReceiver() {
