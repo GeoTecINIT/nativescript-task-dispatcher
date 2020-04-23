@@ -33,7 +33,6 @@ export class TaskGraphLoader {
     private cancelManager: TaskCancelManager = taskCancelManager
   ) {
     this.graphTasks = new Set();
-    this.logger = getLogger("TaskGraphLoader");
   }
 
   async load(graph: TaskGraph): Promise<void> {
@@ -47,7 +46,7 @@ export class TaskGraphLoader {
     const planTaskToBeRun = (taskName: string) =>
       this.trackTaskGoingToBeRun(taskName);
 
-    this.logger.info("Loading task graph");
+    this.getLogger().info("Loading task graph");
     this.loadingTaskGraph = graph.describe(
       createEventListener,
       planTaskToBeRun
@@ -64,7 +63,7 @@ export class TaskGraphLoader {
 
   async prepare(): Promise<void> {
     const tasksToBePrepared = await this.tasksNotReady();
-    this.logger.info(`${tasksToBePrepared.length} are up to be prepared`);
+    this.getLogger().info(`${tasksToBePrepared.length} are up to be prepared`);
 
     await Promise.all(tasksToBePrepared.map((task) => task.prepare()));
   }
@@ -114,6 +113,13 @@ export class TaskGraphLoader {
     } catch (err) {
       return true;
     }
+  }
+
+  private getLogger(): Logger {
+    if (!this.logger) {
+      this.logger = getLogger("TaskGraphLoader");
+    }
+    return this.logger;
   }
 }
 

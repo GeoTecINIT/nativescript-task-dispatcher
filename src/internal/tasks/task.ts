@@ -32,8 +32,6 @@ export abstract class Task {
     if (!taskConfig.outputEventName) {
       taskConfig.outputEventName = `${name}Finished`;
     }
-
-    this._logger = getLogger(`Task (${name})`);
   }
 
   /**
@@ -56,7 +54,7 @@ export abstract class Task {
         this.done(this.taskConfig.outputEventName);
       }
     } catch (err) {
-      this._logger.error(
+      this.getLogger().error(
         `Execution failed with params ${JSON.stringify(
           taskParams
         )} and invocation event ${JSON.stringify(invocationEvent)}: ${err}`
@@ -164,7 +162,9 @@ export abstract class Task {
    * @param message The message to be printed
    */
   protected log(message: any) {
-    this._logger.info(`${message} (invocationId=${this.invocationEvent.id})`);
+    this.getLogger().info(
+      `${message} (invocationId=${this.invocationEvent.id})`
+    );
   }
 
   private emitEndEvent(status: TaskResultStatus, err?: Error): void {
@@ -192,6 +192,13 @@ export abstract class Task {
 
   private removeCancelFunction() {
     this._cancelFunctions.delete(this.invocationEvent.id);
+  }
+
+  private getLogger() {
+    if (!this._logger) {
+      this._logger = getLogger(`Task (${this._name})`);
+    }
+    return this._logger;
   }
 }
 
