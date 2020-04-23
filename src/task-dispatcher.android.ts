@@ -1,20 +1,26 @@
 import { Common } from "./task-dispatcher.common";
 import { BootReceiver } from "./internal/android/boot-receiver.android";
 import { AlarmReceiver } from "./internal/tasks/scheduler/android/alarms/alarm/receiver.android";
+import { AlarmRunnerService } from "./internal/tasks/scheduler/android/alarms/alarm/runner-service.android";
 import { WatchdogReceiver } from "./internal/tasks/scheduler/android/alarms/watchdog/receiver.android";
+import { setTaskScheduler } from "./internal/tasks/scheduler/common";
+import { AndroidTaskScheduler } from "./internal/tasks/scheduler/android";
 
 const bootReceiver = new BootReceiver();
 const alarmReceiver = new AlarmReceiver();
+const alarmRunnerService = new AlarmRunnerService();
 const watchdogReceiver = new WatchdogReceiver();
 
 class TaskDispatcher extends Common {
   public init(): void {
     this.wireUpNativeComponents();
+    setTaskScheduler(new AndroidTaskScheduler());
   }
 
   private wireUpNativeComponents() {
     this.wireUpBootReceiver();
     this.wireUpAlarmReceiver();
+    this.wireUpAlarmRunnerService();
     this.wireUpWatchdogReceiver();
   }
 
@@ -34,6 +40,22 @@ class TaskDispatcher extends Common {
         alarmReceiver.onReceive(context, intent);
       },
     });
+  }
+
+  private wireUpAlarmRunnerService() {
+    es.uji.geotec.taskdispatcher.alarms.AlarmRunnerService.setAlarmRunnerServiceDelegate(
+      {
+        onCreate(nativeService) {
+          alarmRunnerService.onCreate(nativeService);
+        },
+        onStartCommand(intent, flags, startId) {
+          return alarmRunnerService.onStartCommand(intent, flags, startId);
+        },
+        onDestroy() {
+          alarmRunnerService.onDestroy();
+        },
+      }
+    );
   }
 
   private wireUpWatchdogReceiver() {

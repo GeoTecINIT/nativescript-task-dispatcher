@@ -1,14 +1,14 @@
+import { android as androidApp } from "tns-core-modules/application/application";
+
 import {
     TaskNotFoundError,
     setTasks,
 } from "nativescript-task-dispatcher/internal/tasks/provider";
 import { testTasks } from "..";
-import {
-    TaskScheduler,
-    taskScheduler,
-} from "nativescript-task-dispatcher/internal/tasks/scheduler";
+import { TaskScheduler } from "nativescript-task-dispatcher/internal/tasks/scheduler";
 import { plannedTasksDB } from "nativescript-task-dispatcher/internal/persistence/planned-tasks-store";
 import { RunnableTask } from "nativescript-task-dispatcher/internal/tasks/runnable-task";
+import { AndroidTaskScheduler } from "../../../../../../src/internal/tasks/scheduler/android";
 
 describe("Task scheduler", () => {
     setTasks(testTasks);
@@ -16,7 +16,12 @@ describe("Task scheduler", () => {
     let scheduler: TaskScheduler;
 
     beforeEach(() => {
-        scheduler = taskScheduler();
+        if (androidApp) {
+            scheduler = new AndroidTaskScheduler();
+        } else {
+            // TODO: Set iOS scheduler here
+            scheduler = null;
+        }
     });
 
     it("schedules a job in time", async () => {
