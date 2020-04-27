@@ -1,5 +1,5 @@
 import { RunnableTask } from "../runnable-task";
-import { PlatformEvent } from "../../events";
+import { DispatchableEvent } from "../../events";
 import { PlannedTask, PlanningType } from "../planner/planned-task";
 import { PlannedTasksStore } from "../../persistence/planned-tasks-store";
 import { checkIfTaskExists } from "../provider";
@@ -18,7 +18,7 @@ export class InstantTaskRunner implements TaskRunner {
   // and check and control forks here.
   async run(
     task: RunnableTask,
-    platformEvent: PlatformEvent
+    dispatchableEvent: DispatchableEvent
   ): Promise<PlannedTask> {
     checkIfTaskExists(task.name);
 
@@ -28,12 +28,15 @@ export class InstantTaskRunner implements TaskRunner {
       await this.taskStore.insert(plannedTask);
     }
 
-    await this.taskRunner.run(plannedTask, platformEvent);
+    await this.taskRunner.run(plannedTask, dispatchableEvent);
 
     return this.taskStore.get(plannedTask.id);
   }
 }
 
 export interface TaskRunner {
-  run(task: RunnableTask, platformEvent: PlatformEvent): Promise<PlannedTask>;
+  run(
+    task: RunnableTask,
+    dispatchableEvent: DispatchableEvent
+  ): Promise<PlannedTask>;
 }

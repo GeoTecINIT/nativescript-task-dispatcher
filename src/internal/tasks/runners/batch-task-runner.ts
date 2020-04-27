@@ -1,9 +1,9 @@
 import { PlannedTasksStore } from "../../persistence/planned-tasks-store";
 import { PlannedTask } from "../planner/planned-task";
 import {
-  PlatformEvent,
+  DispatchableEvent,
   on,
-  CoreEvent,
+  TaskDispatcherEvent,
   off,
   createEvent,
   emit,
@@ -19,7 +19,7 @@ export class BatchTaskRunner {
 
   async run(
     plannedTasks: Array<PlannedTask>,
-    startEvent: PlatformEvent
+    startEvent: DispatchableEvent
   ): Promise<void> {
     await Promise.all(
       plannedTasks.map((plannedTask) =>
@@ -32,12 +32,12 @@ export class BatchTaskRunner {
     plannedTask: PlannedTask,
     batchStartId: string
   ): Promise<void> {
-    const startEvent = createEvent(CoreEvent.TaskExecutionStarted);
-    const listenerId = on(CoreEvent.TaskExecutionTimedOut, (evt) => {
+    const startEvent = createEvent(TaskDispatcherEvent.TaskExecutionStarted);
+    const listenerId = on(TaskDispatcherEvent.TaskExecutionTimedOut, (evt) => {
       if (evt.id === batchStartId) {
-        off(CoreEvent.TaskExecutionTimedOut, listenerId);
+        off(TaskDispatcherEvent.TaskExecutionTimedOut, listenerId);
         emit(
-          createEvent(CoreEvent.TaskExecutionTimedOut, {
+          createEvent(TaskDispatcherEvent.TaskExecutionTimedOut, {
             id: startEvent.id,
           })
         );

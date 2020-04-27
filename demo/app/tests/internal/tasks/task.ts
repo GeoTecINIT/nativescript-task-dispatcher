@@ -1,15 +1,15 @@
 import {
     createEvent,
-    CoreEvent,
+    TaskDispatcherEvent,
     EventCallback,
     on,
     off,
-    PlatformEvent,
+    DispatchableEvent,
 } from "nativescript-task-dispatcher/internal/events";
 import { SimpleTask } from "nativescript-task-dispatcher/internal/tasks/simple-task";
 
 describe("Task", () => {
-    let startEvent: PlatformEvent;
+    let startEvent: DispatchableEvent;
     const eventData = { previousResult: { status: "ok" } };
 
     // All tasks remain immutable given that they are meant to be used
@@ -64,7 +64,7 @@ describe("Task", () => {
     let secondaryCallback: EventCallback;
 
     beforeEach(() => {
-        startEvent = createEvent(CoreEvent.TaskExecutionStarted, {
+        startEvent = createEvent(TaskDispatcherEvent.TaskExecutionStarted, {
             data: eventData,
         });
         eventCallback = jasmine.createSpy("eventCallback");
@@ -77,14 +77,14 @@ describe("Task", () => {
         off(emitterTaskEndEvtName);
         off(parameterizedTaskEndEvtName);
         off(eventualTaskEndEvtName);
-        off(CoreEvent.TaskChainFinished);
+        off(TaskDispatcherEvent.TaskChainFinished);
     });
 
     it("runs and emits a default end event", async () => {
         on(dumbTaskEndEvtName, eventCallback);
-        on(CoreEvent.TaskChainFinished, secondaryCallback);
+        on(TaskDispatcherEvent.TaskChainFinished, secondaryCallback);
         await dumbTask.run({}, startEvent);
-        const taskFinishedEvt: PlatformEvent = {
+        const taskFinishedEvt: DispatchableEvent = {
             name: dumbTaskEndEvtName,
             id: startEvent.id,
             data: {},
@@ -94,10 +94,10 @@ describe("Task", () => {
     });
 
     it("runs and reports task chain has finished if no other app component is bound to it", async () => {
-        on(CoreEvent.TaskChainFinished, eventCallback);
+        on(TaskDispatcherEvent.TaskChainFinished, eventCallback);
         await dumbTask.run({}, startEvent);
-        const taskChainFinishedEvt: PlatformEvent = {
-            name: CoreEvent.TaskChainFinished,
+        const taskChainFinishedEvt: DispatchableEvent = {
+            name: TaskDispatcherEvent.TaskChainFinished,
             id: startEvent.id,
             data: { result: { status: "ok" } },
         };
@@ -105,12 +105,12 @@ describe("Task", () => {
     });
 
     it("reports about errors raised during task execution and ends task execution chain", async () => {
-        on(CoreEvent.TaskChainFinished, eventCallback);
+        on(TaskDispatcherEvent.TaskChainFinished, eventCallback);
         await expectAsync(erroneousTask.run({}, startEvent)).toBeRejectedWith(
             expectedError
         );
-        const taskChainFinishedEvt: PlatformEvent = {
-            name: CoreEvent.TaskChainFinished,
+        const taskChainFinishedEvt: DispatchableEvent = {
+            name: TaskDispatcherEvent.TaskChainFinished,
             id: startEvent.id,
             data: { result: { status: "error", reason: expectedError } },
         };
@@ -118,12 +118,12 @@ describe("Task", () => {
     });
 
     it("can be cancelled and reports that the task chain has finished prematurely", async () => {
-        on(CoreEvent.TaskChainFinished, eventCallback);
+        on(TaskDispatcherEvent.TaskChainFinished, eventCallback);
         on(timeoutTaskEndEvtName, secondaryCallback);
         setTimeout(() => timeoutTask.cancel(), 100);
         await timeoutTask.run({}, startEvent);
-        const taskChainFinishedEvt: PlatformEvent = {
-            name: CoreEvent.TaskChainFinished,
+        const taskChainFinishedEvt: DispatchableEvent = {
+            name: TaskDispatcherEvent.TaskChainFinished,
             id: startEvent.id,
             data: { result: { status: "cancelled" } },
         };
@@ -133,9 +133,9 @@ describe("Task", () => {
 
     it("is able to emit custom end events with output data", async () => {
         on(emitterTaskEndEvtName, eventCallback);
-        on(CoreEvent.TaskChainFinished, secondaryCallback);
+        on(TaskDispatcherEvent.TaskChainFinished, secondaryCallback);
         await emitterTask.run({}, startEvent);
-        const emitterTaskEndEvt: PlatformEvent = {
+        const emitterTaskEndEvt: DispatchableEvent = {
             name: emitterTaskEndEvtName,
             id: startEvent.id,
             data: { result: ":)" },
@@ -148,7 +148,7 @@ describe("Task", () => {
         on(parameterizedTaskEndEvtName, eventCallback);
         const params = { param0: "a param", param1: 42 };
         await parameterizedTask.run(params, startEvent);
-        const parameterizedTaskEvt: PlatformEvent = {
+        const parameterizedTaskEvt: DispatchableEvent = {
             name: parameterizedTaskEndEvtName,
             id: startEvent.id,
             data: { params },
@@ -159,7 +159,7 @@ describe("Task", () => {
     it("can use invocation event data", async () => {
         on(eventualTaskEndEvtName, eventCallback);
         await eventualTask.run({}, startEvent);
-        const eventualTaskEvt: PlatformEvent = {
+        const eventualTaskEvt: DispatchableEvent = {
             name: eventualTaskEndEvtName,
             id: startEvent.id,
             data: { eventData },

@@ -4,7 +4,7 @@ import {
   EventData as NSEventData,
 } from "tns-core-modules/data/observable";
 import { EventCallback } from "./event-receivers";
-import { PlatformEvent } from "./events";
+import { DispatchableEvent } from "./events";
 
 export class InternalEventManager {
   private notificationCenter: Observable;
@@ -43,11 +43,11 @@ export class InternalEventManager {
     this.callbacks.delete(callbackId);
   }
 
-  emit(platformEvent: PlatformEvent) {
+  emit(dispatchableEvent: DispatchableEvent) {
     const internalEventData = {
-      eventName: platformEvent.name,
+      eventName: dispatchableEvent.name,
       object: this.notificationCenter,
-      data: { ...platformEvent },
+      data: { ...dispatchableEvent },
     };
     this.notificationCenter.notify<InternalEventData>(internalEventData);
   }
@@ -60,7 +60,7 @@ export class InternalEventManager {
 type CallbackId = [string, number];
 
 interface InternalEventData extends NSEventData {
-  data: PlatformEvent;
+  data: DispatchableEvent;
 }
 
 type InternalEventCallback = (eventData: InternalEventData) => void;

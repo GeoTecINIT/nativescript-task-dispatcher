@@ -1,4 +1,8 @@
-import { EventReceiver, PlatformEvent, CoreEvent } from "../../events";
+import {
+  EventReceiver,
+  DispatchableEvent,
+  TaskDispatcherEvent,
+} from "../../events";
 import { RunnableTask } from ".";
 
 import { TimeUnit, toSeconds } from "../../utils/time-converter";
@@ -10,7 +14,7 @@ import { TaskPlanner } from "../planner";
 export interface ReadyRunnableTaskBuilder extends EventReceiver {
   cancelOn(eventName: string): ReadyRunnableTaskBuilder;
   build(): RunnableTask;
-  plan(platformEvent?: PlatformEvent): void;
+  plan(dispatchableEvent?: DispatchableEvent): void;
 }
 
 interface DelayedRunnableTaskBuilder extends ReadyRunnableTaskBuilder {
@@ -33,7 +37,7 @@ export class RunnableTaskBuilder implements ReadyRunnableTaskBuilder {
     this.startAt = -1;
     this.interval = 0;
     this.recurrent = false;
-    this.cancelEvent = CoreEvent.DefaultCancelEvent;
+    this.cancelEvent = TaskDispatcherEvent.DefaultCancelEvent;
 
     this.logger = getLogger("RunnableTaskBuilder");
   }
@@ -86,10 +90,10 @@ export class RunnableTaskBuilder implements ReadyRunnableTaskBuilder {
     };
   }
 
-  plan(platformEvent?: PlatformEvent) {
+  plan(dispatchableEvent?: DispatchableEvent) {
     const runnableTask = this.build();
     this.taskPlanner
-      .plan(runnableTask, platformEvent)
+      .plan(runnableTask, dispatchableEvent)
       .then((plannedTask) => {
         this.logger.info(`Task planned: ${JSON.stringify(plannedTask)}`);
       })
@@ -100,7 +104,7 @@ export class RunnableTaskBuilder implements ReadyRunnableTaskBuilder {
       });
   }
 
-  onReceive(platformEvent: PlatformEvent) {
-    this.plan(platformEvent);
+  onReceive(dispatchableEvent: DispatchableEvent) {
+    this.plan(dispatchableEvent);
   }
 }

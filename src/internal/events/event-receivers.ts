@@ -1,7 +1,7 @@
-import { PlatformEvent } from "./events";
+import { DispatchableEvent } from "./events";
 
-export type EventCallback = (data: PlatformEvent) => void;
+export type EventCallback = (event: DispatchableEvent) => void;
 
 export interface EventReceiver {
-  onReceive(platformEvent: PlatformEvent): void;
+  onReceive(dispatchableEvent: DispatchableEvent): void;
 }

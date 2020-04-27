@@ -7,10 +7,10 @@ import {
 } from "nativescript-task-dispatcher/internal/tasks/planner/planned-task";
 import { BatchTaskRunner } from "nativescript-task-dispatcher/internal/tasks/runners/batch-task-runner";
 import {
-    CoreEvent,
+    TaskDispatcherEvent,
     emit,
     createEvent,
-    PlatformEvent,
+    DispatchableEvent,
 } from "nativescript-task-dispatcher/internal/events";
 
 describe("Batch task runner", () => {
@@ -44,14 +44,14 @@ describe("Batch task runner", () => {
         expectedTimeoutTask,
     ];
 
-    let startEvent: PlatformEvent;
-    let timeoutEvent: PlatformEvent;
+    let startEvent: DispatchableEvent;
+    let timeoutEvent: DispatchableEvent;
 
     const taskRunner = new BatchTaskRunner(taskStore);
 
     beforeEach(() => {
-        startEvent = createEvent(CoreEvent.TaskExecutionStarted);
-        timeoutEvent = createEvent(CoreEvent.TaskExecutionTimedOut, {
+        startEvent = createEvent(TaskDispatcherEvent.TaskExecutionStarted);
+        timeoutEvent = createEvent(TaskDispatcherEvent.TaskExecutionTimedOut, {
             id: startEvent.id,
         });
 

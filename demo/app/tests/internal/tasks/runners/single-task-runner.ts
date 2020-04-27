@@ -7,10 +7,10 @@ import {
 } from "nativescript-task-dispatcher/internal/tasks/planner/planned-task";
 import { SingleTaskRunner } from "nativescript-task-dispatcher/internal/tasks/runners/single-task-runner";
 import {
-    CoreEvent,
+    TaskDispatcherEvent,
     emit,
     createEvent,
-    PlatformEvent,
+    DispatchableEvent,
 } from "nativescript-task-dispatcher/internal/events";
 
 describe("Single task runner", () => {
@@ -55,14 +55,14 @@ describe("Single task runner", () => {
     });
     timeoutTask.timeoutCount = 1;
 
-    let startEvent: PlatformEvent;
-    let timeoutEvent: PlatformEvent;
+    let startEvent: DispatchableEvent;
+    let timeoutEvent: DispatchableEvent;
 
     const taskRunner = new SingleTaskRunner(taskStore);
 
     beforeEach(() => {
-        startEvent = createEvent(CoreEvent.TaskExecutionStarted);
-        timeoutEvent = createEvent(CoreEvent.TaskExecutionTimedOut, {
+        startEvent = createEvent(TaskDispatcherEvent.TaskExecutionStarted);
+        timeoutEvent = createEvent(TaskDispatcherEvent.TaskExecutionTimedOut, {
             id: startEvent.id,
         });
 

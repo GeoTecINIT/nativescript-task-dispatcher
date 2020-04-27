@@ -1,7 +1,7 @@
 import {
-  PlatformEvent,
+  DispatchableEvent,
   createEvent,
-  CoreEvent,
+  TaskDispatcherEvent,
   emit,
   hasListeners,
 } from "../events";
@@ -12,7 +12,7 @@ export abstract class Task {
     return this._name;
   }
   protected taskParams: TaskParams;
-  protected invocationEvent: PlatformEvent;
+  protected invocationEvent: DispatchableEvent;
 
   private _name: string;
   private _executionHistory: Set<string>;
@@ -41,7 +41,7 @@ export abstract class Task {
    */
   async run(
     taskParams: TaskParams,
-    invocationEvent: PlatformEvent
+    invocationEvent: DispatchableEvent
   ): Promise<void> {
     this.taskParams = taskParams;
     this.invocationEvent = invocationEvent;
@@ -135,7 +135,8 @@ export abstract class Task {
 
   /**
    * Meant to be used by the task itself. Task result must be emitted through here.
-   * @param platformEvent The event containing the result of the task
+   * @param eventName The event to be emitted as a done signal
+   * @param data Optional data that comes along with the event
    */
   protected done(eventName: string, data: { [key: string]: any } = {}) {
     if (this.isDone()) {
@@ -173,7 +174,7 @@ export abstract class Task {
     if (err) {
       result.reason = err;
     }
-    const endEvent = createEvent(CoreEvent.TaskChainFinished, {
+    const endEvent = createEvent(TaskDispatcherEvent.TaskChainFinished, {
       id: this.invocationEvent.id,
       data: {
         result,

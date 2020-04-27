@@ -4,7 +4,7 @@ import {
     on,
     emit,
     off,
-    PlatformEvent,
+    DispatchableEvent,
     EventCallback,
 } from "nativescript-task-dispatcher/internal/events";
 import { uuid } from "nativescript-task-dispatcher/internal/utils/uuid";
@@ -21,9 +21,9 @@ describe("Event-based task runner", () => {
 
     let eventCallback: EventCallback;
 
-    let startEvent: PlatformEvent;
-    let stopEvent: PlatformEvent;
-    let expectedEvent: PlatformEvent;
+    let startEvent: DispatchableEvent;
+    let stopEvent: DispatchableEvent;
+    let expectedEvent: DispatchableEvent;
 
     beforeEach(() => {
         taskGraph = new TaskGraphLoader();

@@ -1,10 +1,10 @@
 import { InternalEventManager } from "./internal-event-manager";
-import { PlatformEvent } from "./events";
+import { DispatchableEvent } from "./events";
 import { EventCallback, EventReceiver } from "./event-receivers";
 
 const internalEventManager = new InternalEventManager();
 
-export { CoreEvent, PlatformEvent, createEvent } from "./events";
+export { TaskDispatcherEvent, DispatchableEvent, createEvent } from "./events";
 export { EventCallback, EventReceiver } from "./event-receivers";
 
 export function on(
@@ -27,8 +27,8 @@ export function off(eventName: string, listenerId?: number) {
   }
 }
 
-export function emit(platformEvent: PlatformEvent) {
-  internalEventManager.emit(platformEvent);
+export function emit(dispatchableEvent: DispatchableEvent) {
+  internalEventManager.emit(dispatchableEvent);
 }
 
 export function hasListeners(eventName: string): boolean {

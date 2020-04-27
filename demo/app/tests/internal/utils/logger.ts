@@ -7,7 +7,7 @@ import { DevLogger } from "nativescript-task-dispatcher/internal/utils/logger/de
 import { ProdLogger } from "nativescript-task-dispatcher/internal/utils/logger/prod";
 
 describe("Get logger", () => {
-    it("returns a development logger when loging is enabled", () => {
+    it("returns a development logger when logging is enabled", () => {
         enableLogging();
         const logger = getLogger("SomeTag");
         expect(logger instanceof DevLogger).toBeTruthy();

@@ -1,13 +1,13 @@
 import { uuid } from "../utils/uuid";
 
-export enum CoreEvent {
+export enum TaskDispatcherEvent {
   TaskExecutionStarted = "taskExecutionStarted",
   TaskExecutionTimedOut = "taskExecutionTimedOut",
   TaskChainFinished = "taskChainFinished",
   DefaultCancelEvent = "defaultCancelEvent",
 }
 
-export interface PlatformEvent {
+export interface DispatchableEvent {
   name: string;
   id: string;
   data: EventData;
@@ -20,7 +20,7 @@ interface EventData {
 export function createEvent(
   name: string,
   params: CreateEventParams = {}
-): PlatformEvent {
+): DispatchableEvent {
   const id = params.id ? params.id : uuid();
   const data = params.data ? params.data : {};
 

@@ -10,7 +10,7 @@ import {
     ReadyRunnableTaskBuilder,
 } from "nativescript-task-dispatcher/internal/tasks/runnable-task/builder";
 import {
-    CoreEvent,
+    TaskDispatcherEvent,
     emit,
     createEvent,
 } from "nativescript-task-dispatcher/internal/events";
@@ -126,7 +126,7 @@ describe("Task tree loader", () => {
 
     it("unbinds tasks from its start event when default cancel event gets emitted", async () => {
         await graphLoader.load(taskTree);
-        emit(createEvent(CoreEvent.DefaultCancelEvent));
+        emit(createEvent(TaskDispatcherEvent.DefaultCancelEvent));
         expect(eventListenerDestroyer).toHaveBeenCalledWith(
             "dataAcquired",
             listenerIds.printAcquiredData

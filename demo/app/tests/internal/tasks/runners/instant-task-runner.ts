@@ -8,8 +8,8 @@ import { InstantTaskRunner } from "nativescript-task-dispatcher/internal/tasks/r
 import { RunnableTask } from "nativescript-task-dispatcher/internal/tasks/runnable-task";
 import {
     createEvent,
-    CoreEvent,
-    PlatformEvent,
+    TaskDispatcherEvent,
+    DispatchableEvent,
     EventCallback,
     on,
     emit,
@@ -24,8 +24,8 @@ describe("Instant task planner", () => {
     const taskStore = createPlannedTaskStoreMock();
     const taskRunner = new InstantTaskRunner(taskStore);
 
-    let startEvent: PlatformEvent;
-    let expectedEvent: PlatformEvent;
+    let startEvent: DispatchableEvent;
+    let expectedEvent: DispatchableEvent;
 
     const immediateTask: RunnableTask = {
         name: "emitterTask",
@@ -41,7 +41,7 @@ describe("Instant task planner", () => {
 
     let eventCallback: EventCallback;
     beforeEach(() => {
-        startEvent = createEvent(CoreEvent.TaskExecutionStarted);
+        startEvent = createEvent(TaskDispatcherEvent.TaskExecutionStarted);
         expectedEvent = createEvent("patataCooked", {
             id: startEvent.id,
             data: { status: "slightlyBaked" },
@@ -68,7 +68,11 @@ describe("Instant task planner", () => {
         spyOn(taskStore, "get").and.returnValue(Promise.resolve(null));
 
         on(expectedEvent.name, (evt) => {
-            emit(createEvent(CoreEvent.TaskChainFinished, { id: evt.id }));
+            emit(
+                createEvent(TaskDispatcherEvent.TaskChainFinished, {
+                    id: evt.id,
+                })
+            );
             eventCallback(evt);
         });
         await taskRunner.run(immediateTask, startEvent);
@@ -85,7 +89,11 @@ describe("Instant task planner", () => {
         );
 
         on(expectedEvent.name, (evt) => {
-            emit(createEvent(CoreEvent.TaskChainFinished, { id: evt.id }));
+            emit(
+                createEvent(TaskDispatcherEvent.TaskChainFinished, {
+                    id: evt.id,
+                })
+            );
             eventCallback(evt);
         });
         await taskRunner.run(immediateTask, startEvent);

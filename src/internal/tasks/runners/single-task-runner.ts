@@ -2,7 +2,7 @@ import { PlannedTasksStore } from "../../persistence/planned-tasks-store";
 import { PlannedTask } from "../planner/planned-task";
 import { getTask } from "../provider";
 import { Task, TaskParams } from "../task";
-import { PlatformEvent, on, CoreEvent, off } from "../../events";
+import { DispatchableEvent, on, TaskDispatcherEvent, off } from "../../events";
 import { Logger, getLogger } from "../../utils/logger";
 
 const FAILURE_THRESHOLD = 3;
@@ -16,7 +16,7 @@ export class SingleTaskRunner {
 
   async run(
     plannedTask: PlannedTask,
-    startEvent: PlatformEvent
+    startEvent: DispatchableEvent
   ): Promise<void> {
     const { name, id, params } = plannedTask;
     const task = getTask(name);
@@ -41,13 +41,16 @@ export class SingleTaskRunner {
     startEventId: string
   ): Promise<void> {
     return new Promise((resolve, reject) => {
-      const listenerId = on(CoreEvent.TaskExecutionTimedOut, (evt) => {
-        if (evt.id === startEventId) {
-          off(CoreEvent.TaskExecutionTimedOut, listenerId);
-          task.cancel();
-          this.taskStore.increaseTimeoutCount(id).then(() => resolve());
+      const listenerId = on(
+        TaskDispatcherEvent.TaskExecutionTimedOut,
+        (evt) => {
+          if (evt.id === startEventId) {
+            off(TaskDispatcherEvent.TaskExecutionTimedOut, listenerId);
+            task.cancel();
+            this.taskStore.increaseTimeoutCount(id).then(() => resolve());
+          }
         }
-      });
+      );
 
       let taskAlreadyRun = false;
       let taskChainFinished = false;
@@ -62,13 +65,13 @@ export class SingleTaskRunner {
         .run()
         .then(() => {
           taskAlreadyRun = true;
-          off(CoreEvent.TaskExecutionTimedOut, listenerId);
+          off(TaskDispatcherEvent.TaskExecutionTimedOut, listenerId);
           if (taskChainFinished) {
             resolve();
           }
         })
         .catch((err) => {
-          off(CoreEvent.TaskExecutionTimedOut, listenerId);
+          off(TaskDispatcherEvent.TaskExecutionTimedOut, listenerId);
           reject(err);
         });
     });
@@ -76,12 +79,15 @@ export class SingleTaskRunner {
 
   private waitForTaskChainToFinish(startEventId: string): Promise<void> {
     return new Promise((resolve) => {
-      const listenerId = on(CoreEvent.TaskChainFinished, (chainFinishedEvt) => {
-        if (chainFinishedEvt.id === startEventId) {
-          off(CoreEvent.TaskChainFinished, listenerId);
-          resolve();
+      const listenerId = on(
+        TaskDispatcherEvent.TaskChainFinished,
+        (chainFinishedEvt) => {
+          if (chainFinishedEvt.id === startEventId) {
+            off(TaskDispatcherEvent.TaskChainFinished, listenerId);
+            resolve();
+          }
         }
-      });
+      );
     });
   }
 
@@ -107,7 +113,7 @@ class ParameterizedTask {
   constructor(
     private task: Task,
     private taskParams: TaskParams,
-    private startEvent: PlatformEvent
+    private startEvent: DispatchableEvent
   ) {}
 
   run(): Promise<void> {

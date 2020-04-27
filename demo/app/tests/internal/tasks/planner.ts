@@ -3,8 +3,8 @@ import { TaskScheduler } from "nativescript-task-dispatcher/internal/tasks/sched
 import { RunnableTask } from "nativescript-task-dispatcher/internal/tasks/runnable-task";
 import { RunnableTaskBuilder } from "nativescript-task-dispatcher/internal/tasks/runnable-task/builder";
 import {
-    PlatformEvent,
-    CoreEvent,
+    DispatchableEvent,
+    TaskDispatcherEvent,
     EventCallback,
     on,
     createEvent,
@@ -31,7 +31,7 @@ describe("Task planner", () => {
         cancelManager
     );
 
-    const dummyEvent: PlatformEvent = {
+    const dummyEvent: DispatchableEvent = {
         name: "dummyEvent",
         id: "unknown",
         data: {},
@@ -78,7 +78,7 @@ describe("Task planner", () => {
     });
 
     it("schedules a recurrent task in time", async () => {
-        on(CoreEvent.TaskChainFinished, dummyCallback);
+        on(TaskDispatcherEvent.TaskChainFinished, dummyCallback);
         await taskPlanner.plan(recurrentTask, dummyEvent);
         expect(taskScheduler.schedule).toHaveBeenCalledWith(recurrentTask);
         expect(dummyCallback).toHaveBeenCalled();
@@ -86,14 +86,14 @@ describe("Task planner", () => {
     });
 
     it("schedules a one-shot task in time", async () => {
-        on(CoreEvent.TaskChainFinished, dummyCallback);
+        on(TaskDispatcherEvent.TaskChainFinished, dummyCallback);
         await taskPlanner.plan(oneShotTask, dummyEvent);
         expect(taskScheduler.schedule).toHaveBeenCalledWith(oneShotTask);
         expect(dummyCallback).toHaveBeenCalled();
     });
 
     it("schedules a delayed task in time", async () => {
-        on(CoreEvent.TaskChainFinished, dummyCallback);
+        on(TaskDispatcherEvent.TaskChainFinished, dummyCallback);
         await taskPlanner.plan(delayedTask, dummyEvent);
         expect(taskScheduler.schedule).toHaveBeenCalledWith(delayedTask);
         expect(dummyCallback).toHaveBeenCalled();
@@ -107,7 +107,7 @@ describe("Task planner", () => {
             recurrent: false,
             params: {},
         };
-        const errorEvent = createEvent(CoreEvent.TaskChainFinished, {
+        const errorEvent = createEvent(TaskDispatcherEvent.TaskChainFinished, {
             id: dummyEvent.id,
             data: {
                 result: {
@@ -116,7 +116,7 @@ describe("Task planner", () => {
                 },
             },
         });
-        on(CoreEvent.TaskChainFinished, dummyCallback);
+        on(TaskDispatcherEvent.TaskChainFinished, dummyCallback);
         await expectAsync(
             taskPlanner.plan(unknownTask, dummyEvent)
         ).toBeRejectedWith(new TaskNotFoundError(unknownTask.name));
@@ -146,7 +146,7 @@ describe("Task planner", () => {
     });
 
     afterEach(() => {
-        off(CoreEvent.TaskChainFinished);
+        off(TaskDispatcherEvent.TaskChainFinished);
     });
 });
 
@@ -165,7 +165,7 @@ function createTaskRunnerMock(): TaskRunner {
     return {
         run(
             task: RunnableTask,
-            platformEvent: PlatformEvent
+            dispatchableEvent: DispatchableEvent
         ): Promise<PlannedTask> {
             return Promise.resolve(null);
         },

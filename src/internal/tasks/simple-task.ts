@@ -1,5 +1,5 @@
 import { Task, TaskConfig, TaskParams, CancelFunction } from "./task";
-import { PlatformEvent } from "../events";
+import { DispatchableEvent } from "../events";
 
 type SimpleTaskFunction = (ctx: SimpleTaskContext) => Promise<void>;
 
@@ -37,7 +37,7 @@ export class SimpleTask extends Task {
 
 interface SimpleTaskContext {
   params: TaskParams;
-  evt: PlatformEvent;
+  evt: DispatchableEvent;
   done(eventName: string, data: { [key: string]: any }): void;
   onCancel(cancelFunction: CancelFunction): void;
   runAgainIn(seconds: number, params?: TaskParams): void;

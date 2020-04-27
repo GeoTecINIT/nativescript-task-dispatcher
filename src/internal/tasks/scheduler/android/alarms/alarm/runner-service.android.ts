@@ -9,8 +9,8 @@ import {
 } from "../../../../../persistence/planned-tasks-store";
 import { BatchTaskRunner } from "../../../../runners/batch-task-runner";
 import {
-  PlatformEvent,
-  CoreEvent,
+  DispatchableEvent,
+  TaskDispatcherEvent,
   emit,
   createEvent,
 } from "../../../../../events";
@@ -154,13 +154,16 @@ export class AlarmRunnerService
     );
   }
 
-  private initializeExecutionWindow(timeout: number): PlatformEvent {
+  private initializeExecutionWindow(timeout: number): DispatchableEvent {
     this.wakeLock.acquire(timeout);
-    const startEvent = createEvent(CoreEvent.TaskExecutionStarted);
+    const startEvent = createEvent(TaskDispatcherEvent.TaskExecutionStarted);
     const { id } = startEvent;
-    const timeoutEvent = createEvent(CoreEvent.TaskExecutionTimedOut, {
-      id,
-    });
+    const timeoutEvent = createEvent(
+      TaskDispatcherEvent.TaskExecutionTimedOut,
+      {
+        id,
+      }
+    );
     const executionTimeout = timeout - TIMEOUT_EVENT_OFFSET;
     this.logger.info(
       `Execution will timeout in ${executionTimeout}, for tasks running with execution id: ${id}`

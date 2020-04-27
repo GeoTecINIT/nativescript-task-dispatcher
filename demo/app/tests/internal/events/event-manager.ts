@@ -3,7 +3,7 @@ import { EventCallback } from "nativescript-task-dispatcher/internal/events";
 
 describe("Event manager", () => {
     const eventName = "dummyEvent";
-    const platformEvent = {
+    const dispatchableEvent = {
         name: eventName,
         id: "uniqueEventId",
         data: { param: "patata" },
@@ -24,33 +24,33 @@ describe("Event manager", () => {
 
     it("allows to register an event subscription", () => {
         const listenerId = internalEventManager.on(eventName, dummyCallback);
-        internalEventManager.emit(platformEvent);
-        expect(dummyCallback).toHaveBeenCalledWith(platformEvent);
+        internalEventManager.emit(dispatchableEvent);
+        expect(dummyCallback).toHaveBeenCalledWith(dispatchableEvent);
         expect(listenerId).toEqual(jasmine.any(Number));
     });
 
     it("allows to unregister an event subscription", () => {
         const listenerId = internalEventManager.on(eventName, dummyCallback);
         internalEventManager.off(eventName, listenerId);
-        internalEventManager.emit(platformEvent);
+        internalEventManager.emit(dispatchableEvent);
         expect(dummyCallback).not.toHaveBeenCalled();
     });
 
     it("allows to register multiple event subscriptions", () => {
         internalEventManager.on(eventName, dummyCallback);
         internalEventManager.on(eventName, anotherDummyCallback);
-        internalEventManager.emit(platformEvent);
-        expect(dummyCallback).toHaveBeenCalledWith(platformEvent);
-        expect(anotherDummyCallback).toHaveBeenCalledWith(platformEvent);
+        internalEventManager.emit(dispatchableEvent);
+        expect(dummyCallback).toHaveBeenCalledWith(dispatchableEvent);
+        expect(anotherDummyCallback).toHaveBeenCalledWith(dispatchableEvent);
     });
 
     it("allows to unregister one of the event subscriptions", () => {
         const listenerId = internalEventManager.on(eventName, dummyCallback);
         internalEventManager.on(eventName, anotherDummyCallback);
         internalEventManager.off(eventName, listenerId);
-        internalEventManager.emit(platformEvent);
+        internalEventManager.emit(dispatchableEvent);
         expect(dummyCallback).not.toHaveBeenCalled();
-        expect(anotherDummyCallback).toHaveBeenCalledWith(platformEvent);
+        expect(anotherDummyCallback).toHaveBeenCalledWith(dispatchableEvent);
     });
 
     it("allows to check if an unlistened event has listeners", () => {

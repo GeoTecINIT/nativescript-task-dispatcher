@@ -1,5 +1,10 @@
 import { RunnableTask } from "../runnable-task";
-import { PlatformEvent, emit, CoreEvent, createEvent } from "../../events";
+import {
+  DispatchableEvent,
+  emit,
+  TaskDispatcherEvent,
+  createEvent,
+} from "../../events";
 import { PlannedTask } from "./planned-task";
 import { TaskScheduler, taskScheduler as getTaskScheduler } from "../scheduler";
 import {
@@ -21,29 +26,32 @@ export class TaskPlanner {
 
   async plan(
     runnableTask: RunnableTask,
-    platformEvent?: PlatformEvent
+    dispatchableEvent?: DispatchableEvent
   ): Promise<PlannedTask> {
     try {
       checkIfTaskExists(runnableTask.name);
 
       const plannedTask = await (runnableTask.interval > 0 ||
       runnableTask.startAt !== -1
-        ? this.planScheduled(runnableTask, platformEvent)
-        : this.planImmediate(runnableTask, platformEvent));
+        ? this.planScheduled(runnableTask, dispatchableEvent)
+        : this.planImmediate(runnableTask, dispatchableEvent));
 
       return plannedTask;
     } catch (err) {
-      this.emitTaskChainFinished(platformEvent, err);
+      this.emitTaskChainFinished(dispatchableEvent, err);
       throw err;
     }
   }
 
   private async planImmediate(
     runnableTask: RunnableTask,
-    platformEvent: PlatformEvent
+    dispatchableEvent: DispatchableEvent
   ): Promise<PlannedTask> {
     const existedBefore = await this.taskStore.get(runnableTask);
-    const plannedTask = await this.taskRunner.run(runnableTask, platformEvent);
+    const plannedTask = await this.taskRunner.run(
+      runnableTask,
+      dispatchableEvent
+    );
     if (!existedBefore) {
       this.cancelManager.add(plannedTask);
     }
@@ -53,24 +61,27 @@ export class TaskPlanner {
 
   private async planScheduled(
     runnableTask: RunnableTask,
-    platformEvent: PlatformEvent
+    dispatchableEvent: DispatchableEvent
   ): Promise<PlannedTask> {
     const possibleExisting = await this.taskStore.get(runnableTask);
     if (possibleExisting) {
-      this.emitTaskChainFinished(platformEvent);
+      this.emitTaskChainFinished(dispatchableEvent);
 
       return possibleExisting;
     }
 
     const plannedTask = await this.getTaskScheduler().schedule(runnableTask);
-    this.emitTaskChainFinished(platformEvent);
+    this.emitTaskChainFinished(dispatchableEvent);
     this.cancelManager.add(plannedTask);
 
     return plannedTask;
   }
 
-  private emitTaskChainFinished(platformEvent?: PlatformEvent, error?: Error) {
-    if (!platformEvent) {
+  private emitTaskChainFinished(
+    dispatchableEvent?: DispatchableEvent,
+    error?: Error
+  ) {
+    if (!dispatchableEvent) {
       return;
     }
     let result: TaskChainResult = { status: TaskResultStatus.Ok };
@@ -78,8 +89,8 @@ export class TaskPlanner {
       result = { status: TaskResultStatus.Error, reason: error };
     }
     emit(
-      createEvent(CoreEvent.TaskChainFinished, {
-        id: platformEvent.id,
+      createEvent(TaskDispatcherEvent.TaskChainFinished, {
+        id: dispatchableEvent.id,
         data: { result },
       })
     );
