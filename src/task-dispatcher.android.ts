@@ -5,13 +5,13 @@ import { Common } from "./task-dispatcher.common";
 import { Task } from "./internal/tasks/task";
 import { TaskGraph } from "./internal/tasks/graph";
 
-import { BootReceiver } from "./internal/android/boot-receiver.android";
+import { BootReceiver } from "./internal/tasks/scheduler/android/boot-receiver.android";
 import { AlarmReceiver } from "./internal/tasks/scheduler/android/alarms/alarm/receiver.android";
 import { AlarmRunnerService } from "./internal/tasks/scheduler/android/alarms/alarm/runner-service.android";
 import { WatchdogReceiver } from "./internal/tasks/scheduler/android/alarms/watchdog/receiver.android";
 import { setTaskSchedulerCreator } from "./internal/tasks/scheduler/common";
 import { AndroidTaskScheduler } from "./internal/tasks/scheduler/android";
-import { setupNotificationChannels } from "./internal/android/notification-manager.android";
+import { setupNotificationChannels } from "./internal/tasks/scheduler/android/notification-manager.android";
 import { AndroidAlarmScheduler } from "./internal/tasks/scheduler/android/alarms/alarm/scheduler.android";
 
 class TaskDispatcher extends Common {

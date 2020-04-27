@@ -1,5 +1,5 @@
 import { android as androidApp } from "tns-core-modules/application/application";
-import { createAlarmReceiverIntent } from "../../../../../android/intents.android";
+import { createAlarmReceiverIntent } from "../../intents.android";
 import { AbstractAlarmManager } from "../abstract-alarm-manager.android";
 import { PowerSavingsManager } from "../power-savings-manager.android";
 import { getLogger } from "../../../../../utils/logger";

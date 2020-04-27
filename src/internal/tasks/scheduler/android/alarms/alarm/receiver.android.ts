@@ -2,7 +2,7 @@ import { TaskManager } from "../../../../manager";
 import { AlarmManager } from "../abstract-alarm-manager.android";
 import { AndroidAlarmManager } from "./manager.android";
 import { plannedTasksDB } from "../../../../../persistence/planned-tasks-store";
-import { createAlarmRunnerServiceIntent } from "../../../../../android/intents.android";
+import { createAlarmRunnerServiceIntent } from "../../intents.android";
 import { PlanningType } from "../../../../planner/planned-task";
 import { Logger, getLogger } from "../../../../../utils/logger";
 

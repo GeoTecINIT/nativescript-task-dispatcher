@@ -1,5 +1,5 @@
 import { android as androidApp } from "tns-core-modules/application/application";
-import { createSavingsDeactivationIntent } from "../../../../android/intents.android";
+import { createSavingsDeactivationIntent } from "../intents.android";
 import { Logger, getLogger } from "../../../../utils/logger";
 
 export class PowerSavingsManager {
