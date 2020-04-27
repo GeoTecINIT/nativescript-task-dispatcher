@@ -3,7 +3,7 @@ import { nSQL } from "@nano-sql/core/lib/index";
 import { PlannedTask, PlanningType } from "../tasks/planner/planned-task";
 import { RunnableTask } from "../tasks/runnable-task";
 
-const DB_NAME = "symptoms-mobile";
+const DB_NAME = "tasks-dispatcher";
 const PLANNED_TASKS_TABLE = "plannedTasks";
 
 class PlannedTaskDBStore implements PlannedTasksStore {

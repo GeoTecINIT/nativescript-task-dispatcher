@@ -10,7 +10,7 @@ import {
 import { uuid } from "nativescript-task-dispatcher/internal/utils/uuid";
 import { TaskGraphLoader } from "nativescript-task-dispatcher/internal/tasks/graph/loader";
 import {
-    TaskEventBinder,
+    EventListenerGenerator,
     RunnableTaskDescriptor,
 } from "nativescript-task-dispatcher/internal/tasks/graph";
 
@@ -85,7 +85,7 @@ describe("Event-based task runner", () => {
 });
 
 const testTaskGraph = {
-    async describe(onEvt: TaskEventBinder, run: RunnableTaskDescriptor) {
+    async describe(onEvt: EventListenerGenerator, run: RunnableTaskDescriptor) {
         onEvt("startEvent", run("emitterTask").now().cancelOn("stopEvent"));
     },
 };

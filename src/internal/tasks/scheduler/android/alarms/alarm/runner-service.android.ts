@@ -231,7 +231,7 @@ export class AlarmRunnerService
 function alarmRunnerWakeLock(
   context: android.content.Context
 ): android.os.PowerManager.WakeLock {
-  const wakeLockName = "Symptoms::AlarmRunnerWakeLock";
+  const wakeLockName = "TaskDispatcher::AlarmRunnerWakeLock";
   const powerManager = context.getSystemService(
     android.content.Context.POWER_SERVICE
   ) as android.os.PowerManager;
