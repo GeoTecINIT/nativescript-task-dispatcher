@@ -1,9 +1,9 @@
 import { android as androidApp } from "tns-core-modules/application/application";
 
-import { Common } from "./task-dispatcher.common";
+import { Common, ConfigParams } from "./task-dispatcher.common";
 
-import { Task } from "./internal/tasks/task";
-import { TaskGraph } from "./internal/tasks/graph";
+import { Task } from "./tasks";
+import { TaskGraph } from "./tasks/graph";
 
 import { BootReceiver } from "./internal/tasks/scheduler/android/boot-receiver.android";
 import { AlarmReceiver } from "./internal/tasks/scheduler/android/alarms/alarm/receiver.android";
@@ -15,10 +15,14 @@ import { setupNotificationChannels } from "./internal/tasks/scheduler/android/no
 import { AndroidAlarmScheduler } from "./internal/tasks/scheduler/android/alarms/alarm/scheduler.android";
 
 class TaskDispatcher extends Common {
-  public init(appTasks: Array<Task>, appTaskGraph: TaskGraph): Promise<void> {
+  public init(
+    appTasks: Array<Task>,
+    appTaskGraph: TaskGraph,
+    config?: ConfigParams
+  ): Promise<void> {
     this.wireUpNativeComponents();
     setTaskSchedulerCreator(() => getAndroidTaskScheduler());
-    return super.init(appTasks, appTaskGraph);
+    return super.init(appTasks, appTaskGraph, config);
   }
 
   public isReady() {

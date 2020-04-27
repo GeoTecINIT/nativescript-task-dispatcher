@@ -1,12 +1,12 @@
 import {
     TaskGraph,
-    TaskEventBinder,
+    EventListenerGenerator,
     RunnableTaskDescriptor,
-} from "nativescript-task-dispatcher/internal/tasks/graph";
+} from "nativescript-task-dispatcher/tasks/graph";
 
 class DemoTaskGraph implements TaskGraph {
     async describe(
-        on: TaskEventBinder,
+        on: EventListenerGenerator,
         run: RunnableTaskDescriptor
     ): Promise<void> {
         on(

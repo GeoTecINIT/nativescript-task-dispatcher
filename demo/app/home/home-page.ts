@@ -1,8 +1,5 @@
 import { taskDispatcher } from "nativescript-task-dispatcher";
-import {
-    emit,
-    createEvent,
-} from "nativescript-task-dispatcher/internal/events";
+import { emit, createEvent } from "nativescript-task-dispatcher/events";
 
 /*
 In NativeScript, a file with the same name as an XML file is known as

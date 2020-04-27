@@ -1,6 +1,5 @@
-import { SimpleTask } from "nativescript-task-dispatcher/internal/tasks/simple-task";
-import { toSeconds } from "nativescript-task-dispatcher/internal/utils/time-converter";
-import { Task } from "nativescript-task-dispatcher/internal/tasks/task";
+import { Task, SimpleTask } from "nativescript-task-dispatcher/tasks";
+import { toSeconds } from "nativescript-task-dispatcher/utils/time-converter";
 
 export const appTasks: Array<Task> = [
     new SimpleTask("fastTask", async ({ log }) => log("Fast task run!")),

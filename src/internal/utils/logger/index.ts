@@ -11,7 +11,9 @@ function createLogger(tag: string): Logger {
   return new ProdLogger(tag);
 }
 
-let loggerCreator = createLogger;
+export type LoggerCreator = (tag: string) => Logger;
+
+let loggerCreator: LoggerCreator = createLogger;
 
 export function enableLogging() {
   loggingEnabled = true;
@@ -21,7 +23,7 @@ export function disableLogging() {
   loggingEnabled = false;
 }
 
-export function setLoggerCreator(creator: (tag: string) => Logger) {
+export function setLoggerCreator(creator: LoggerCreator) {
   loggerCreator = creator;
 }
 

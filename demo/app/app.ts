@@ -3,7 +3,7 @@ import { taskDispatcher } from "nativescript-task-dispatcher";
 import { appTasks } from "./tasks";
 import { demoTaskGraph } from "./tasks/graph";
 
-taskDispatcher.init(appTasks, demoTaskGraph);
+taskDispatcher.init(appTasks, demoTaskGraph, { enableLogging: true });
 
 app.run({ moduleName: "app-root" });
 

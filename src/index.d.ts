@@ -1,8 +1,12 @@
-import { Common } from "./task-dispatcher.common";
-import { Task } from "./internal/tasks/task";
-import { TaskGraph } from "./internal/tasks/graph";
+import { Common, ConfigParams } from "./task-dispatcher.common";
+import { Task } from "./tasks";
+import { TaskGraph } from "./tasks/graph";
 declare class TaskDispatcher extends Common {
-  init(appTasks: Array<Task>, appTaskGraph: TaskGraph): Promise<void>;
+  init(
+    appTasks: Array<Task>,
+    appTaskGraph: TaskGraph,
+    config?: ConfigParams
+  ): Promise<void>;
   isReady(): Promise<boolean>;
   prepare(): Promise<void>;
 }
