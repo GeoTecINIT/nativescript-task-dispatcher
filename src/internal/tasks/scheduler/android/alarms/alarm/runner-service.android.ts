@@ -121,11 +121,8 @@ export class AlarmRunnerService
       return;
     }
     this.nativeService.startForeground(
-      AndroidNotification.LocationTracking,
-      createNotification(
-        this.nativeService,
-        AndroidNotification.LocationTracking
-      )
+      AndroidNotification.LocationUsage,
+      createNotification(this.nativeService, AndroidNotification.LocationUsage)
     );
     this.inForeground = true;
     this.logger.debug("Running in foreground");

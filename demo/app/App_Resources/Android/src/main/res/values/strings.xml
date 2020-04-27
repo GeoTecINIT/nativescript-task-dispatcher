@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">demo</string>
+    <string name="title_activity_kimera">demo</string>
+    <string name="task_dispatcher_location_usage_channel_name">Background location</string>
+    <string name="task_dispatcher_location_usage_channel_description">Indicates when the app is accessing your location in background</string>
+    <string name="task_dispatcher_location_usage_notification_title">demo is using your location</string>
+    <string name="task_dispatcher_location_usage_notification_content"></string>
+</resources>

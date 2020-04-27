@@ -1,23 +1,29 @@
+import { ad } from "tns-core-modules/utils/utils";
+
 import { createAppLaunchIntent } from "./intents.android";
 
 // Member numbers are notification unique ids, only the first one is needed
 export enum AndroidNotification {
-  LocationTracking = 1000,
+  LocationUsage = 1000,
 }
 
 let _notificationChannels: Map<AndroidNotification, NotificationChannel>;
-function notificationChannels(): Map<AndroidNotification, NotificationChannel> {
+function notificationChannels(
+  context: android.content.Context
+): Map<AndroidNotification, NotificationChannel> {
   if (!_notificationChannels) {
+    const getString = createStringFetcher(context);
     const NotificationManagerCompat =
       androidx.core.app.NotificationManagerCompat;
     _notificationChannels = new Map([
       [
-        AndroidNotification.LocationTracking,
+        AndroidNotification.LocationUsage,
         {
-          id: "LOCATION_TRACKING",
-          name: "Background location",
-          description:
-            "Indicates when the app is accessing your location in background",
+          id: "LOCATION_USAGE",
+          name: getString("task_dispatcher_location_usage_channel_name"),
+          description: getString(
+            "task_dispatcher_location_usage_channel_description"
+          ),
           priority: NotificationManagerCompat.IMPORTANCE_LOW,
         },
       ],
@@ -32,7 +38,7 @@ export function setupNotificationChannels(context: android.content.Context) {
   if (sdkInt < 26) {
     return;
   }
-  for (const channel of notificationChannels().values()) {
+  for (const channel of notificationChannels(context).values()) {
     setupNotificationChannel(context, channel);
   }
 }
@@ -43,7 +49,7 @@ export function createNotification(
 ): android.app.Notification {
   let notificationBuilder: androidx.core.app.NotificationCompat.Builder;
   switch (type) {
-    case AndroidNotification.LocationTracking:
+    case AndroidNotification.LocationUsage:
       const appLaunchIntent = createAppLaunchIntent(context);
       const pendingIntent = android.app.PendingIntent.getActivity(
         context,
@@ -54,8 +60,8 @@ export function createNotification(
       notificationBuilder = initializeNotificationBuilder(
         context,
         type,
-        "Demo app is using your location",
-        ""
+        "task_dispatcher_location_usage_notification_title",
+        "task_dispatcher_location_usage_notification_content"
       ).setContentIntent(pendingIntent);
 
       break;
@@ -88,7 +94,7 @@ function initializeNotificationBuilder(
   title: string,
   content: string
 ) {
-  const { id, priority } = notificationChannels().get(type);
+  const { id, priority } = notificationChannels(context).get(type);
   const iconId = context
     .getResources()
     .getIdentifier(
@@ -97,10 +103,11 @@ function initializeNotificationBuilder(
       context.getApplicationInfo().packageName
     );
 
+  const getString = createStringFetcher(context);
   return new androidx.core.app.NotificationCompat.Builder(context, id)
     .setSmallIcon(iconId)
-    .setContentTitle(title)
-    .setContentText(content)
+    .setContentTitle(getString(title))
+    .setContentText(getString(content))
     .setPriority(priority);
 }
 
@@ -109,4 +116,9 @@ interface NotificationChannel {
   name: string;
   description: string;
   priority: number;
+}
+
+function createStringFetcher(context: android.content.Context) {
+  return (key: string) =>
+    context.getResources().getString(ad.resources.getStringId(key));
 }
