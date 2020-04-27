@@ -121,10 +121,10 @@ export class AlarmRunnerService
       return;
     }
     this.nativeService.startForeground(
-      AndroidNotification.BehaviorTracking,
+      AndroidNotification.LocationTracking,
       createNotification(
         this.nativeService,
-        AndroidNotification.BehaviorTracking
+        AndroidNotification.LocationTracking
       )
     );
     this.inForeground = true;

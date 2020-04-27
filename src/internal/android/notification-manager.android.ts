@@ -2,7 +2,7 @@ import { createAppLaunchIntent } from "./intents.android";
 
 // Member numbers are notification unique ids, only the first one is needed
 export enum AndroidNotification {
-  BehaviorTracking = 1000,
+  LocationTracking = 1000,
 }
 
 let _notificationChannels: Map<AndroidNotification, NotificationChannel>;
@@ -12,12 +12,12 @@ function notificationChannels(): Map<AndroidNotification, NotificationChannel> {
       androidx.core.app.NotificationManagerCompat;
     _notificationChannels = new Map([
       [
-        AndroidNotification.BehaviorTracking,
+        AndroidNotification.LocationTracking,
         {
-          id: "BEHAVIOR_TRACKING",
+          id: "LOCATION_TRACKING",
           name: "Background location",
           description:
-            "Indicates when the app is watching your location in background",
+            "Indicates when the app is accessing your location in background",
           priority: NotificationManagerCompat.IMPORTANCE_LOW,
         },
       ],
@@ -43,7 +43,7 @@ export function createNotification(
 ): android.app.Notification {
   let notificationBuilder: androidx.core.app.NotificationCompat.Builder;
   switch (type) {
-    case AndroidNotification.BehaviorTracking:
+    case AndroidNotification.LocationTracking:
       const appLaunchIntent = createAppLaunchIntent(context);
       const pendingIntent = android.app.PendingIntent.getActivity(
         context,
@@ -78,14 +78,6 @@ function setupNotificationChannel(
   const { id, name, description, priority } = channel;
   const ch = new android.app.NotificationChannel(id, name, priority);
   ch.setDescription(description);
-
-  const NotificationManagerCompat = androidx.core.app.NotificationManagerCompat;
-  if (priority === NotificationManagerCompat.IMPORTANCE_HIGH) {
-    ch.enableLights(true);
-    ch.setLightColor(android.graphics.Color.RED);
-    ch.enableVibration(true);
-    ch.setVibrationPattern([100, 200, 300, 400, 500, 400, 300, 200, 400]);
-  }
 
   notificationManager.createNotificationChannel(ch);
 }
