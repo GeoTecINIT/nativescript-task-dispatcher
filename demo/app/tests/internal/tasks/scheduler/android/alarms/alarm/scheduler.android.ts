@@ -3,6 +3,7 @@ import { AndroidAlarmScheduler } from "nativescript-task-dispatcher/internal/tas
 import {
     PlannedTask,
     PlanningType,
+    SchedulerType,
 } from "nativescript-task-dispatcher/internal/tasks/planner/planned-task";
 import { createPlannedTaskStoreMock } from "../../../../../persistence";
 import { RunnableTask } from "nativescript-task-dispatcher/internal/tasks/runnable-task";
@@ -383,7 +384,7 @@ function createAlarmManagerMock(): AlarmManager {
 }
 
 function createPlannedTask(task: RunnableTask) {
-    return new PlannedTask(PlanningType.Scheduled, task);
+    return new PlannedTask(PlanningType.Scheduled, SchedulerType.Alarm, task);
 }
 
 function isLastCallCloseTo(spy: any, num: number, threshold: number): boolean {

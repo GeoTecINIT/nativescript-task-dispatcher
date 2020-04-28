@@ -179,6 +179,7 @@ class PlannedTaskDBStore implements PlannedTasksStore {
             model: {
               "id:uuid": { pk: true },
               "planningType:string": {},
+              "schedulerType:string": {},
               "name:string": {},
               "startAt:int": {},
               "params:obj": {},
@@ -201,6 +202,7 @@ class PlannedTaskDBStore implements PlannedTasksStore {
   private plannedTaskFromRow(obj: any) {
     return new PlannedTask(
       obj.planningType,
+      obj.schedulerType,
       {
         name: obj.name,
         startAt: obj.startAt,

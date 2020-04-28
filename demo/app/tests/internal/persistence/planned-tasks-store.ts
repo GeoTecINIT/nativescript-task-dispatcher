@@ -5,6 +5,7 @@ import {
 import {
     PlannedTask,
     PlanningType,
+    SchedulerType,
 } from "nativescript-task-dispatcher/internal/tasks/planner/planned-task";
 import { RunnableTask } from "nativescript-task-dispatcher/internal/tasks/runnable-task";
 
@@ -45,12 +46,25 @@ describe("Planned Tasks Store", () => {
         cancelEvent: "cancelEvent",
     };
 
-    const plannedTask1 = new PlannedTask(PlanningType.Scheduled, runnableTask1);
-    const plannedTask2 = new PlannedTask(PlanningType.Scheduled, runnableTask2);
-    const plannedTask3 = new PlannedTask(PlanningType.Scheduled, runnableTask3);
+    const plannedTask1 = new PlannedTask(
+        PlanningType.Scheduled,
+        SchedulerType.Alarm,
+        runnableTask1
+    );
+    const plannedTask2 = new PlannedTask(
+        PlanningType.Scheduled,
+        SchedulerType.Alarm,
+        runnableTask2
+    );
+    const plannedTask3 = new PlannedTask(
+        PlanningType.Scheduled,
+        SchedulerType.Alarm,
+        runnableTask3
+    );
 
     const plannedTask4: PlannedTask = new PlannedTask(
         PlanningType.Immediate,
+        SchedulerType.None,
         runnableTask4
     );
 

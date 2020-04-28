@@ -1,6 +1,10 @@
 import { RunnableTask } from "../runnable-task";
 import { DispatchableEvent } from "../../events";
-import { PlannedTask, PlanningType } from "../planner/planned-task";
+import {
+  PlannedTask,
+  PlanningType,
+  SchedulerType,
+} from "../planner/planned-task";
 import { PlannedTasksStore } from "../../persistence/planned-tasks-store";
 import { checkIfTaskExists } from "../provider";
 import { SingleTaskRunner } from "./single-task-runner";
@@ -24,7 +28,11 @@ export class InstantTaskRunner implements TaskRunner {
 
     let plannedTask = await this.taskStore.get(task);
     if (!plannedTask) {
-      plannedTask = new PlannedTask(PlanningType.Immediate, task);
+      plannedTask = new PlannedTask(
+        PlanningType.Immediate,
+        SchedulerType.None,
+        task
+      );
       await this.taskStore.insert(plannedTask);
     }
 

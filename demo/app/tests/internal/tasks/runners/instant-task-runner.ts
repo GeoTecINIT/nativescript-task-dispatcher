@@ -17,6 +17,7 @@ import {
 import {
     PlannedTask,
     PlanningType,
+    SchedulerType,
 } from "nativescript-task-dispatcher/internal/tasks/planner/planned-task";
 
 describe("Instant task planner", () => {
@@ -36,6 +37,7 @@ describe("Instant task planner", () => {
     };
     const expectedImmediateTask = new PlannedTask(
         PlanningType.Immediate,
+        SchedulerType.None,
         immediateTask
     );
 

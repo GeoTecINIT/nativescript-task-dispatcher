@@ -5,7 +5,11 @@ import {
 import { AlarmManager } from "../abstract-alarm-manager.android";
 import { AndroidAlarmManager } from "./manager.android";
 import { WatchdogManager } from "../watchdog/manager.android";
-import { PlannedTask, PlanningType } from "../../../../planner/planned-task";
+import {
+  PlannedTask,
+  PlanningType,
+  SchedulerType,
+} from "../../../../planner/planned-task";
 import { RunnableTask } from "../../../../runnable-task";
 import { Logger, getLogger } from "../../../../../utils/logger";
 
@@ -51,7 +55,11 @@ export class AndroidAlarmScheduler {
       PlanningType.Scheduled
     );
     const now = new Date().getTime();
-    const plannedTask = new PlannedTask(PlanningType.Scheduled, runnableTask);
+    const plannedTask = new PlannedTask(
+      PlanningType.Scheduled,
+      SchedulerType.Alarm,
+      runnableTask
+    );
     if (
       allTasks.length === 0 ||
       allTasks[0].nextRun(now) > plannedTask.nextRun(now)

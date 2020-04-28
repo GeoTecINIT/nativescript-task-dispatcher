@@ -13,6 +13,7 @@ import {
 import {
     PlannedTask,
     PlanningType,
+    SchedulerType,
 } from "nativescript-task-dispatcher/internal/tasks/planner/planned-task";
 import { createPlannedTaskStoreMock } from "../persistence";
 import { createTaskCancelManagerMock } from ".";
@@ -50,11 +51,13 @@ describe("Task planner", () => {
 
     const immediatePlannedTask = new PlannedTask(
         PlanningType.Immediate,
+        SchedulerType.None,
         immediateTask
     );
 
     const recurrentPlannedTask = new PlannedTask(
         PlanningType.Scheduled,
+        SchedulerType.Alarm,
         recurrentTask
     );
 

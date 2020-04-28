@@ -7,6 +7,11 @@ export enum PlanningType {
   Immediate = "immediate",
 }
 
+export enum SchedulerType {
+  None = "none",
+  Alarm = "alarm",
+}
+
 export class PlannedTask {
   name: string;
   startAt: number;
@@ -21,6 +26,7 @@ export class PlannedTask {
 
   constructor(
     public planningType: PlanningType,
+    public schedulerType: SchedulerType,
     task: RunnableTask,
     public id = uuid(),
     public createdAt = new Date().getTime(),

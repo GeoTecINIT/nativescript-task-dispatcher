@@ -3,6 +3,7 @@ import { testTasks } from ".";
 import {
     PlanningType,
     PlannedTask,
+    SchedulerType,
 } from "nativescript-task-dispatcher/internal/tasks/planner/planned-task";
 import { createPlannedTaskStoreMock } from "../persistence";
 import { TaskManager } from "nativescript-task-dispatcher/internal/tasks/manager";
@@ -21,6 +22,7 @@ describe("Task manager", () => {
     // To be run in 30s
     const ephemeralTaskToBeRun = new PlannedTask(
         PlanningType.Scheduled,
+        SchedulerType.Alarm,
         {
             name: "dummyTask",
             startAt: -1,
@@ -35,6 +37,7 @@ describe("Task manager", () => {
     // To be run in 90s
     const ephemeralTaskNotToBeRun = new PlannedTask(
         PlanningType.Scheduled,
+        SchedulerType.Alarm,
         {
             name: "dummyTask",
             startAt: -1,
@@ -49,6 +52,7 @@ describe("Task manager", () => {
     // To be run in 30s
     const recurrentTaskToBeRun = new PlannedTask(
         PlanningType.Scheduled,
+        SchedulerType.Alarm,
         {
             name: "dummyForegroundTask",
             startAt: -1,
@@ -64,6 +68,7 @@ describe("Task manager", () => {
     // To be run in 60s
     const recurrentTaskNotToBeRun = new PlannedTask(
         PlanningType.Scheduled,
+        SchedulerType.Alarm,
         {
             name: "dummyTask",
             startAt: -1,
@@ -79,6 +84,7 @@ describe("Task manager", () => {
     // To be run in 30s
     const delayedTaskToBeRun = new PlannedTask(
         PlanningType.Scheduled,
+        SchedulerType.Alarm,
         {
             name: "dummyTask",
             startAt: currentTime + offset,
@@ -93,6 +99,7 @@ describe("Task manager", () => {
     // To be run in 90s
     const delayedTaskNotToBeRun = new PlannedTask(
         PlanningType.Scheduled,
+        SchedulerType.Alarm,
         {
             name: "dummyTask",
             startAt: currentTime + stdInterval + offset,
@@ -229,6 +236,7 @@ describe("Tasks manager next interval", () => {
 
     const task1Minutes = new PlannedTask(
         PlanningType.Scheduled,
+        SchedulerType.Alarm,
         {
             name: "dummyTask",
             startAt: -1,
@@ -241,6 +249,7 @@ describe("Tasks manager next interval", () => {
     );
     const task2Minutes = new PlannedTask(
         PlanningType.Scheduled,
+        SchedulerType.Alarm,
         {
             name: "dummyTask",
             startAt: -1,
@@ -253,6 +262,7 @@ describe("Tasks manager next interval", () => {
     );
     const task3Minutes = new PlannedTask(
         PlanningType.Scheduled,
+        SchedulerType.Alarm,
         {
             name: "dummyTask",
             startAt: -1,
@@ -265,6 +275,7 @@ describe("Tasks manager next interval", () => {
     );
     const task5Minutes = new PlannedTask(
         PlanningType.Scheduled,
+        SchedulerType.Alarm,
         {
             name: "dummyTask",
             startAt: -1,

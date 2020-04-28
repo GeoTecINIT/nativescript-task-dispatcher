@@ -4,6 +4,7 @@ import { createPlannedTaskStoreMock } from "../../persistence";
 import {
     PlannedTask,
     PlanningType,
+    SchedulerType,
 } from "nativescript-task-dispatcher/internal/tasks/planner/planned-task";
 import { BatchTaskRunner } from "nativescript-task-dispatcher/internal/tasks/runners/batch-task-runner";
 import {
@@ -17,27 +18,39 @@ describe("Batch task runner", () => {
     setTasks(testTasks);
     const taskStore = createPlannedTaskStoreMock();
 
-    const expectedDummyTask = new PlannedTask(PlanningType.Scheduled, {
-        name: "dummyTask",
-        startAt: -1,
-        interval: 60000,
-        recurrent: true,
-        params: {},
-    });
-    const expectedFailedTask = new PlannedTask(PlanningType.Scheduled, {
-        name: "failedTask",
-        startAt: -1,
-        interval: 60000,
-        recurrent: true,
-        params: {},
-    });
-    const expectedTimeoutTask = new PlannedTask(PlanningType.Scheduled, {
-        name: "timeoutTask",
-        startAt: -1,
-        interval: 60000,
-        recurrent: true,
-        params: {},
-    });
+    const expectedDummyTask = new PlannedTask(
+        PlanningType.Scheduled,
+        SchedulerType.Alarm,
+        {
+            name: "dummyTask",
+            startAt: -1,
+            interval: 60000,
+            recurrent: true,
+            params: {},
+        }
+    );
+    const expectedFailedTask = new PlannedTask(
+        PlanningType.Scheduled,
+        SchedulerType.Alarm,
+        {
+            name: "failedTask",
+            startAt: -1,
+            interval: 60000,
+            recurrent: true,
+            params: {},
+        }
+    );
+    const expectedTimeoutTask = new PlannedTask(
+        PlanningType.Scheduled,
+        SchedulerType.Alarm,
+        {
+            name: "timeoutTask",
+            startAt: -1,
+            interval: 60000,
+            recurrent: true,
+            params: {},
+        }
+    );
     const plannedTasks = [
         expectedDummyTask,
         expectedFailedTask,

@@ -11,6 +11,7 @@ import {
 import {
     PlannedTask,
     PlanningType,
+    SchedulerType,
 } from "nativescript-task-dispatcher/internal/tasks/planner/planned-task";
 
 describe("Task cancel manager", () => {
@@ -22,46 +23,66 @@ describe("Task cancel manager", () => {
     const cancelImmediateTasks = "cancelImmediateTasks";
     const cancelExtraImmediateTasks = "cancelExtraImmediateTasks";
 
-    const firstScheduledTask = new PlannedTask(PlanningType.Scheduled, {
-        name: "dummyTask",
-        startAt: -1,
-        interval: 60000,
-        recurrent: true,
-        params: {},
-    });
+    const firstScheduledTask = new PlannedTask(
+        PlanningType.Scheduled,
+        SchedulerType.Alarm,
+        {
+            name: "dummyTask",
+            startAt: -1,
+            interval: 60000,
+            recurrent: true,
+            params: {},
+        }
+    );
 
-    const secondScheduledTask = new PlannedTask(PlanningType.Scheduled, {
-        name: "dummyTask",
-        startAt: -1,
-        interval: 120000,
-        recurrent: false,
-        params: {},
-    });
+    const secondScheduledTask = new PlannedTask(
+        PlanningType.Scheduled,
+        SchedulerType.None,
+        {
+            name: "dummyTask",
+            startAt: -1,
+            interval: 120000,
+            recurrent: false,
+            params: {},
+        }
+    );
 
-    const firstImmediateTask = new PlannedTask(PlanningType.Immediate, {
-        name: "dummyTask",
-        startAt: -1,
-        interval: 0,
-        recurrent: false,
-        params: {},
-    });
+    const firstImmediateTask = new PlannedTask(
+        PlanningType.Immediate,
+        SchedulerType.None,
+        {
+            name: "dummyTask",
+            startAt: -1,
+            interval: 0,
+            recurrent: false,
+            params: {},
+        }
+    );
 
-    const secondImmediateTask = new PlannedTask(PlanningType.Immediate, {
-        name: "anotherDummyTask",
-        startAt: -1,
-        interval: 0,
-        recurrent: false,
-        params: {},
-    });
+    const secondImmediateTask = new PlannedTask(
+        PlanningType.Immediate,
+        SchedulerType.None,
+        {
+            name: "anotherDummyTask",
+            startAt: -1,
+            interval: 0,
+            recurrent: false,
+            params: {},
+        }
+    );
 
-    const extraImmediateTask = new PlannedTask(PlanningType.Immediate, {
-        name: "yetAnotherDummyTask",
-        startAt: -1,
-        interval: 0,
-        recurrent: false,
-        params: {},
-        cancelEvent: cancelExtraImmediateTasks,
-    });
+    const extraImmediateTask = new PlannedTask(
+        PlanningType.Immediate,
+        SchedulerType.None,
+        {
+            name: "yetAnotherDummyTask",
+            startAt: -1,
+            interval: 0,
+            recurrent: false,
+            params: {},
+            cancelEvent: cancelExtraImmediateTasks,
+        }
+    );
 
     beforeEach(() => {
         cancelManager = new TaskCancelManager(taskStore, taskScheduler);

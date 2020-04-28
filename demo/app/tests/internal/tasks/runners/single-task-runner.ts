@@ -4,6 +4,7 @@ import { createPlannedTaskStoreMock } from "../../persistence";
 import {
     PlannedTask,
     PlanningType,
+    SchedulerType,
 } from "nativescript-task-dispatcher/internal/tasks/planner/planned-task";
 import { SingleTaskRunner } from "nativescript-task-dispatcher/internal/tasks/runners/single-task-runner";
 import {
@@ -17,42 +18,62 @@ describe("Single task runner", () => {
     setTasks(testTasks);
     const taskStore = createPlannedTaskStoreMock();
 
-    const dummyTask = new PlannedTask(PlanningType.Scheduled, {
-        name: "dummyTask",
-        startAt: -1,
-        interval: 60000,
-        recurrent: true,
-        params: {},
-    });
-    const dummyOneShotTask = new PlannedTask(PlanningType.Scheduled, {
-        name: "dummyTask",
-        startAt: -1,
-        interval: 60000,
-        recurrent: false,
-        params: {},
-    });
-    const dummyImmediateTask = new PlannedTask(PlanningType.Immediate, {
-        name: "dummyTask",
-        startAt: -1,
-        interval: 0,
-        recurrent: false,
-        params: {},
-    });
-    const failedTask = new PlannedTask(PlanningType.Scheduled, {
-        name: "failedTask",
-        startAt: -1,
-        interval: 60000,
-        recurrent: false,
-        params: {},
-    });
+    const dummyTask = new PlannedTask(
+        PlanningType.Scheduled,
+        SchedulerType.Alarm,
+        {
+            name: "dummyTask",
+            startAt: -1,
+            interval: 60000,
+            recurrent: true,
+            params: {},
+        }
+    );
+    const dummyOneShotTask = new PlannedTask(
+        PlanningType.Scheduled,
+        SchedulerType.Alarm,
+        {
+            name: "dummyTask",
+            startAt: -1,
+            interval: 60000,
+            recurrent: false,
+            params: {},
+        }
+    );
+    const dummyImmediateTask = new PlannedTask(
+        PlanningType.Immediate,
+        SchedulerType.None,
+        {
+            name: "dummyTask",
+            startAt: -1,
+            interval: 0,
+            recurrent: false,
+            params: {},
+        }
+    );
+    const failedTask = new PlannedTask(
+        PlanningType.Scheduled,
+        SchedulerType.Alarm,
+        {
+            name: "failedTask",
+            startAt: -1,
+            interval: 60000,
+            recurrent: false,
+            params: {},
+        }
+    );
     failedTask.errorCount = 1;
-    const timeoutTask = new PlannedTask(PlanningType.Scheduled, {
-        name: "timeoutTask",
-        startAt: -1,
-        interval: 60000,
-        recurrent: false,
-        params: {},
-    });
+    const timeoutTask = new PlannedTask(
+        PlanningType.Scheduled,
+        SchedulerType.Alarm,
+        {
+            name: "timeoutTask",
+            startAt: -1,
+            interval: 60000,
+            recurrent: false,
+            params: {},
+        }
+    );
     timeoutTask.timeoutCount = 1;
 
     let startEvent: DispatchableEvent;
