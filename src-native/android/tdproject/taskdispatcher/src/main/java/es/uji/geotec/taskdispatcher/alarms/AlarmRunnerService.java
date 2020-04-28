@@ -46,6 +46,7 @@ public class AlarmRunnerService extends Service {
             delegate.onDestroy();
         } else {
             Log.w(tag, "Service delegate was not set! Caching method call...");
+            // FIXME: It does not make sense to cache onDestroy call, it should do some clean-up instead
             activationCache.onDestroyEarlyCalled();
         }
         super.onDestroy();

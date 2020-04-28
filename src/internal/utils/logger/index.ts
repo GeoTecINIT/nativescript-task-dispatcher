@@ -31,4 +31,5 @@ export function getLogger(tag: string): Logger {
   return loggerCreator(tag);
 }
 
+// FIXME: The export should be an interface in order to not to force developers to extend our logger
 export { Logger } from "./common";
