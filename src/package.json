@@ -23,6 +23,8 @@
     "prepack": "npm run build.native",
     "demo.ios": "npm i && cd ../demo && tns run ios",
     "demo.android": "npm i && cd ../demo && tns run android",
+    "test.ios": "npm i && cd ../demo && tns test ios",
+    "test.android": "npm i && cd ../demo && tns test android",
     "demo.reset": "cd ../demo && npx rimraf -- hooks node_modules platforms package-lock.json",
     "plugin.prepare": "npm run build && cd ../demo && tns plugin remove nativescript-task-dispatcher && tns plugin add ../src",
     "clean": "npm run demo.reset && npx rimraf -- node_modules package-lock.json && npm i"
