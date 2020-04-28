@@ -11,6 +11,11 @@ export abstract class Task {
   get name(): string {
     return this._name;
   }
+
+  get outputEventNames(): Array<string> {
+    return this.taskConfig.outputEventNames;
+  }
+
   protected taskParams: TaskParams;
   protected invocationEvent: DispatchableEvent;
 
@@ -29,8 +34,8 @@ export abstract class Task {
       taskConfig.foreground = false;
     }
 
-    if (!taskConfig.outputEventName) {
-      taskConfig.outputEventName = `${name}Finished`;
+    if (!taskConfig.outputEventNames) {
+      taskConfig.outputEventNames = [`${name}Finished`];
     }
   }
 
@@ -43,6 +48,21 @@ export abstract class Task {
     taskParams: TaskParams,
     invocationEvent: DispatchableEvent
   ): Promise<void> {
+    if (this.invocationEvent && !this.isDone()) {
+      this.getLogger().warn(
+        `Multiple executions of a task cannot run concurrently. Warning triggered with: params=${JSON.stringify(
+          taskParams
+        )} and invocationEvent=${JSON.stringify(invocationEvent)}`
+      );
+      this.emitEndEvent(
+        TaskResultStatus.Cancelled,
+        new Error(
+          "Concurrent Execution: Executing multiple instances of a task concurrently is not allowed"
+        ),
+        invocationEvent.id
+      );
+    }
+
     this.taskParams = taskParams;
     this.invocationEvent = invocationEvent;
 
@@ -51,7 +71,7 @@ export abstract class Task {
       await this.checkIfCanRun();
       await this.onRun();
       if (!this.isDone()) {
-        this.done(this.taskConfig.outputEventName);
+        this.done(this.taskConfig.outputEventNames[0]);
       }
     } catch (err) {
       this.getLogger().error(
@@ -168,14 +188,19 @@ export abstract class Task {
     );
   }
 
-  private emitEndEvent(status: TaskResultStatus, err?: Error): void {
-    this.markAsDone();
+  private emitEndEvent(
+    status: TaskResultStatus,
+    err?: Error,
+    invocationId?: string
+  ): void {
+    const id = invocationId ? invocationId : this.invocationEvent.id;
+    this.markAsDone(id);
     const result: TaskChainResult = { status };
     if (err) {
       result.reason = err;
     }
     const endEvent = createEvent(TaskDispatcherEvent.TaskChainFinished, {
-      id: this.invocationEvent.id,
+      id,
       data: {
         result,
       },
@@ -187,8 +212,9 @@ export abstract class Task {
     return this._executionHistory.has(this.invocationEvent.id);
   }
 
-  private markAsDone() {
-    this._executionHistory.add(this.invocationEvent.id);
+  private markAsDone(invocationId?: string) {
+    const id = invocationId ? invocationId : this.invocationEvent.id;
+    this._executionHistory.add(id);
   }
 
   private removeCancelFunction() {
@@ -205,7 +231,7 @@ export abstract class Task {
 
 export interface TaskConfig {
   foreground?: boolean;
-  outputEventName?: string;
+  outputEventNames?: Array<string>;
 }
 
 export interface TaskParams {
