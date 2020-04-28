@@ -1,4 +1,9 @@
-declare module native {	export class Array<T> {	constructor(); length: number; [index: number]: T; } }
+declare namespace native {
+  export class Array<T> {
+    constructor();
+    length: number;
+    [index: number]: T;
+  }
+}
 
 import globalAndroid = android;
-
