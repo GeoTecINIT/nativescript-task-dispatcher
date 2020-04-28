@@ -17,21 +17,21 @@ describe("Batch task runner", () => {
     setTasks(testTasks);
     const taskStore = createPlannedTaskStoreMock();
 
-    const expectedDummyTask = new PlannedTask(PlanningType.Alarm, {
+    const expectedDummyTask = new PlannedTask(PlanningType.Scheduled, {
         name: "dummyTask",
         startAt: -1,
         interval: 60000,
         recurrent: true,
         params: {},
     });
-    const expectedFailedTask = new PlannedTask(PlanningType.Alarm, {
+    const expectedFailedTask = new PlannedTask(PlanningType.Scheduled, {
         name: "failedTask",
         startAt: -1,
         interval: 60000,
         recurrent: true,
         params: {},
     });
-    const expectedTimeoutTask = new PlannedTask(PlanningType.Alarm, {
+    const expectedTimeoutTask = new PlannedTask(PlanningType.Scheduled, {
         name: "timeoutTask",
         startAt: -1,
         interval: 60000,

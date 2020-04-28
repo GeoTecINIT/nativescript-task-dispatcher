@@ -45,9 +45,9 @@ describe("Planned Tasks Store", () => {
         cancelEvent: "cancelEvent",
     };
 
-    const plannedTask1 = new PlannedTask(PlanningType.Alarm, runnableTask1);
-    const plannedTask2 = new PlannedTask(PlanningType.Alarm, runnableTask2);
-    const plannedTask3 = new PlannedTask(PlanningType.Alarm, runnableTask3);
+    const plannedTask1 = new PlannedTask(PlanningType.Scheduled, runnableTask1);
+    const plannedTask2 = new PlannedTask(PlanningType.Scheduled, runnableTask2);
+    const plannedTask3 = new PlannedTask(PlanningType.Scheduled, runnableTask3);
 
     const plannedTask4: PlannedTask = new PlannedTask(
         PlanningType.Immediate,
@@ -109,7 +109,7 @@ describe("Planned Tasks Store", () => {
         await store.insert(plannedTask3);
         await store.insert(plannedTask4);
 
-        const tasks = await store.getAllSortedByNextRun(PlanningType.Alarm);
+        const tasks = await store.getAllSortedByNextRun(PlanningType.Scheduled);
         expect(tasks.length).toBe(3);
         const now = new Date().getTime();
         for (let i = 0; i < tasks.length - 1; i++) {

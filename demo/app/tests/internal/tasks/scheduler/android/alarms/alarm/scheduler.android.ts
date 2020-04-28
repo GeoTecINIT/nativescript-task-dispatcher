@@ -383,7 +383,7 @@ function createAlarmManagerMock(): AlarmManager {
 }
 
 function createPlannedTask(task: RunnableTask) {
-    return new PlannedTask(PlanningType.Alarm, task);
+    return new PlannedTask(PlanningType.Scheduled, task);
 }
 
 function isLastCallCloseTo(spy: any, num: number, threshold: number): boolean {

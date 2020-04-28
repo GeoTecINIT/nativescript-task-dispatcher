@@ -22,7 +22,7 @@ describe("Task cancel manager", () => {
     const cancelImmediateTasks = "cancelImmediateTasks";
     const cancelExtraImmediateTasks = "cancelExtraImmediateTasks";
 
-    const firstScheduledTask = new PlannedTask(PlanningType.Alarm, {
+    const firstScheduledTask = new PlannedTask(PlanningType.Scheduled, {
         name: "dummyTask",
         startAt: -1,
         interval: 60000,
@@ -30,7 +30,7 @@ describe("Task cancel manager", () => {
         params: {},
     });
 
-    const secondScheduledTask = new PlannedTask(PlanningType.Alarm, {
+    const secondScheduledTask = new PlannedTask(PlanningType.Scheduled, {
         name: "dummyTask",
         startAt: -1,
         interval: 120000,

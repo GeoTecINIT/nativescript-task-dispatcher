@@ -3,7 +3,7 @@ import { RunnableTask } from "../runnable-task";
 import { TaskParams } from "../task";
 
 export enum PlanningType {
-  Alarm = "alarm",
+  Scheduled = "scheduled",
   Immediate = "immediate",
 }
 

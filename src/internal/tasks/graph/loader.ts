@@ -91,6 +91,9 @@ export class TaskGraphLoader {
   ) {
     const listenerId = this.taskEventBinder(eventName, taskBuilder);
 
+    // FIXME: This is giving a lot of trouble. Immediate tasks do not make sense to be canceled.
+    // By convention, let them gracefully finish if they happen to be already running, ensure
+    // its launch event does not get triggered after "cancellation" (e.g. cutting it at the source).
     const cancelEvent = taskBuilder.build().cancelEvent;
     const cancelListenerId = on(taskBuilder.build().cancelEvent, () => {
       off(cancelEvent, cancelListenerId);

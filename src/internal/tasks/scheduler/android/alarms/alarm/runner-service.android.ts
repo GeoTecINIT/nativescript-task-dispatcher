@@ -147,7 +147,7 @@ export class AlarmRunnerService
 
   private createTaskManager() {
     return new TaskManager(
-      PlanningType.Alarm,
+      PlanningType.Scheduled,
       this.taskStore,
       this.timeOffset,
       this.currentTime

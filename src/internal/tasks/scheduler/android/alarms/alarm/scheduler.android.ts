@@ -27,7 +27,7 @@ export class AndroidAlarmScheduler {
       return;
     }
     const plannedTasks = await this.plannedTaskStore.getAllSortedByNextRun(
-      PlanningType.Alarm
+      PlanningType.Scheduled
     );
     if (plannedTasks.length > 0) {
       if (!this.alarmManager.alarmUp) {
@@ -48,10 +48,10 @@ export class AndroidAlarmScheduler {
       return possibleExisting;
     }
     const allTasks = await this.plannedTaskStore.getAllSortedByNextRun(
-      PlanningType.Alarm
+      PlanningType.Scheduled
     );
     const now = new Date().getTime();
-    const plannedTask = new PlannedTask(PlanningType.Alarm, runnableTask);
+    const plannedTask = new PlannedTask(PlanningType.Scheduled, runnableTask);
     if (
       allTasks.length === 0 ||
       allTasks[0].nextRun(now) > plannedTask.nextRun(now)
@@ -73,7 +73,7 @@ export class AndroidAlarmScheduler {
       return;
     }
     const allTasks = await this.plannedTaskStore.getAllSortedByNextRun(
-      PlanningType.Alarm
+      PlanningType.Scheduled
     );
     const now = new Date().getTime();
     if (allTasks.length === 1) {

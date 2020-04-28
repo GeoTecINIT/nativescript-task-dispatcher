@@ -20,7 +20,7 @@ describe("Task manager", () => {
 
     // To be run in 30s
     const ephemeralTaskToBeRun = new PlannedTask(
-        PlanningType.Alarm,
+        PlanningType.Scheduled,
         {
             name: "dummyTask",
             startAt: -1,
@@ -34,7 +34,7 @@ describe("Task manager", () => {
 
     // To be run in 90s
     const ephemeralTaskNotToBeRun = new PlannedTask(
-        PlanningType.Alarm,
+        PlanningType.Scheduled,
         {
             name: "dummyTask",
             startAt: -1,
@@ -48,7 +48,7 @@ describe("Task manager", () => {
 
     // To be run in 30s
     const recurrentTaskToBeRun = new PlannedTask(
-        PlanningType.Alarm,
+        PlanningType.Scheduled,
         {
             name: "dummyForegroundTask",
             startAt: -1,
@@ -63,7 +63,7 @@ describe("Task manager", () => {
 
     // To be run in 60s
     const recurrentTaskNotToBeRun = new PlannedTask(
-        PlanningType.Alarm,
+        PlanningType.Scheduled,
         {
             name: "dummyTask",
             startAt: -1,
@@ -78,7 +78,7 @@ describe("Task manager", () => {
 
     // To be run in 30s
     const delayedTaskToBeRun = new PlannedTask(
-        PlanningType.Alarm,
+        PlanningType.Scheduled,
         {
             name: "dummyTask",
             startAt: currentTime + offset,
@@ -92,7 +92,7 @@ describe("Task manager", () => {
 
     // To be run in 90s
     const delayedTaskNotToBeRun = new PlannedTask(
-        PlanningType.Alarm,
+        PlanningType.Scheduled,
         {
             name: "dummyTask",
             startAt: currentTime + stdInterval + offset,
@@ -115,7 +115,7 @@ describe("Task manager", () => {
 
     beforeEach(() => {
         taskPlanner = new TaskManager(
-            PlanningType.Alarm,
+            PlanningType.Scheduled,
             plannedTasksStore,
             offset,
             currentTime
@@ -124,7 +124,7 @@ describe("Task manager", () => {
 
     it("lists the tasks to be run for a given type", async () => {
         spyOn(plannedTasksStore, "getAllSortedByNextRun")
-            .withArgs(PlanningType.Alarm)
+            .withArgs(PlanningType.Scheduled)
             .and.returnValue(Promise.resolve(sortedTasks));
         const tasks = await taskPlanner.tasksToRun();
         expect(tasks).toEqual([
@@ -136,7 +136,7 @@ describe("Task manager", () => {
 
     it("returns an empty list when no tasks need to be run", async () => {
         spyOn(plannedTasksStore, "getAllSortedByNextRun")
-            .withArgs(PlanningType.Alarm)
+            .withArgs(PlanningType.Scheduled)
             .and.returnValue(
                 Promise.resolve([
                     ephemeralTaskNotToBeRun,
@@ -150,7 +150,7 @@ describe("Task manager", () => {
 
     it("checks if at least a task to be run requires foreground execution", async () => {
         spyOn(plannedTasksStore, "getAllSortedByNextRun")
-            .withArgs(PlanningType.Alarm)
+            .withArgs(PlanningType.Scheduled)
             .and.returnValue(Promise.resolve(sortedTasks));
         const requiresForeground = await taskPlanner.requiresForeground();
         expect(requiresForeground).toBeTruthy();
@@ -158,7 +158,7 @@ describe("Task manager", () => {
 
     it("returns false when no tasks need to be run in the foreground", async () => {
         spyOn(plannedTasksStore, "getAllSortedByNextRun")
-            .withArgs(PlanningType.Alarm)
+            .withArgs(PlanningType.Scheduled)
             .and.returnValue(
                 Promise.resolve([
                     ephemeralTaskToBeRun,
@@ -172,7 +172,7 @@ describe("Task manager", () => {
 
     it("determines if there are tasks that will require another run", async () => {
         spyOn(plannedTasksStore, "getAllSortedByNextRun")
-            .withArgs(PlanningType.Alarm)
+            .withArgs(PlanningType.Scheduled)
             .and.returnValue(Promise.resolve(sortedTasks));
         const willContinue = await taskPlanner.willContinue();
         expect(willContinue).toBeTruthy();
@@ -180,7 +180,7 @@ describe("Task manager", () => {
 
     it("returns false when no tasks need to be run", async () => {
         spyOn(plannedTasksStore, "getAllSortedByNextRun")
-            .withArgs(PlanningType.Alarm)
+            .withArgs(PlanningType.Scheduled)
             .and.returnValue(Promise.resolve([]));
         const willContinue = await taskPlanner.willContinue();
         expect(willContinue).toBeFalsy();
@@ -188,7 +188,7 @@ describe("Task manager", () => {
 
     it("returns false when all the tasks are finite and fit in this execution window", async () => {
         spyOn(plannedTasksStore, "getAllSortedByNextRun")
-            .withArgs(PlanningType.Alarm)
+            .withArgs(PlanningType.Scheduled)
             .and.returnValue(Promise.resolve([ephemeralTaskToBeRun]));
         const willContinue = await taskPlanner.willContinue();
         expect(willContinue).toBeFalsy();
@@ -196,7 +196,7 @@ describe("Task manager", () => {
 
     it("returns true when all the tasks are finite but do not fit in this execution window", async () => {
         spyOn(plannedTasksStore, "getAllSortedByNextRun")
-            .withArgs(PlanningType.Alarm)
+            .withArgs(PlanningType.Scheduled)
             .and.returnValue(
                 Promise.resolve([ephemeralTaskToBeRun, ephemeralTaskNotToBeRun])
             );
@@ -206,7 +206,7 @@ describe("Task manager", () => {
 
     it("calculates the time until the next execution of the planner", async () => {
         spyOn(plannedTasksStore, "getAllSortedByNextRun")
-            .withArgs(PlanningType.Alarm)
+            .withArgs(PlanningType.Scheduled)
             .and.returnValue(Promise.resolve(sortedTasks));
         const nextInterval = await taskPlanner.nextInterval();
         expect(nextInterval).toBe(offset);
@@ -214,7 +214,7 @@ describe("Task manager", () => {
 
     it("returns -1 when a next execution is not required", async () => {
         spyOn(plannedTasksStore, "getAllSortedByNextRun")
-            .withArgs(PlanningType.Alarm)
+            .withArgs(PlanningType.Scheduled)
             .and.returnValue(Promise.resolve([ephemeralTaskToBeRun]));
         const nextInterval = await taskPlanner.nextInterval();
         expect(nextInterval).toBe(-1);
@@ -228,7 +228,7 @@ describe("Tasks manager next interval", () => {
     let taskPlanner: TaskManager;
 
     const task1Minutes = new PlannedTask(
-        PlanningType.Alarm,
+        PlanningType.Scheduled,
         {
             name: "dummyTask",
             startAt: -1,
@@ -240,7 +240,7 @@ describe("Tasks manager next interval", () => {
         initialTime
     );
     const task2Minutes = new PlannedTask(
-        PlanningType.Alarm,
+        PlanningType.Scheduled,
         {
             name: "dummyTask",
             startAt: -1,
@@ -252,7 +252,7 @@ describe("Tasks manager next interval", () => {
         initialTime
     );
     const task3Minutes = new PlannedTask(
-        PlanningType.Alarm,
+        PlanningType.Scheduled,
         {
             name: "dummyTask",
             startAt: -1,
@@ -264,7 +264,7 @@ describe("Tasks manager next interval", () => {
         initialTime
     );
     const task5Minutes = new PlannedTask(
-        PlanningType.Alarm,
+        PlanningType.Scheduled,
         {
             name: "dummyTask",
             startAt: -1,
@@ -481,13 +481,13 @@ describe("Tasks manager next interval", () => {
             const sortedTasks = test.tasks.map(({ task }) => task);
 
             taskPlanner = new TaskManager(
-                PlanningType.Alarm,
+                PlanningType.Scheduled,
                 plannedTasksStore,
                 minute / 2,
                 initialTime + test.currentMinute * minute
             );
             spyOn(plannedTasksStore, "getAllSortedByNextRun")
-                .withArgs(PlanningType.Alarm)
+                .withArgs(PlanningType.Scheduled)
                 .and.returnValue(Promise.resolve(sortedTasks));
             const nextInterval = await taskPlanner.nextInterval();
             expect(nextInterval).toBe(test.expectedResult * minute);

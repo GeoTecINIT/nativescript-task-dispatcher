@@ -17,14 +17,14 @@ describe("Single task runner", () => {
     setTasks(testTasks);
     const taskStore = createPlannedTaskStoreMock();
 
-    const dummyTask = new PlannedTask(PlanningType.Alarm, {
+    const dummyTask = new PlannedTask(PlanningType.Scheduled, {
         name: "dummyTask",
         startAt: -1,
         interval: 60000,
         recurrent: true,
         params: {},
     });
-    const dummyOneShotTask = new PlannedTask(PlanningType.Alarm, {
+    const dummyOneShotTask = new PlannedTask(PlanningType.Scheduled, {
         name: "dummyTask",
         startAt: -1,
         interval: 60000,
@@ -38,7 +38,7 @@ describe("Single task runner", () => {
         recurrent: false,
         params: {},
     });
-    const failedTask = new PlannedTask(PlanningType.Alarm, {
+    const failedTask = new PlannedTask(PlanningType.Scheduled, {
         name: "failedTask",
         startAt: -1,
         interval: 60000,
@@ -46,7 +46,7 @@ describe("Single task runner", () => {
         params: {},
     });
     failedTask.errorCount = 1;
-    const timeoutTask = new PlannedTask(PlanningType.Alarm, {
+    const timeoutTask = new PlannedTask(PlanningType.Scheduled, {
         name: "timeoutTask",
         startAt: -1,
         interval: 60000,

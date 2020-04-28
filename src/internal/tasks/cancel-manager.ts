@@ -55,7 +55,7 @@ export class TaskCancelManager {
 
   private async cancelTask(task: PlannedTask): Promise<void> {
     try {
-      if (task.planningType === PlanningType.Alarm) {
+      if (task.planningType === PlanningType.Scheduled) {
         await this.getTaskScheduler().cancel(task.id);
       } else {
         await this.taskStore.delete(task.id);

@@ -54,7 +54,7 @@ describe("Task planner", () => {
     );
 
     const recurrentPlannedTask = new PlannedTask(
-        PlanningType.Alarm,
+        PlanningType.Scheduled,
         recurrentTask
     );
 

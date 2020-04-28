@@ -24,7 +24,7 @@ export class AlarmReceiver
     this.timeOffset = 30000;
     this.currentTime = new Date().getTime();
     this.taskManager = new TaskManager(
-      PlanningType.Alarm,
+      PlanningType.Scheduled,
       plannedTasksDB,
       this.timeOffset,
       this.currentTime
