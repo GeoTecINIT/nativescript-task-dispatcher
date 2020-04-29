@@ -69,7 +69,7 @@ If one or more of your app tasks require to run in foreground (while in backgrou
     The notification title and content that your user will see in the status bar while the service is running in foreground.
     (more info here: https://developer.android.com/guide/components/services#Foreground)
   <-->
-  <string name="task_dispatcher_location_usage_notification_title">"SyMptOMS is using your location"</string>
+  <string name="task_dispatcher_location_usage_notification_title">"demo app is using your location"</string>
   <string name="task_dispatcher_location_usage_notification_content">""</string>
 
   <!--> Other strings <-->
@@ -101,7 +101,7 @@ We'll handle the rest for you :)
 
 ### Quick start
 
-First of all you'll need to start defining some tasks and make the globally accessible. As a matter of an example, here you can see some tasks that we have defined for our demo app (located in: `demo/app/tasks/index.ts`):
+First of all you'll need to start defining some tasks and make them globally accessible. As a matter of an example, here you can see some tasks that we have defined for our demo app (located in: `demo/app/tasks/index.ts`):
 
 ```ts
 // tasks.ts;
