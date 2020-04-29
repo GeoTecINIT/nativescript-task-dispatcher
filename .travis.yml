@@ -71,13 +71,15 @@ matrix:
         - nvm install 10
       before_script:
         - echo no | android create avd --force -n test -t android-24 --abi armeabi-v7a
+        - emulator -avd test -no-audio -no-window &
       script:
+        - adb kill-server
         - tns device android --available-devices
         - cd src
         - npm i
         - npm run tsc
         - cd ../demo
-        - tns test android --watch false --justlaunch
+        - tns test android --watch false --justlaunch --timeout 600
     - os: osx
       env:
         - TestiOS="12"
