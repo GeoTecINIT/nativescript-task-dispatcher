@@ -273,6 +273,22 @@ async function emitStartEvent() {
 
 ## API
 
+### taskDispatcher
+
+### Task ([see code](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/task.ts#L10))
+
+### SimpleTask ([see code](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/simple-task.ts#L6))
+
+### TaskGraph ([see code](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/graph/index.ts#L16))
+
+#### EventListenerGenerator
+
+#### RunnableTaskDescriptor
+
+##### RunnableTaskBuilder ([see code](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/runnable-task/builder.ts#L24))
+
+### Events
+
 Describe your plugin methods and properties here. See [nativescript-feedback](https://github.com/EddyVerbruggen/nativescript-feedback) for example.
 
 | Property         | Default                | Description                                 |
