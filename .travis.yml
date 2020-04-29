@@ -1,4 +1,5 @@
 matrix:
+  fast_finish: true
   include:
     - stage: "Lint"
       language: node_js
@@ -72,23 +73,22 @@ matrix:
         - nvm install 10
       before_script:
         - echo no | android create avd --force -n test -t android-24 -b armeabi-v7a
-        - emulator -avd test -no-audio -no-window
+        - emulator -avd test -no-audio -no-window &
       script:
         - cd src
         - npm run test.android
-    - os: osx
+  allow_failures:
+    - stage: "Test"
+      os: osx
       env:
         - TestiOS="12"
         - Xcode="11.2"
       language: node_js
-      node_js: "10"
       jdk: oraclejdk8
       osx_image: xcode11.2
       script:
         - cd src
         - npm run test.ios
-  allow_failures:
-    - env: TestiOS="12"
 
 android:
   components:
