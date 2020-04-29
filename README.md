@@ -20,9 +20,9 @@ This plugin bases its way of working in three software primitives:
 - **Task schedulers:** These are completely transparent to the user of the plugin, right now there are two schedulers and another three planned:
   - _Immediate tasks scheduler (Android/iOS):_ in charge of running tasks that have to run a task immediately, with zero delay. This scheduler is in charge of running tasks whose execution has been triggered by another task.
   - _> 1 minute tasks scheduler (Android only):_ An alarm-based task scheduler. In charge of running tasks whose execution window falls in a minute or more in the future.
-  - _(Planned) < 1 minute tasks scheduler (Android only):_ A background service-based tasks scheduler. That will be in charge of running time-critical tasks that need to run bellow a 1 minute period (e.g. tasks running every 15 seconds)
-  - _(Planned) Delayed tasks scheduler (iOS only):_ Will allow running time-triggered tasks in iOS. We cannot make any promises about its time accuracy or its possibilities. We are still studying now to implement it (**PRs are welcome!**)
-  - _(Planned) Event-driven tasks scheduler (Android/iOS):_ Two implementations, identical functionality. Will reliably run tasks triggered by external events in the background (e.g. a change in the activity of the user, a server-sent event, a system event, etc.). A basic multi-platform version of this scheduler is already running but can only execute tasks reliably when the app is visible to the user or another scheduler is already running.
+  - _**(Planned)** < 1 minute tasks scheduler (Android only):_ A background service-based tasks scheduler. That will be in charge of running time-critical tasks that need to run bellow a 1 minute period (e.g. tasks running every 15 seconds)
+  - _**(Planned)** Delayed tasks scheduler (iOS only):_ Will allow running time-triggered tasks in iOS. We cannot make any promises about its time accuracy or its possibilities. We are still studying how to implement this (**PRs are welcome!**)
+  - _**(Planned)** Event-driven tasks scheduler (Android/iOS):_ Two implementations, identical functionality. Will reliably run tasks triggered by external events in the background (e.g. a change in the activity of the user, a server-sent event, a system event, etc.). A basic multi-platform version of this scheduler is already running but can only execute tasks reliably when the app is visible to the user or another scheduler is already running.
 
 To illustrate how the three aforementioned components link together, let's present the following simple (yet relatively complex) use case. Let's say that we want to wake-up our app every minute. To run a dummy task, collect the battery level of the device and log the task execution. In parallel, we want to follow the same workflow but with a task that collects user location, another task which collects battery level and finally another tasks that logs the execution of the whole pipeline branch. The following figure depicts the whole process:
 
@@ -60,12 +60,14 @@ If one or more of your app tasks require to run in foreground (while in backgrou
   <!--> Other strings <-->
 
   <!-->
-    The notification channel used in Android 8.0 and upper to deliver foreground service sticky notifications (more info here: https://developer.android.com/training/notify-user/channels)
+    The notification channel used in Android 8.0 and upper to deliver foreground service sticky notifications.
+    (more info here: https://developer.android.com/training/notify-user/channels)
   <-->
   <string name="task_dispatcher_location_usage_channel_name">"Background location"</string>
   <string name="task_dispatcher_location_usage_channel_description">"Indicates when the app is accessing your location in background"</string>
   <!-->
-    The notification title and content that your user will see in the status bar while the service is running in foreground (more info here: https://developer.android.com/guide/components/services#Foreground)
+    The notification title and content that your user will see in the status bar while the service is running in foreground.
+    (more info here: https://developer.android.com/guide/components/services#Foreground)
   <-->
   <string name="task_dispatcher_location_usage_notification_title">"SyMptOMS is using your location"</string>
   <string name="task_dispatcher_location_usage_notification_content">""</string>
@@ -80,7 +82,7 @@ This plugin has been highly optimized to get over one of the biggest shortcoming
 
 In order to do so, first you'll have to check if you meet one of the requirements to be whitelisted by the OS as an app that does not have to be bothered by the system's energy optimizer: [https://developer.android.com/training/monitoring-device-state/doze-standby#whitelisting-cases](https://developer.android.com/training/monitoring-device-state/doze-standby#whitelisting-cases)
 
-If your meets the requirements to be whitelisted, then you'll need to add the following permission in your app's AndroidManifest.xml file (located in: `App_Resources -> Android -> src -> main):
+If your meets the requirements to be whitelisted, then you'll need to add the following permission in your app's AndroidManifest.xml file (located in: `App_Resources -> Android -> src -> main`):
 
 ```xml
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -124,7 +126,7 @@ export const appTasks: Array<Task> = [
         });
       })
   ),
-  // A really slow task which takes 30 seconds to complete
+  // A really slow task, which takes 30 seconds to complete
   new SimpleTask(
     "slowTask",
     ({ log, onCancel }) =>
@@ -201,15 +203,15 @@ export const demoTaskGraph = new DemoTaskGraph();
 
 Explanation of the task graph:
 
-- By time the external event "startEvent" gets triggered 3 task instances are scheduled to run:
+- _By time the external event "startEvent" gets triggered_ 3 task instances are scheduled to run:
   - fastTask every minute
   - mediumTask every two minutes
   - slowTask every four minutes
-- After 1 minute fastTask runs immediately and logs its message through the console
-- After 2 minutes fast and medium tasks run. fastTask runs immediately, mediumTask takes 2 seconds to run. After mediumTask finishes, fastTask runs again. Then, the device goes to sleep.
-- After 3 minutes fastTask runs again
-- After 4 minutes fast, medium and slow tasks run. fastTask runs immediately, mediumTask takes 2 seconds to run and slowTask takes 30 seconds to run. After mediumTask finishes, fastTask runs again. After slowTask finishes, mediumTask runs again and takes 2 seconds to run, after those 2 seconds, fastTask runs for a third time in this task chain. Then, the device goes to sleep.
-- And so on, until external event "stopEvent" gets triggered. By this time, all scheduled tasks get cancelled and no task runs from here, due the event driven nature of the task graph.
+- _After 1 minute_ fastTask runs immediately and logs its message through the console
+- _After 2 minutes_ fast and medium tasks run. fastTask runs immediately, mediumTask takes 2 seconds to run. After mediumTask finishes, fastTask runs again. Then, the device goes to sleep.
+- _After 3 minutes_ fastTask runs again
+- _After 4 minutes_ fast, medium and slow tasks run. fastTask runs immediately, mediumTask takes 2 seconds to run and slowTask takes 30 seconds to run. After mediumTask finishes, fastTask runs again. After slowTask finishes, mediumTask runs again and takes 2 seconds to run, after those 2 seconds, fastTask runs for a third time in this task chain. Then, the device goes to sleep.
+- And so on, _until external event "stopEvent" gets triggered_. By this time, all scheduled tasks get cancelled and no task runs from here, due the event driven nature of the task graph.
 
 As you can see, task graphs can get as complicated as you want (or need, for your application). There are some [limitations](#limitations) though.
 
