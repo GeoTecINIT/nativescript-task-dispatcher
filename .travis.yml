@@ -63,6 +63,7 @@ matrix:
         - tns build ios
     - stage: "Test"
       os: linux
+      dist: trusty
       env:
         - TestAndroid="29"
       language: android
@@ -72,6 +73,7 @@ matrix:
       before_script:
         - echo no | android create avd --force -n test -t android-24 --abi armeabi-v7a
         - emulator -avd test -no-audio -no-window &
+        - android-wait-for-emulator
       script:
         - adb kill-server
         - tns device android --available-devices
