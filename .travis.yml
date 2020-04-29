@@ -72,11 +72,10 @@ matrix:
         - nvm install 10
       before_script:
         - echo no | android create avd --force -n test -t android-24 -b armeabi-v7a
-        - emulator -avd test -no-audio -no-window &
-        - android-wait-for-emulator
+        - emulator -avd test -no-audio -no-window
       script:
         - cd src
-        - travis_wait travis_retry npm run test.android
+        - npm run test.android
     - os: osx
       env:
         - TestiOS="12"
@@ -87,7 +86,7 @@ matrix:
       osx_image: xcode11.2
       script:
         - cd src
-        - travis_wait travis_retry npm run test.ios
+        - npm run test.ios
   allow_failures:
     - env: TestiOS="12"
 
