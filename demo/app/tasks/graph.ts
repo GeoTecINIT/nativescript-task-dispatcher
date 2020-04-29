@@ -22,8 +22,8 @@ class DemoTaskGraph implements TaskGraph {
             run("slowTask").every(4, "minutes").cancelOn("stopEvent")
         );
 
-        on("slowTaskFinished", run("mediumTask").now());
-        on("mediumTaskFinished", run("fastTask").now());
+        on("slowTaskFinished", run("mediumTask"));
+        on("mediumTaskFinished", run("fastTask"));
     }
 }
 
