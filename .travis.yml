@@ -81,7 +81,7 @@ matrix:
         - npm i
         - npm run tsc
         - cd ../demo
-        - tns test android --watch false --justlaunch --timeout 600
+        - tns test android --watch false --justlaunch
     - os: osx
       env:
         - TestiOS="12"
@@ -97,6 +97,8 @@ matrix:
         - cd ../demo
         - tns test android --watch false --justlaunch
   allow_failures:
+    - env:
+        - TestAndroid="29"
     - env:
         - TestiOS="12"
         - Xcode="11.2"
