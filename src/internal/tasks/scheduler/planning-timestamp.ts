@@ -1,6 +1,7 @@
 import {
   getNumber,
   setNumber,
+  flush,
 } from "tns-core-modules/application-settings/application-settings";
 
 const PREVIOUS_PLANNING_TIMESTAMP = "PREVIOUS_PLANNING_TIMESTAMP";
@@ -19,18 +20,13 @@ class PlanningTimestamp {
   }
 
   updateCurrent(): void {
-    this.setPrevious(this.current);
-    this.setCurrent(new Date().getTime());
-  }
-
-  private setPrevious(value: number) {
-    this._previous = value;
-    setNumber(PREVIOUS_PLANNING_TIMESTAMP, value);
-  }
-
-  private setCurrent(value: number) {
-    this._current = value;
-    setNumber(CURRENT_PLANNING_TIMESTAMP, value);
+    const previousCurrent = this.current;
+    const newCurrent = new Date().getTime();
+    this._previous = previousCurrent;
+    this._current = newCurrent;
+    setNumber(PREVIOUS_PLANNING_TIMESTAMP, previousCurrent);
+    setNumber(CURRENT_PLANNING_TIMESTAMP, newCurrent);
+    flush();
   }
 }
 
