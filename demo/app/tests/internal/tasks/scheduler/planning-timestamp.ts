@@ -8,7 +8,8 @@ describe("Planning timestamp", () => {
         await aBit();
         for (let i = 0; i <= 5; i++) {
             planningTimestamp.updateCurrent();
-            const planTimestamp = planningTimestamp.previous;
+            const previous = planningTimestamp.previous;
+            const current = planningTimestamp.current;
             console.log(
                 `Previous=${planningTimestamp.previous}, Current=${
                     planningTimestamp.current
@@ -16,7 +17,7 @@ describe("Planning timestamp", () => {
                     planningTimestamp.current - planningTimestamp.previous
                 }`
             );
-            expect(isABitBehindNow(planTimestamp)).toBeTruthy();
+            expect(isABitBehind(previous, current)).toBeTruthy();
             await aBit();
         }
     });
@@ -28,9 +29,8 @@ function aBit(): Promise<void> {
     });
 }
 
-function isABitBehindNow(timestamp: number) {
-    const now = new Date().getTime();
-    const offset = 50;
+function isABitBehind(previous: number, current: number) {
+    const offset = A_BIT / 2;
 
-    return now - timestamp < A_BIT + offset && now - timestamp > A_BIT - offset;
+    return current - previous < A_BIT + offset;
 }
