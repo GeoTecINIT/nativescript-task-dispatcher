@@ -74,7 +74,7 @@ matrix:
         - export ANDROID_HOME=/usr/local/android-sdk
         - export TOOLS=${ANDROID_HOME}/tools
         - export PATH=${ANDROID_HOME}:${ANDROID_HOME}/emulator:${TOOLS}:${TOOLS}/bin:${ANDROID_HOME}/platform-tools:${PATH}
-        - echo no | android create avd --force -n test -t -k "system-images;android-27;default;x86_64"
+        - echo no | android create avd --force -n test -t android-27 --abi x86_64
         - emulator -verbose -avd test -no-accel -no-snapshot -no-window $AUDIO -camera-back none -camera-front none -selinux permissive -qemu -m 2048 &
         - ./ci-tools/android-wait-for-emulator.sh
         - adb shell input keyevent 82 &
