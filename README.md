@@ -298,6 +298,11 @@ Describe your plugin methods and properties here. See [nativescript-feedback](ht
 
 ## Limitations
 
+- **No support for scheduled tasks on iOS**. We currently cannot commit to an estimated time until this limitation gets addressed.
+- **Scheduled tasks can run in parallel, in contrast _an event cannot spawn the execution of multiple tasks at the same time._** We are aware of that this might pose severe constraints for certain setups. That's why solving this limitation is one of our priorities
+- **Task chains initiated by external events might not be able to finish its execution at some point if the user switches to a different app or the task chain starts in background.** Again, we are aware of that this can pose a problem for executing tasks reliably under certain circumstances. That's why solving this limitation is another of our priorities.
+- **Trying to stop and start scheduled tasks in the same app run will lead to latest planning being ignored**. This was thought as a feature to avoid event-driven tasks being triggered after its cancellation, but we can understand that it can be understood as a bug. We'll fix this limitation by following a different convention: in order to stop an event-driven task, stop the event source instead. Addressing this limitation is our top priority.
+
 ## License
 
 Apache License Version 2.0, January 2004
