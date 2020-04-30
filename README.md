@@ -1,5 +1,7 @@
 # nativescript-task-dispatcher
 
+[![Build Status](https://travis-ci.com/GeoTecINIT/nativescript-task-dispatcher.svg?token=cYMN5eetmCX8aPqFVaQb&branch=master)](https://travis-ci.com/GeoTecINIT/nativescript-task-dispatcher)
+
 NativeScript Task Dispatcher is a NativeScript plugin aimed to ease the execution of mobile app's task definition and execution workflows in the background.
 
 It abstracts all the platform-specific details, leaving a clear and easy-to-use, yet powerful, API for task development and the definition of dependencies between them by means of an event-driven software architecture.
@@ -30,7 +32,7 @@ To illustrate how the three aforementioned components link together, let's prese
 
 Here **_> 1 minute tasks scheduler_** and **_Immediate tasks scheduler_** take place. The first scheduler bootstraps both task chains every minute, running them in parallel and waiting for them to finish before putting the device again to sleep. The task which logs the execution of a task chain depends on the battery (%) collection task successfully finishing in order to run. At the same time, battery level collection task won't run if the dummy task or the GPS task don't run before.
 
-## Prerequisites / Requirements
+## Prerequisites
 
 ### Android
 
