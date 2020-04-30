@@ -107,8 +107,6 @@ matrix:
         - tns test android --watch false --justlaunch
   allow_failures:
     - env:
-        - TestAndroid="29"
-    - env:
         - TestiOS="12"
         - Xcode="11.2"
 
