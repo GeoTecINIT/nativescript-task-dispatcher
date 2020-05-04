@@ -1,7 +1,7 @@
 import { TaskPlanner } from "nativescript-task-dispatcher/internal/tasks/planner";
 import { TaskScheduler } from "nativescript-task-dispatcher/internal/tasks/scheduler";
 import { RunnableTask } from "nativescript-task-dispatcher/internal/tasks/runnable-task";
-import { RunnableTaskBuilder } from "nativescript-task-dispatcher/internal/tasks/runnable-task/builder";
+import { RunnableTaskBuilderImpl } from "nativescript-task-dispatcher/internal/tasks/runnable-task/builder";
 import {
     DispatchableEvent,
     TaskDispatcherEvent,
@@ -38,14 +38,16 @@ describe("Task planner", () => {
         data: {},
     };
 
-    const immediateTask = new RunnableTaskBuilder("dummyTask", {})
+    const immediateTask = new RunnableTaskBuilderImpl("dummyTask", {})
         .now()
         .build();
-    const recurrentTask = new RunnableTaskBuilder("dummyTask", {})
+    const recurrentTask = new RunnableTaskBuilderImpl("dummyTask", {})
         .every(10)
         .build();
-    const oneShotTask = new RunnableTaskBuilder("dummyTask", {}).in(10).build();
-    const delayedTask = new RunnableTaskBuilder("dummyTask", {})
+    const oneShotTask = new RunnableTaskBuilderImpl("dummyTask", {})
+        .in(10)
+        .build();
+    const delayedTask = new RunnableTaskBuilderImpl("dummyTask", {})
         .at(new Date(new Date().getTime() + 3600 * 1000))
         .build();
 

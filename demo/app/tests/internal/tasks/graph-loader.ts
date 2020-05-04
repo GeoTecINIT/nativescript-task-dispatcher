@@ -6,17 +6,12 @@ import {
 import { Task } from "nativescript-task-dispatcher/internal/tasks/task";
 import { TaskGraphLoader } from "nativescript-task-dispatcher/internal/tasks/graph/loader";
 import {
-    RunnableTaskBuilder,
     ReadyRunnableTaskBuilder,
+    RunnableTaskBuilderImpl,
 } from "nativescript-task-dispatcher/internal/tasks/runnable-task/builder";
-import {
-    TaskDispatcherEvent,
-    emit,
-    createEvent,
-} from "nativescript-task-dispatcher/internal/events";
 import { createTaskCancelManagerMock } from ".";
 
-describe("Task tree loader", () => {
+describe("Task graph loader", () => {
     const errorMsg = "Task is not ready";
 
     const acquireData = new SimpleTask("acquireData", async () => null);
@@ -57,7 +52,6 @@ describe("Task tree loader", () => {
         eventName: string,
         taskBuilder: ReadyRunnableTaskBuilder
     ) => number;
-    let eventListenerDestroyer: (eventName: string, listenerId: number) => void;
     let describedTaskRunner: RunnableTaskDescriptor;
     let taskProvider: (taskName: string) => Task;
     let graphLoader: TaskGraphLoader;
@@ -71,11 +65,10 @@ describe("Task tree loader", () => {
                     listenerIds[taskBuilder.build().name]
             )
             .and.callThrough();
-        eventListenerDestroyer = jasmine.createSpy("eventListenerDestroyer");
         describedTaskRunner = jasmine
             .createSpy(
                 "describedTaskRunner",
-                (taskName: string) => new RunnableTaskBuilder(taskName, {})
+                (taskName: string) => new RunnableTaskBuilderImpl(taskName, {})
             )
             .and.callThrough();
         taskProvider = jasmine
@@ -85,7 +78,6 @@ describe("Task tree loader", () => {
             .and.callThrough();
         graphLoader = new TaskGraphLoader(
             eventListenerCreator,
-            eventListenerDestroyer,
             describedTaskRunner,
             (_: string) => null,
             taskProvider,
@@ -100,37 +92,15 @@ describe("Task tree loader", () => {
         await graphLoader.load(taskTree);
         expect(eventListenerCreator).toHaveBeenCalledWith(
             "startEvent",
-            jasmine.any(RunnableTaskBuilder)
+            jasmine.any(RunnableTaskBuilderImpl)
         );
         expect(eventListenerCreator).toHaveBeenCalledWith(
             "dataAcquired",
-            jasmine.any(RunnableTaskBuilder)
+            jasmine.any(RunnableTaskBuilderImpl)
         );
         expect(describedTaskRunner).toHaveBeenCalledWith("acquireData");
         expect(describedTaskRunner).toHaveBeenCalledWith("printAcquiredData");
         expect(cancelManager.init).toHaveBeenCalled();
-    });
-
-    it("unbinds tasks from its start event when cancel event gets emitted", async () => {
-        await graphLoader.load(taskTree);
-        emit(createEvent("endEvent"));
-        expect(eventListenerDestroyer).toHaveBeenCalledWith(
-            "startEvent",
-            listenerIds.acquireData
-        );
-        expect(eventListenerDestroyer).toHaveBeenCalledWith(
-            "startEvent",
-            listenerIds.acquireOtherData
-        );
-    });
-
-    it("unbinds tasks from its start event when default cancel event gets emitted", async () => {
-        await graphLoader.load(taskTree);
-        emit(createEvent(TaskDispatcherEvent.DefaultCancelEvent));
-        expect(eventListenerDestroyer).toHaveBeenCalledWith(
-            "dataAcquired",
-            listenerIds.printAcquiredData
-        );
     });
 
     it("returns that is not ready when at least one task is not", async () => {

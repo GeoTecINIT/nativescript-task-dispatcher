@@ -13,6 +13,7 @@ import {
     EventListenerGenerator,
     RunnableTaskDescriptor,
 } from "nativescript-task-dispatcher/internal/tasks/graph";
+import { plannedTasksDB } from "../../../src/internal/persistence/planned-tasks-store";
 
 describe("Event-based task runner", () => {
     setTasks(testTasks);
@@ -60,21 +61,18 @@ describe("Event-based task runner", () => {
         expect(eventCallback).toHaveBeenCalledWith(expectedEvent);
     });
 
-    it("does not run a task if it has been stopped", async () => {
+    it("removes a delayed task if it has been canceled", async () => {
         await taskGraph.load(testTaskGraph);
-        const callbackPromise = new Promise((resolve, reject) => {
-            setTimeout(() => resolve(), 2000);
-            on(expectedEvent.name, (evt) => {
-                eventCallback(evt);
-                reject(new Error("Callback should not be called"));
-            });
-        });
-
         emit(stopEvent);
-        emit(startEvent);
-        await callbackPromise;
 
-        expect(eventCallback).not.toHaveBeenCalled();
+        const plannedTask = await plannedTasksDB.get({
+            name: "dummyTask",
+            startAt: -1,
+            interval: 60000,
+            recurrent: true,
+            params: {},
+        });
+        expect(plannedTask).toBeNull();
     });
 
     afterEach(() => {
@@ -82,10 +80,18 @@ describe("Event-based task runner", () => {
         off(stopEvent.name);
         off(expectedEvent.name);
     });
+
+    afterAll(() => {
+        emit(stopEvent);
+    });
 });
 
 const testTaskGraph = {
     async describe(onEvt: EventListenerGenerator, run: RunnableTaskDescriptor) {
-        onEvt("startEvent", run("emitterTask").now().cancelOn("stopEvent"));
+        onEvt("startEvent", run("emitterTask"));
+        onEvt(
+            "startEvent",
+            run("dummyTask").every(1, "minutes").cancelOn("stopEvent")
+        );
     },
 };

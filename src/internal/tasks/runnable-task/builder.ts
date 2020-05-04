@@ -10,18 +10,29 @@ import { Logger, getLogger } from "../../utils/logger";
 
 import { TaskParams } from "../task";
 import { TaskPlanner } from "../planner";
+import { PlannedTask } from "../planner/planned-task";
 
 export interface ReadyRunnableTaskBuilder extends EventReceiver {
-  cancelOn(eventName: string): ReadyRunnableTaskBuilder;
   build(): RunnableTask;
-  plan(dispatchableEvent?: DispatchableEvent): void;
+  plan(dispatchableEvent?: DispatchableEvent): Promise<PlannedTask>;
 }
 
-interface DelayedRunnableTaskBuilder extends ReadyRunnableTaskBuilder {
-  every(time: number, timeUnit?: TimeUnit): ReadyRunnableTaskBuilder;
+interface ScheduledRunnableTaskBuilder extends ReadyRunnableTaskBuilder {
+  cancelOn(eventName: string): ReadyRunnableTaskBuilder;
 }
 
-export class RunnableTaskBuilder implements ReadyRunnableTaskBuilder {
+interface DelayedRunnableTaskBuilder extends ScheduledRunnableTaskBuilder {
+  every(time: number, timeUnit?: TimeUnit): ScheduledRunnableTaskBuilder;
+}
+
+export interface RunnableTaskBuilder extends ReadyRunnableTaskBuilder {
+  now(): ReadyRunnableTaskBuilder;
+  every(time: number, timeUnit?: TimeUnit): ScheduledRunnableTaskBuilder;
+  in(time: number, timeUnit?: TimeUnit): ScheduledRunnableTaskBuilder;
+  at(date: Date): DelayedRunnableTaskBuilder;
+}
+
+export class RunnableTaskBuilderImpl implements RunnableTaskBuilder {
   private startAt: number;
   private interval: number;
   private recurrent: boolean;
@@ -43,13 +54,14 @@ export class RunnableTaskBuilder implements ReadyRunnableTaskBuilder {
   }
 
   now(): ReadyRunnableTaskBuilder {
+    this.startAt = -1;
     this.interval = 0;
     this.recurrent = false;
 
     return this;
   }
 
-  every(time: number, timeUnit?: TimeUnit): ReadyRunnableTaskBuilder {
+  every(time: number, timeUnit?: TimeUnit): ScheduledRunnableTaskBuilder {
     const seconds = timeUnit ? toSeconds(time, timeUnit) : time;
     this.interval = seconds;
     this.recurrent = true;
@@ -57,7 +69,9 @@ export class RunnableTaskBuilder implements ReadyRunnableTaskBuilder {
     return this;
   }
 
-  in(time: number, timeUnit?: TimeUnit): ReadyRunnableTaskBuilder {
+  // TODO: Perhaps now it makes more sense for in to use startAt instead of interval.
+  // Will allow combining in with every, thus allowing running deferred recurrent tasks.
+  in(time: number, timeUnit?: TimeUnit): ScheduledRunnableTaskBuilder {
     const seconds = timeUnit ? toSeconds(time, timeUnit) : time;
     this.interval = seconds;
     this.recurrent = false;
@@ -69,6 +83,7 @@ export class RunnableTaskBuilder implements ReadyRunnableTaskBuilder {
     if (date > new Date()) {
       this.startAt = date.getTime();
     }
+    this.recurrent = false;
 
     return this;
   }
@@ -90,21 +105,24 @@ export class RunnableTaskBuilder implements ReadyRunnableTaskBuilder {
     };
   }
 
-  plan(dispatchableEvent?: DispatchableEvent) {
+  async plan(dispatchableEvent?: DispatchableEvent): Promise<PlannedTask> {
     const runnableTask = this.build();
-    this.taskPlanner
-      .plan(runnableTask, dispatchableEvent)
+    try {
+      return this.taskPlanner.plan(runnableTask, dispatchableEvent);
+    } catch (err) {
+      throw new Error(
+        `Could not plan (${JSON.stringify(runnableTask)}). Reason: ${err}`
+      );
+    }
+  }
+
+  onReceive(dispatchableEvent: DispatchableEvent) {
+    this.plan(dispatchableEvent)
       .then((plannedTask) => {
         this.logger.info(`Task planned: ${JSON.stringify(plannedTask)}`);
       })
       .catch((err) => {
-        this.logger.error(
-          `Error while planning ${JSON.stringify(runnableTask)}: ${err}`
-        );
+        this.logger.error(err);
       });
-  }
-
-  onReceive(dispatchableEvent: DispatchableEvent) {
-    this.plan(dispatchableEvent);
   }
 }

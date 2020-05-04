@@ -1,11 +1,17 @@
 import { TaskParams, setTaskDeferrer } from "./task";
 
 import { TaskPlanner } from "./planner";
-import { RunnableTaskBuilder } from "./runnable-task/builder";
+import {
+  RunnableTaskBuilder,
+  RunnableTaskBuilderImpl,
+} from "./runnable-task/builder";
 
 const taskPlanner = new TaskPlanner();
-export function run(taskName: string, params: TaskParams = {}) {
-  return new RunnableTaskBuilder(taskName, params, taskPlanner);
+export function run(
+  taskName: string,
+  params: TaskParams = {}
+): RunnableTaskBuilder {
+  return new RunnableTaskBuilderImpl(taskName, params, taskPlanner);
 }
 
 setTaskDeferrer((taskName, seconds, params) =>

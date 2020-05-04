@@ -14,7 +14,6 @@ type TaskEventBinder = (
   eventName: string,
   taskBuilder: ReadyRunnableTaskBuilder
 ) => number;
-type TaskEventUnbinder = (eventName: string, listenerId: number) => void;
 type TaskVerifier = (taskName: string) => void;
 type TaskProvider = (taskName: string) => Task;
 
@@ -26,7 +25,6 @@ export class TaskGraphLoader {
 
   constructor(
     private taskEventBinder: TaskEventBinder = on,
-    private taskEventUnbinder: TaskEventUnbinder = off,
     private runnableTaskDescriptor: RunnableTaskDescriptor = run,
     private taskVerifier: TaskVerifier = checkIfTaskExists,
     private taskProvider: TaskProvider = getTask,
@@ -89,16 +87,7 @@ export class TaskGraphLoader {
     eventName: string,
     taskBuilder: ReadyRunnableTaskBuilder
   ) {
-    const listenerId = this.taskEventBinder(eventName, taskBuilder);
-
-    // FIXME: This is giving a lot of trouble. It does not make sense to cancel immediate tasks.
-    // By convention, let them gracefully finish if they happen to be already running, ensure
-    // its launch event does not get triggered after "cancellation" (e.g. cutting it at the source).
-    const cancelEvent = taskBuilder.build().cancelEvent;
-    const cancelListenerId = on(taskBuilder.build().cancelEvent, () => {
-      off(cancelEvent, cancelListenerId);
-      this.taskEventUnbinder(eventName, listenerId);
-    });
+    this.taskEventBinder(eventName, taskBuilder);
   }
 
   private trackTaskGoingToBeRun(taskName: string) {
