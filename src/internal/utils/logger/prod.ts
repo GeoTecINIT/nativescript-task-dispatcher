@@ -1,6 +1,6 @@
-import { Logger } from "./common";
+import { AbstractLogger } from "./common";
 
-export class ProdLogger extends Logger {
+export class ProdLogger extends AbstractLogger {
   constructor(tag: string) {
     super(tag);
   }

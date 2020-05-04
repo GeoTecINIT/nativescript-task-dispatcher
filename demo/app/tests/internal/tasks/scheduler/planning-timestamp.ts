@@ -1,12 +1,13 @@
 import { planningTimestamp } from "nativescript-task-dispatcher/internal/tasks/scheduler/planning-timestamp";
 
 const A_BIT = 200;
+const ATTEMPTS = 3;
 
 describe("Planning timestamp", () => {
     it("returns the planning timestamp of the current invocation in successive runs", async () => {
         planningTimestamp.updateCurrent();
         await aBit();
-        for (let i = 0; i <= 5; i++) {
+        for (let i = 0; i <= ATTEMPTS; i++) {
             planningTimestamp.updateCurrent();
             const previous = planningTimestamp.previous;
             const current = planningTimestamp.current;

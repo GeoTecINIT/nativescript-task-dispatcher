@@ -32,4 +32,4 @@ export function getLogger(tag: string): Logger {
 }
 
 // FIXME: The export should be an interface in order to not to force developers to extend our logger
-export { Logger } from "./common";
+export { Logger, AbstractLogger } from "./common";
