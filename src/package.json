@@ -1,7 +1,7 @@
 {
   "name": "nativescript-task-dispatcher",
   "version": "0.0.1",
-  "description": "Your awesome NativeScript plugin.",
+  "description": "NativeScript-based mobile background task scheduler and dispatcher",
   "main": "task-dispatcher",
   "typings": "index.d.ts",
   "nativescript": {
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/agonper/nativescript-task-dispatcher.git"
+    "url": "https://github.com/GeoTecINIT/nativescript-task-dispatcher.git"
   },
   "scripts": {
     "tsc": "npm i && tsc",
@@ -35,15 +35,21 @@
     "Android",
     "iOS"
   ],
-  "author": {
-    "name": "Your Name",
-    "email": "youremail@yourdomain.com"
-  },
+  "authors": [
+    {
+      "name": "Alberto González Pérez",
+      "email": "algonzal@uji.es"
+    },
+    {
+      "name": "Miguel Matey Sanz",
+      "email": "matey@uji.es"
+    }
+  ],
   "bugs": {
-    "url": "https://github.com/agonper/nativescript-task-dispatcher/issues"
+    "url": "https://github.com/matey97/nativescript-task-dispatcher/issues"
   },
   "license": "Apache-2.0",
-  "homepage": "https://github.com/agonper/nativescript-task-dispatcher",
+  "homepage": "https://github.com/matey97/nativescript-task-dispatcher",
   "devDependencies": {
     "tns-core-modules": "^6.0.0",
     "tns-platform-declarations": "^6.0.0",

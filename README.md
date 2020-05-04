@@ -345,7 +345,7 @@ export class DataProviderTask extends Task {
 
 | Name                                                 | Return type        | Description                                                                                                                                                                                                                                                          |
 | ---------------------------------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `constructor(name: string, taskConfig?: TaskConfig)` | void               | Override task constructor to inject external dependencies or to perform actions at instantiation time.                                                                                                                                                               |
+| `constructor(name: string, taskConfig?: TaskConfig)` | `void`             | Override task constructor to inject external dependencies or to perform actions at instantiation time.                                                                                                                                                               |
 | `onRun()`                                            | `Promise<void>`    | Override this method to describe your task's logic.                                                                                                                                                                                                                  |
 | (optional) `checkIfCanRun()`                         | `Promise<boolean>` | Override this method if your task cannot if some conditions are not met. This method will be called while calling taskDispatcher.isReady() method. As an example, you can perform permission checks here.                                                            |
 | (optional) `prepare()`                               | `Promise<boolean>` | Override this method to define all the actions that must be executed in order to allow your task to run without issues. **UI code is allowed!** As an example, you can ask for permissions here. The UI is supposed to be visible by the time this method is called. |
@@ -461,6 +461,19 @@ Emit an event created by `createEvent`.
 - **Scheduled tasks can run in parallel, in contrast _an event cannot spawn the execution of multiple tasks at the same time._** We are aware of that this might pose severe constraints for certain setups. That's why solving this limitation is one of our priorities
 - **Task chains initiated by external events might not be able to finish its execution at some point if the user switches to a different app or the task chain starts in background.** Again, we are aware of that this can pose a problem for executing tasks reliably under certain circumstances. That's why solving this limitation is another of our priorities.
 - **Trying to stop and start scheduled tasks in the same app run will lead to latest planning being ignored**. This was thought as a feature to avoid event-driven tasks being triggered after its cancellation, but we can understand that it can be understood as a bug. We'll fix this limitation by following a different convention: in order to stop an event-driven task, stop the event source instead. Addressing this limitation is our top priority.
+
+## Plugin authors
+
+<a href="https://github.com/agonper" title="Alberto González Pérez" target="_blank">
+  <img src="https://avatars3.githubusercontent.com/u/10727467?s=120" alt="Alberto González Pérez" width="120"/>
+</a>
+<a href="https://github.com/matey97" title="Miguel Matey Sanz" target="_blank">
+  <img src="https://avatars3.githubusercontent.com/u/25453537?s=120" alt="Miguel Matey Sanz" width="120"/>
+</a>
+
+## Acknowledgements
+
+The development of this plugin has been made possible thanks to the Spanish Government. Concretely from, Spanish Ministry of Education, Culture and Sports (grant reference FPU17/03832), and “Programa Estatal de I+D+i Orientada a los Retos de la Sociedad" (reference RTI2018-099939-BI-00).
 
 ## License
 
