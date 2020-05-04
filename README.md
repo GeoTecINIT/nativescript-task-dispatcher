@@ -463,10 +463,10 @@ Emit an event created by `createEvent`.
 
 ## Plugin authors
 
-<a href="https://github.com/agonper" title="Alberto González Pérez" target="_blank">
+<a href="https://github.com/agonper" title="Alberto González Pérez">
   <img src="https://avatars3.githubusercontent.com/u/10727467?s=120" alt="Alberto González Pérez" width="120"/>
 </a>
-<a href="https://github.com/matey97" title="Miguel Matey Sanz" target="_blank">
+<a href="https://github.com/matey97" title="Miguel Matey Sanz">
   <img src="https://avatars3.githubusercontent.com/u/25453537?s=120" alt="Miguel Matey Sanz" width="120"/>
 </a>
 

@@ -1,6 +1,6 @@
 import { planningTimestamp } from "nativescript-task-dispatcher/internal/tasks/scheduler/planning-timestamp";
 
-const A_BIT = 200;
+const A_BIT = 500;
 const ATTEMPTS = 3;
 
 describe("Planning timestamp", () => {
