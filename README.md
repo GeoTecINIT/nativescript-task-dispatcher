@@ -58,6 +58,8 @@ tns plugin add nativescript-task-dispatcher
 
 If one or more of your app tasks require to run in foreground (while in background), for example if one of your tasks requires to access user location on a regular basis (more than once per hour) while in background ([more info here](https://developer.android.com/about/versions/oreo/background-location-limits)), please ensure the following keys are included in your app's `strings.xml` file (located in: `App_Resources -> Android -> src -> main -> res -> values`):
 
+> **Note**: If your application does not yet include a `strings.xml` file inside the values folder. Please, copy the auto-generated file present inside `platforms -> android -> app -> src -> main -> res -> values` folder to the folder mentioned above. Please keep in mind that this structure won't be present in your project if you have not built your app yet.
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
@@ -67,14 +69,14 @@ If one or more of your app tasks require to run in foreground (while in backgrou
     The notification channel used in Android 8.0 and upper to deliver foreground service sticky notifications.
     (more info here: https://developer.android.com/training/notify-user/channels)
   <-->
-  <string name="task_dispatcher_location_usage_channel_name">"Background location"</string>
-  <string name="task_dispatcher_location_usage_channel_description">"Indicates when the app is accessing your location in background"</string>
+  <string name="task_dispatcher_channel_name">"Background location"</string>
+  <string name="task_dispatcher_channel_description">"Indicates when the app is accessing your location in background"</string>
   <!-->
     The notification title and content that your user will see in the status bar while the service is running in foreground.
     (more info here: https://developer.android.com/guide/components/services#Foreground)
   <-->
-  <string name="task_dispatcher_location_usage_notification_title">"demo app is using your location"</string>
-  <string name="task_dispatcher_location_usage_notification_content">""</string>
+  <string name="task_dispatcher_notification_title">"demo app is using your location"</string>
+  <string name="task_dispatcher_notification_content">""</string>
 
   <!--> Other strings <-->
 </resources>
@@ -99,6 +101,8 @@ If your meets the requirements to be whitelisted, then you'll need to add the fo
 ```
 
 We'll handle the rest for you :)
+
+> **Note**: Certain phone manufacturers include a non-stock Android layer in their phones, i.e. Samsung, Huawei, Xiaomi, to mention a few of them. This custom Android layer does not allow to disable battery savings by means of system APIs. If you're aware of that your users use devices from these brands, they will be required to adjust phone settings manually in order for the plugin to work reliably at bellow 15 minutes intervals. [Here](./docs/disable-android-battery-saving.md) you will find further instructions.
 
 > **Disclaimer**: Google regularly checks its store for apps that have declared the indicated permission. If you claim that your app should be whitelisted but in the end it turns out not, your app could end up banned from the Play Store. We advise you to thoroughly evaluate this.
 
@@ -473,7 +477,3 @@ Emit an event created by `createEvent`.
 ## Acknowledgements
 
 The development of this plugin has been made possible thanks to the Spanish Government. Concretely from, Spanish Ministry of Education, Culture and Sports (grant reference FPU17/03832), and “Programa Estatal de I+D+i Orientada a los Retos de la Sociedad" (reference RTI2018-099939-BI-00).
-
-## License
-
-Apache License Version 2.0, January 2004
