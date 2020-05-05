@@ -20,10 +20,8 @@ function notificationChannels(
         AndroidNotification.LocationUsage,
         {
           id: "LOCATION_USAGE",
-          name: getString("task_dispatcher_location_usage_channel_name"),
-          description: getString(
-            "task_dispatcher_location_usage_channel_description"
-          ),
+          name: getString("task_dispatcher_channel_name"),
+          description: getString("task_dispatcher_channel_description"),
           priority: NotificationManagerCompat.IMPORTANCE_LOW,
         },
       ],
@@ -60,8 +58,8 @@ export function createNotification(
       notificationBuilder = initializeNotificationBuilder(
         context,
         type,
-        "task_dispatcher_location_usage_notification_title",
-        "task_dispatcher_location_usage_notification_content"
+        "task_dispatcher_notification_title",
+        "task_dispatcher_notification_content"
       ).setContentIntent(pendingIntent);
 
       break;
