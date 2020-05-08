@@ -463,6 +463,7 @@ Emit an event created by `createEvent`.
 
 - **No support for scheduled tasks on iOS**. We currently cannot commit to an estimated time until this limitation gets addressed.
 - **Scheduled tasks can run in parallel, in contrast _an event cannot spawn the execution of multiple tasks at the same time._** We are aware of that this might pose severe constraints for certain setups. That's why solving this limitation is one of our priorities
+- **No support for foreground tasks in the middle of a task chain**. If one of your tasks requires foreground execution and depends on another task that does not require it, it will not be executed in foreground. This happens because currently we do not back-propagate the foreground execution setting (but it is something planned). As a temporal fix, if a task could make a foreground task to be executed, declare the first task as a foreground task too.
 - **Task chains initiated by external events might not be able to finish its execution at some point if the user switches to a different app or the task chain starts in background.** Again, we are aware of that this can pose a problem for executing tasks reliably under certain circumstances. That's why solving this limitation is another of our priorities.
 
 ## Plugin authors
