@@ -310,11 +310,13 @@ import { DispatchableEvent } from "nativescript-task-dispatcher/events";
 
 export class DataProviderTask extends Task {
   constructor(
-    name: string,
+    name: string
     // Inject task dependencies here. e.g.:
     // private dataProvider: DataProvider
-    taskConfig?: TaskConfig
   ) {
+    const taskConfig = {
+      outputEventNames: ["dataAcquired"],
+    };
     super(name, taskConfig);
   }
 
@@ -343,7 +345,7 @@ export class DataProviderTask extends Task {
     // Mark the task execution as finished and emit a custom event (dataAcquired)
     // with the acquired data as payload to make it accessible to any tasks
     // waiting for this task to complete
-    this.done(`dataAcquired`, { data });
+    this.done("dataAcquired", { data });
   }
 }
 ```

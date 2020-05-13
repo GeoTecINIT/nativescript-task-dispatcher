@@ -13,9 +13,10 @@ export abstract class Task {
   }
 
   get outputEventNames(): Array<string> {
-    return this.taskConfig.outputEventNames;
+    return this._taskConfig.outputEventNames;
   }
 
+  private _taskConfig: TaskConfig;
   private _taskParams: TaskParams;
   private _invocationEvent: DispatchableEvent;
 
@@ -25,18 +26,12 @@ export abstract class Task {
 
   private _logger: Logger;
 
-  constructor(name: string, protected taskConfig: TaskConfig = {}) {
+  constructor(name: string, taskConfig: TaskConfig = {}) {
     this._name = name;
     this._executionHistory = new Set();
     this._cancelFunctions = new Map();
 
-    if (!taskConfig.foreground) {
-      taskConfig.foreground = false;
-    }
-
-    if (!taskConfig.outputEventNames) {
-      taskConfig.outputEventNames = [`${name}Finished`];
-    }
+    this.configureTask(taskConfig);
   }
 
   /**
@@ -64,7 +59,7 @@ export abstract class Task {
       await this.onRun(taskParams, invocationEvent);
 
       if (!this.isDone()) {
-        this.done(this.taskConfig.outputEventNames[0]);
+        this.done(this.outputEventNames[0]);
       }
     } catch (err) {
       this.getLogger().error(
@@ -84,7 +79,7 @@ export abstract class Task {
    * Indicates if a task runs in background (true by default). Can be configured at instantiation time.
    */
   runsInBackground(): boolean {
-    return !this.taskConfig.foreground;
+    return !this._taskConfig.foreground;
   }
 
   /**
@@ -165,6 +160,13 @@ export abstract class Task {
     }
     this.markAsDone();
 
+    if (!this.outputEventNames.find((name) => name === eventName)) {
+      this.getLogger().warn(
+        `About to emit an event (${eventName}) not declared in the list of possible output events of this task.
+      This can lead to unintended behaviors. Perhaps you have forgot to include it in the task configuration or there is a typo`
+      );
+    }
+
     if (!hasListeners(eventName)) {
       this.emitEndEvent(TaskResultStatus.Ok);
 
@@ -188,6 +190,20 @@ export abstract class Task {
     this.getLogger().info(
       `${message} (invocationId=${this._invocationEvent.id})`
     );
+  }
+
+  private configureTask(taskConfig: TaskConfig) {
+    this._taskConfig = {
+      foreground: taskConfig.foreground ? true : false,
+      outputEventNames: taskConfig.outputEventNames
+        ? taskConfig.outputEventNames
+        : [],
+    };
+
+    this._taskConfig.outputEventNames = [
+      `${this.name}Finished`,
+      ...this._taskConfig.outputEventNames,
+    ];
   }
 
   private cancelParallelInvocation(
