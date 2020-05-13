@@ -28,8 +28,12 @@ export const testTasks: Array<Task> = [
                 });
             })
     ),
-    new SimpleTask("emitterTask", async ({ done }) =>
-        done("patataCooked", { status: "slightlyBaked" })
+    new SimpleTask(
+        "emitterTask",
+        async () => ({
+            result: { status: "slightlyBaked" },
+        }),
+        { outputEventNames: ["patataCooked"] }
     ),
 ];
 

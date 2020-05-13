@@ -1,7 +1,15 @@
-import { Task, TaskConfig, TaskParams, CancelFunction } from "./task";
+import {
+  Task,
+  TaskConfig,
+  TaskParams,
+  CancelFunction,
+  TaskOutcome,
+} from "./task";
 import { DispatchableEvent } from "../events";
 
-type SimpleTaskFunction = (ctx: SimpleTaskContext) => Promise<void>;
+type SimpleTaskFunction = (
+  ctx: SimpleTaskContext
+) => Promise<void | TaskOutcome>;
 
 export class SimpleTask extends Task {
   constructor(
@@ -13,9 +21,6 @@ export class SimpleTask extends Task {
   }
 
   protected async onRun(params: TaskParams, evt: DispatchableEvent) {
-    const done = (eventName: string, data: { [key: string]: any }) =>
-      this.done(eventName, data);
-
     const onCancel = (f: () => void) => this.setCancelFunction(f);
 
     const runAgainIn = (seconds: number, taskParams: TaskParams) =>
@@ -26,19 +31,17 @@ export class SimpleTask extends Task {
     const ctx: SimpleTaskContext = {
       params,
       evt,
-      done,
       onCancel,
       runAgainIn,
       log,
     };
-    await this.functionToRun(ctx);
+    return this.functionToRun(ctx);
   }
 }
 
 interface SimpleTaskContext {
   params: TaskParams;
   evt: DispatchableEvent;
-  done(eventName: string, data: { [key: string]: any }): void;
   onCancel(cancelFunction: CancelFunction): void;
   runAgainIn(seconds: number, params?: TaskParams): void;
   log(message: any): void;

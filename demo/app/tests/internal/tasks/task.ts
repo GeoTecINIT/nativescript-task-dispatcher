@@ -36,20 +36,28 @@ describe("Task", () => {
     const timeoutTaskEndEvtName = `${timeoutTask.name}Finished`;
 
     const emitterTaskEndEvtName = "emissionCompleted";
-    const emitterTask = new SimpleTask("emitterTask", async ({ done }) =>
-        done(emitterTaskEndEvtName, { result: ":)" })
+    const emitterTask = new SimpleTask(
+        "emitterTask",
+        async () => ({ result: ":)" }),
+        { outputEventNames: [emitterTaskEndEvtName] }
     );
 
     const parameterizedTaskEndEvtName = "completedWithParams";
     const parameterizedTask = new SimpleTask(
         "parameterizedTask",
-        async ({ done, params }) =>
-            done(parameterizedTaskEndEvtName, { params })
+        async ({ params }) => ({
+            result: { params },
+        }),
+        { outputEventNames: [parameterizedTaskEndEvtName] }
     );
 
     const eventualTaskEndEvtName = "completedWithEventData";
-    const eventualTask = new SimpleTask("eventualTask", async ({ done, evt }) =>
-        done(eventualTaskEndEvtName, { eventData: evt.data })
+    const eventualTask = new SimpleTask(
+        "eventualTask",
+        async ({ evt }) => ({
+            result: { eventData: evt.data },
+        }),
+        { outputEventNames: [eventualTaskEndEvtName] }
     );
 
     const foregroundDumbTask = new SimpleTask(

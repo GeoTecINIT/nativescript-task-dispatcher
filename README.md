@@ -66,7 +66,7 @@ If one or more of your app tasks require to run in foreground (while in backgrou
   <!--> Other strings <-->
 
   <!-->
-    The notification channel used in Android 8.0 and upper to deliver foreground service sticky notifications.
+    The notification channel used in Android 8.0 or higher to deliver foreground service sticky notifications.
     (more info here: https://developer.android.com/training/notify-user/channels)
   <-->
   <string name="task_dispatcher_channel_name">"Background location"</string>
@@ -290,8 +290,8 @@ Plugin's entry point. A singleton instance that can be used as needed throughout
 | Name                                                                          | Return type        | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ----------------------------------------------------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `init(appTasks: Array<Task>, appTaskGraph: TaskGraph, config?: ConfigParams)` | `Promise<void>`    | Allows to initialize the plugin with your own custom tasks and a task graph to describe how do they relate to each other. In order for the plugin to work, **it must be called only once** at your app's entry point (`app.ts` or `main.ts`). Through the configuration you can enable library's info and debug logging and also inject your custom logger which will inherently enable library's logging.                                                                                           |
-| `isReady()`                                                                   | `Promise<boolean>` | Allows to check (and wait for) plugin initialization status. It also iterates over your app's tasks to check if they are [ready](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/task.ts#L114) for its execution. You should call this method before emitting any external event. The promise is stored internally, it is safe to call this method as many times as needed.                                                                                |
-| `prepare()`                                                                   | `Promise<void>`    | Method to be called if isReady() returns false. If your app has one or more tasks that have reported not to be ready, it will call their [prepare()](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/task.ts#L122) method (e.g. to ask for missing permissions or enable disabled capabilities). **WARNING! This method is only meant to be called while the UI is visible.** Follow this guideline to foster the creation of a consistent task ecosystem. |
+| `isReady()`                                                                   | `Promise<boolean>` | Allows to check (and wait for) plugin initialization status. It also iterates over your app's tasks to check if they are [ready](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/task.ts#L107) for its execution. You should call this method before emitting any external event. The promise is stored internally, it is safe to call this method as many times as needed.                                                                                |
+| `prepare()`                                                                   | `Promise<void>`    | Method to be called if isReady() returns false. If your app has one or more tasks that have reported not to be ready, it will call their [prepare()](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/task.ts#L114) method (e.g. to ask for missing permissions or enable disabled capabilities). **WARNING! This method is only meant to be called while the UI is visible.** Follow this guideline to foster the creation of a consistent task ecosystem. |
 
 ### Task ([see code](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/task.ts#L10))
 
@@ -305,6 +305,7 @@ import {
   Task,
   TaskConfig,
   TaskParams,
+  TaskOutcome,
 } from "nativescript-task-dispatcher/tasks";
 import { DispatchableEvent } from "nativescript-task-dispatcher/events";
 
@@ -315,7 +316,10 @@ export class DataProviderTask extends Task {
     // private dataProvider: DataProvider
   ) {
     const taskConfig = {
+      // Declare the name of the event(s) that the task can emit on result
       outputEventNames: ["dataAcquired"],
+      // If empty or undefined, all tasks declare a default output event:
+      // {taskName}Finished
     };
     super(name, taskConfig);
   }
@@ -333,7 +337,7 @@ export class DataProviderTask extends Task {
   protected async onRun(
     params: TaskParams,
     invocationEvent: DispatchableEvent
-  ): Promise<void> {
+  ): Promise<void | TaskOutcome> {
     let data = {};
     // e.g:
     this.setCancelFunction(() => {
@@ -342,22 +346,36 @@ export class DataProviderTask extends Task {
     });
     // data = await this.dataProvider.acquireData();
 
-    // Mark the task execution as finished and emit a custom event (dataAcquired)
-    // with the acquired data as payload to make it accessible to any tasks
-    // waiting for this task to complete
-    this.done("dataAcquired", { data });
+    return { result: data };
+    // A task emits an event on return. If a task can only emit one event
+    // there is no need to specify the event to be emitted, but you can
+    // anyway do it. Like this:
+    // return { eventName: "dataAcquired", result: data };
+
+    // Any other task invoked by "dataAcquired" event will find the captured
+    // "data" inside invocationEvent.data. If data is a non-object value (e.g.
+    // a string), it will be accessible from invocationEvent.data.result
+
+    // If a task can emit one or more events, you must specify which event has
+    // to be emitted otherwise task will fail to finish its execution correctly
+
+    // A task can return no data. In that scenario, if the task can only emit
+    // one kind of event, once onRun method ends its execution the event will
+    // be fired, containing no data. If a task which returns no data can emit
+    // more than one event. It will have to return the event name like this:
+    // return { eventName: "dataAcquired" };
   }
 }
 ```
 
 #### Methods to override when extending Task class
 
-| Name                                                                | Return type        | Description                                                                                                                                                                                                                                                          |
-| ------------------------------------------------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `constructor(name: string, taskConfig?: TaskConfig)`                | `void`             | Override task constructor to inject external dependencies or to perform actions at instantiation time.                                                                                                                                                               |
-| `onRun(taskParams: TaskParams, invocationEvent: DispatchableEvent)` | `Promise<void>`    | Override this method to describe your task's logic.                                                                                                                                                                                                                  |
-| (optional) `checkIfCanRun()`                                        | `Promise<boolean>` | Override this method if your task cannot if some conditions are not met. This method will be called while calling taskDispatcher.isReady() method. As an example, you can perform permission checks here.                                                            |
-| (optional) `prepare()`                                              | `Promise<boolean>` | Override this method to define all the actions that must be executed in order to allow your task to run without issues. **UI code is allowed!** As an example, you can ask for permissions here. The UI is supposed to be visible by the time this method is called. |
+| Name                                                                | Return type                   | Description                                                                                                                                                                                                                                                          |
+| ------------------------------------------------------------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `constructor(name: string, taskConfig?: TaskConfig)`                | `void`                        | Override task constructor to inject external dependencies or to perform actions at instantiation time.                                                                                                                                                               |
+| `onRun(taskParams: TaskParams, invocationEvent: DispatchableEvent)` | `Promise<void | TaskOutcome>` | Override this method to describe your task's logic. It can return nothing or a result to be used by other tasks. See Task example snippet above for more information.                                                                                                |
+| (optional) `checkIfCanRun()`                                        | `Promise<boolean>`            | Override this method if your task cannot if some conditions are not met. This method will be called while calling taskDispatcher.isReady() method. As an example, you can perform permission checks here.                                                            |
+| (optional) `prepare()`                                              | `Promise<boolean>`            | Override this method to define all the actions that must be executed in order to allow your task to run without issues. **UI code is allowed!** As an example, you can ask for permissions here. The UI is supposed to be visible by the time this method is called. |
 
 > **Note:** We highly discourage you to **not to override other Task class methods** aside of the listed in the table above. _Things could go really wrong._
 
@@ -370,29 +388,27 @@ export class DataProviderTask extends Task {
 
 #### Methods available while extending Task class
 
-| Name                                                    | Return type | Description                                                                                                                                                                                                                                                                                                                                                                                                              |
-| ------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `setCancelFunction(f: () => void)`                      | `void`      | Because of OS restrictions your task could end up being stopped at some moment if it takes too long to execute. Use this method to pass by a function to define actions to be performed in case your task has to finish its execution earlier than expected. You can cancel requests here or save partial results to start from the saved progress when the task gets invoked again.                                     |
-| `done(eventName: string, data?: { [key: string]: any})` | `void`      | Use this method if your task has some results to report to other tasks upon finalization. If you forget to call this function, the plugin will emit an event with the following shape: `{your-task-name}Finished`. This allows the device to go to sleep when unattended tasks finish their execution.                                                                                                                   |
-| `runAgainIn(seconds: number, params?: TaskParams)`      | `void`      | Schedule task to run again in a certain amount of seconds. Task params can be redefined. **WARNING! Calling this method from inside recurrent tasks could lead to unexpected results**. Always use this method in tasks declared as non-repeating.                                                                                                                                                                       |
-| `log(message: any)`                                     | `void`      | Allows you to log info messages and tie them to the task name and the task invocation id which is propagated from one task to another inside task's invocationEvent. If you set a custom [Logger](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/utils/logger/common.ts#L1) at plugin's initialization time, all log() method calls will pass through your logger as info messages. |
+| Name                                               | Return type | Description                                                                                                                                                                                                                                                                                                                                                                                                              |
+| -------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `setCancelFunction(f: () => void)`                 | `void`      | Because of OS restrictions your task could end up being stopped at some moment if it takes too long to execute. Use this method to pass by a function to define actions to be performed in case your task has to finish its execution earlier than expected. You can cancel requests here or save partial results to start from the saved progress when the task gets invoked again.                                     |
+| `runAgainIn(seconds: number, params?: TaskParams)` | `void`      | Schedule task to run again in a certain amount of seconds. Task params can be redefined. **WARNING! Calling this method from inside recurrent tasks could lead to unexpected results**. Always use this method in tasks declared as non-repeating.                                                                                                                                                                       |
+| `log(message: any)`                                | `void`      | Allows you to log info messages and tie them to the task name and the task invocation id which is propagated from one task to another inside task's invocationEvent. If you set a custom [Logger](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/utils/logger/common.ts#L1) at plugin's initialization time, all log() method calls will pass through your logger as info messages. |
 
 ### SimpleTask ([see code](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/simple-task.ts#L6))
 
 A higher level (and simpler) version of the [Task](#task-see-code) construct. It enforces functional programming principles to declare tasks as functions within a class object container. All the interaction with the simple task is done through its constructor. The constructor has the following shape:
 
-> [SimpleTask](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/simple-task.ts#L6)(name: string, functionToRun: [SimpleTaskFunction](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/simple-task.ts#L4), taskConfig?: [TaskConfig](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/simple-task.ts#L4))
+> [SimpleTask](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/simple-task.ts#L6)(name: string, functionToRun: [SimpleTaskFunction](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/simple-task.ts#L4), taskConfig?: [TaskConfig](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/task.ts#L291))
 
-The function passed by to the SimpleTask constructor only gets a context parameter, which is a JavaScript object with the following properties:
+The result of calling `functionToRun` will be interpreted as a task outcome. It can be void (`null`, `undefined`, `{}`) or an object matching the [TaskOutcome](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/task.ts#L300) interface. This function only gets a context parameter, which is a JavaScript object with the following properties:
 
-| Name                                                    | Type                                                                                                                            | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `params`                                                | [`TaskParams`](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/task.ts#L237)          | The parameters passed by to the task when it is declared inside the task graph.                                                                                                                                                                                                                                                                                                                                                                             |
-| `evt`                                                   | [`DispatchableEvent`](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/events/events.ts#L10) | The event that triggered task                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `done(eventName: string, data?: { [key: string]: any})` | `void`                                                                                                                          | _Equivalent to Task done() method._ Use this method if your task has some results to report to other tasks upon finalization. If you forget to call this function, the plugin will emit an event with the following shape: `{your-task-name}Finished`. This allows the device to go to sleep when unattended tasks finish their execution.                                                                                                                  |
-| `onCancel(f: () => void)`                               | `void`                                                                                                                          | _Equivalent to Task setCancelFunction() method._ Because of OS restrictions your task could end up being stopped at some moment if it takes too long to execute. Use this method to pass by a function to define actions to be performed in case your task has to finish its execution earlier than expected. You can cancel requests here or save partial results to start from the saved progress when the task gets invoked again.                       |
-| `runAgainIn(seconds: number, params?: TaskParams)`      | `void`                                                                                                                          | _Equivalent to Task runAgainIn() method._ Schedule task to run again in a certain amount of seconds. Task params can be redefined. **WARNING! Calling this method from inside recurrent tasks could lead to unexpected results**. Always use this method in tasks declared as non-repeating.                                                                                                                                                                |
-| `log(message: any)`                                     | `void`                                                                                                                          | _Equivalent to Task log() method._ Allows you to log info messages and tie them to the task name and the task invocation id which is propagated from one task to another inside task's invocationEvent. If you set a custom [Logger](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/utils/logger/common.ts#L1) at plugin's initialization time, all log() method calls will pass through your logger as info messages. |
+| Name                                               | Type                                                                                                                            | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `params`                                           | [`TaskParams`](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/task.ts#L296)          | The parameters passed by to the task when it is declared inside the task graph.                                                                                                                                                                                                                                                                                                                                                                             |
+| `evt`                                              | [`DispatchableEvent`](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/events/events.ts#L10) | The event that triggered task                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `onCancel(f: () => void)`                          | `void`                                                                                                                          | _Equivalent to Task setCancelFunction() method._ Because of OS restrictions your task could end up being stopped at some moment if it takes too long to execute. Use this method to pass by a function to define actions to be performed in case your task has to finish its execution earlier than expected. You can cancel requests here or save partial results to start from the saved progress when the task gets invoked again.                       |
+| `runAgainIn(seconds: number, params?: TaskParams)` | `void`                                                                                                                          | _Equivalent to Task runAgainIn() method._ Schedule task to run again in a certain amount of seconds. Task params can be redefined. **WARNING! Calling this method from inside recurrent tasks could lead to unexpected results**. Always use this method in tasks declared as non-repeating.                                                                                                                                                                |
+| `log(message: any)`                                | `void`                                                                                                                          | _Equivalent to Task log() method._ Allows you to log info messages and tie them to the task name and the task invocation id which is propagated from one task to another inside task's invocationEvent. If you set a custom [Logger](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/utils/logger/common.ts#L1) at plugin's initialization time, all log() method calls will pass through your logger as info messages. |
 
 Due to context parameter being an object you can use JavaScript's [object destructuring](https://developer.mozilla.org/es/docs/Web/JavaScript/Referencia/Operadores/Destructuring_assignment#Object_destructuring) mechanism while developing your own tasks to only use the properties that you need. In the following example you can see how all the context properties of the context object can be extracted by using this technique:
 
@@ -406,7 +422,7 @@ export const appTasks: Array<Task> = [
 
   new SimpleTask(
     "useThemAllTask",
-    async ({ params, evt, log, onCancel, runAgainIn, done }) => {
+    async ({ params, evt, log, onCancel, runAgainIn }) => {
       log(`Started running with params=${params}, invokedBy evt=${evt}`);
       onCancel(() => {
         log("Can't stop me now");
@@ -415,9 +431,11 @@ export const appTasks: Array<Task> = [
         // (unless you add some mechanism to control the recursive storm)
         runAgainIn(60, { state: "Some random state" });
       });
-      done("mrIllUseThemAllHasFinished(thankfully)", {
-        message: "But i'll return",
-      });
+      return {
+        eventName: "mrIllUseThemAllHasFinished(thankfully)" // Optional,
+        // because this task declares only one output event
+        result: "But i'll return"
+      }
     },
     { outputEventNames: ["mrIllUseThemAllHasFinished(thankfully)"] }
   ),
@@ -436,7 +454,7 @@ Notice that the describe method expects your implementation to return a promise.
 
 The complexity here relapses in the the two parameters that the describe method receives. The EventListenerGenerator (`on`) is a function which receives two arguments a string with the name of the event that initiates an action and the receiver of that action, which right now can only be a ReadyRunnableTaskBuilder.
 
-The only (advised) way to create a ReadyRunnableTaskBuilder from within a TaskGraph is by using describe's second parameter: `run`, a RunnableTaskDescriptor. The RunnableTaskDescriptor is another function which takes as arguments, the name of the task to be run and the parameters that are going to be passed to this task at runtime ([TaskParams](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/task.ts#L237)). `run` returns a RunnableTaskBuilder with the following methods:
+The only (advised) way to create a ReadyRunnableTaskBuilder from within a TaskGraph is by using describe's second parameter: `run`, a RunnableTaskDescriptor. The RunnableTaskDescriptor is another function which takes as arguments, the name of the task to be run and the parameters that are going to be passed to this task at runtime ([TaskParams](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/task.ts#L296)). `run` returns a RunnableTaskBuilder with the following methods:
 
 | Name                                        | Return type                                                                                                                                     | Description                                                                                                                                                                                                                            |
 | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
