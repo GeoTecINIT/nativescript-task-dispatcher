@@ -301,7 +301,12 @@ There is an scenario where extending the Task class makes more sense than using 
 
 ```ts
 // data-provider-task.ts
-import { Task, TaskConfig } from "nativescript-task-dispatcher/tasks";
+import {
+  Task,
+  TaskConfig,
+  TaskParams,
+} from "nativescript-task-dispatcher/tasks";
+import { DispatchableEvent } from "nativescript-task-dispatcher/events";
 
 export class DataProviderTask extends Task {
   constructor(
@@ -323,12 +328,10 @@ export class DataProviderTask extends Task {
     // await this.dataProvider.askPermission();
   }
 
-  protected async onRun(): Promise<void> {
-    // Here you can access some contextual information
-    // like this.taskParams
-    // and this.invocationEvent
-    // more info at Task class API section
-
+  protected async onRun(
+    params: TaskParams,
+    invocationEvent: DispatchableEvent
+  ): Promise<void> {
     let data = {};
     // e.g:
     this.setCancelFunction(() => {
@@ -347,23 +350,21 @@ export class DataProviderTask extends Task {
 
 #### Methods to override when extending Task class
 
-| Name                                                 | Return type        | Description                                                                                                                                                                                                                                                          |
-| ---------------------------------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `constructor(name: string, taskConfig?: TaskConfig)` | `void`             | Override task constructor to inject external dependencies or to perform actions at instantiation time.                                                                                                                                                               |
-| `onRun()`                                            | `Promise<void>`    | Override this method to describe your task's logic.                                                                                                                                                                                                                  |
-| (optional) `checkIfCanRun()`                         | `Promise<boolean>` | Override this method if your task cannot if some conditions are not met. This method will be called while calling taskDispatcher.isReady() method. As an example, you can perform permission checks here.                                                            |
-| (optional) `prepare()`                               | `Promise<boolean>` | Override this method to define all the actions that must be executed in order to allow your task to run without issues. **UI code is allowed!** As an example, you can ask for permissions here. The UI is supposed to be visible by the time this method is called. |
+| Name                                                                | Return type        | Description                                                                                                                                                                                                                                                          |
+| ------------------------------------------------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `constructor(name: string, taskConfig?: TaskConfig)`                | `void`             | Override task constructor to inject external dependencies or to perform actions at instantiation time.                                                                                                                                                               |
+| `onRun(taskParams: TaskParams, invocationEvent: DispatchableEvent)` | `Promise<void>`    | Override this method to describe your task's logic.                                                                                                                                                                                                                  |
+| (optional) `checkIfCanRun()`                                        | `Promise<boolean>` | Override this method if your task cannot if some conditions are not met. This method will be called while calling taskDispatcher.isReady() method. As an example, you can perform permission checks here.                                                            |
+| (optional) `prepare()`                                              | `Promise<boolean>` | Override this method to define all the actions that must be executed in order to allow your task to run without issues. **UI code is allowed!** As an example, you can ask for permissions here. The UI is supposed to be visible by the time this method is called. |
 
 > **Note:** We highly discourage you to **not to override other Task class methods** aside of the listed in the table above. _Things could go really wrong._
 
 #### Properties available while extending Task class
 
-| Name               | Type                                                                                                                            | Description                                                                                                                   |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `name`             | `string`                                                                                                                        | The name of the class.                                                                                                        |
-| `outputEventNames` | `Array<string>`                                                                                                                 | The list of possible events which the class has declared at construction time that will emit at some moment of its execution. |
-| `taskParams`       | [`TaskParams`](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/task.ts#L237)          | (accessible from onRun() method only) The parameters passed by to the task when it is declared inside the task graph.         |
-| `invocationEvent`  | [`DispatchableEvent`](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/events/events.ts#L10) | (accessible form onRun() method only) The event that triggered task execution.                                                |
+| Name               | Type            | Description                                                                                        |
+| ------------------ | --------------- | -------------------------------------------------------------------------------------------------- |
+| `name`             | `string`        | The name of the task.                                                                              |
+| `outputEventNames` | `Array<string>` | All the events the task has declared at build time that will emit at some moment of its execution. |
 
 #### Methods available while extending Task class
 

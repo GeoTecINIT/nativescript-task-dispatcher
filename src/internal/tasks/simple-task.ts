@@ -12,15 +12,15 @@ export class SimpleTask extends Task {
     super(name, taskConfig);
   }
 
-  protected async onRun() {
-    const params = this.taskParams;
-    const evt = this.invocationEvent;
-
+  protected async onRun(params: TaskParams, evt: DispatchableEvent) {
     const done = (eventName: string, data: { [key: string]: any }) =>
       this.done(eventName, data);
+
     const onCancel = (f: () => void) => this.setCancelFunction(f);
+
     const runAgainIn = (seconds: number, taskParams: TaskParams) =>
       this.runAgainIn(seconds, taskParams);
+
     const log = (message: any) => this.log(message);
 
     const ctx: SimpleTaskContext = {

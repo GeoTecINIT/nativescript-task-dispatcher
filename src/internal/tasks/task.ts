@@ -16,8 +16,8 @@ export abstract class Task {
     return this.taskConfig.outputEventNames;
   }
 
-  protected taskParams: TaskParams;
-  protected invocationEvent: DispatchableEvent;
+  private _taskParams: TaskParams;
+  private _invocationEvent: DispatchableEvent;
 
   private _name: string;
   private _executionHistory: Set<string>;
@@ -48,28 +48,21 @@ export abstract class Task {
     taskParams: TaskParams,
     invocationEvent: DispatchableEvent
   ): Promise<void> {
-    if (this.invocationEvent && !this.isDone()) {
-      this.getLogger().warn(
-        `Multiple executions of a task cannot run concurrently. Warning triggered with: params=${JSON.stringify(
-          taskParams
-        )} and invocationEvent=${JSON.stringify(invocationEvent)}`
-      );
-      this.emitEndEvent(
-        TaskResultStatus.Cancelled,
-        new Error(
-          "Concurrent Execution: Executing multiple instances of a task concurrently is not allowed"
-        ),
-        invocationEvent.id
-      );
+    if (this._invocationEvent && !this.isDone()) {
+      this.cancelParallelInvocation(taskParams, invocationEvent);
+
+      return;
     }
 
-    this.taskParams = taskParams;
-    this.invocationEvent = invocationEvent;
+    this._taskParams = taskParams;
+    this._invocationEvent = invocationEvent;
 
     this.log(`Run triggered by ${invocationEvent.name} event`);
+
     try {
       await this.checkIfCanRun();
-      await this.onRun();
+      await this.onRun(taskParams, invocationEvent);
+
       if (!this.isDone()) {
         this.done(this.taskConfig.outputEventNames[0]);
       }
@@ -79,6 +72,7 @@ export abstract class Task {
           taskParams
         )} and invocation event ${JSON.stringify(invocationEvent)}: ${err}`
       );
+
       this.emitEndEvent(TaskResultStatus.Error, err);
       throw err;
     }
@@ -99,11 +93,15 @@ export abstract class Task {
    */
   cancel(): void {
     this.emitEndEvent(TaskResultStatus.Cancelled);
-    if (this._cancelFunctions.has(this.invocationEvent.id)) {
-      const cancelFunction = this._cancelFunctions.get(this.invocationEvent.id);
+
+    if (this._cancelFunctions.has(this._invocationEvent.id)) {
+      const cancelFunction = this._cancelFunctions.get(
+        this._invocationEvent.id
+      );
       cancelFunction();
       this.removeCancelFunction();
     }
+
     this.log("Cancelled");
   }
 
@@ -131,14 +129,17 @@ export abstract class Task {
    * @param params optional parameters that will be passed to the task
    */
   protected runAgainIn(seconds: number, params?: TaskParams) {
-    defer(this.name, seconds, params ? params : this.taskParams);
+    defer(this.name, seconds, params ? params : this._taskParams);
     this.log(`Will run again in ${seconds} s`);
   }
 
   /**
    * The content of the task to be executed
    */
-  protected abstract onRun(): Promise<void>;
+  protected abstract onRun(
+    taskParams: TaskParams,
+    invocationEvent: DispatchableEvent
+  ): Promise<void>;
 
   /**
    * Method to be called to inject a function in charge of cleaning up
@@ -150,7 +151,7 @@ export abstract class Task {
 
       return;
     }
-    this._cancelFunctions.set(this.invocationEvent.id, f);
+    this._cancelFunctions.set(this._invocationEvent.id, f);
   }
 
   /**
@@ -163,6 +164,7 @@ export abstract class Task {
       return;
     }
     this.markAsDone();
+
     if (!hasListeners(eventName)) {
       this.emitEndEvent(TaskResultStatus.Ok);
 
@@ -171,7 +173,7 @@ export abstract class Task {
 
     emit({
       name: eventName,
-      id: this.invocationEvent.id,
+      id: this._invocationEvent.id,
       data,
     });
 
@@ -184,8 +186,24 @@ export abstract class Task {
    */
   protected log(message: any) {
     this.getLogger().info(
-      `${message} (invocationId=${this.invocationEvent.id})`
+      `${message} (invocationId=${this._invocationEvent.id})`
     );
+  }
+
+  private cancelParallelInvocation(
+    taskParams: TaskParams,
+    invocationEvent: DispatchableEvent
+  ) {
+    this.getLogger().warn(
+      `Multiple executions of a task cannot run concurrently. Warning triggered with: params=${JSON.stringify(
+        taskParams
+      )} and invocationEvent=${JSON.stringify(invocationEvent)}`
+    );
+
+    const reason = new Error(
+      "Concurrent Execution: Executing multiple instances of a task concurrently is not allowed"
+    );
+    this.emitEndEvent(TaskResultStatus.Cancelled, reason, invocationEvent.id);
   }
 
   private emitEndEvent(
@@ -193,12 +211,14 @@ export abstract class Task {
     err?: Error,
     invocationId?: string
   ): void {
-    const id = invocationId ? invocationId : this.invocationEvent.id;
+    const id = invocationId ? invocationId : this._invocationEvent.id;
     this.markAsDone(id);
+
     const result: TaskChainResult = { status };
     if (err) {
       result.reason = err;
     }
+
     const endEvent = createEvent(TaskDispatcherEvent.TaskChainFinished, {
       id,
       data: {
@@ -209,16 +229,16 @@ export abstract class Task {
   }
 
   private isDone(): boolean {
-    return this._executionHistory.has(this.invocationEvent.id);
+    return this._executionHistory.has(this._invocationEvent.id);
   }
 
   private markAsDone(invocationId?: string) {
-    const id = invocationId ? invocationId : this.invocationEvent.id;
+    const id = invocationId ? invocationId : this._invocationEvent.id;
     this._executionHistory.add(id);
   }
 
   private removeCancelFunction() {
-    this._cancelFunctions.delete(this.invocationEvent.id);
+    this._cancelFunctions.delete(this._invocationEvent.id);
   }
 
   private getLogger() {
