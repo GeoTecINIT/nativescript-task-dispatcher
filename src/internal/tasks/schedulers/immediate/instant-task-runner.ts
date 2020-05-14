@@ -1,13 +1,13 @@
-import { RunnableTask } from "../../../runnable-task";
+import { RunnableTask } from "../../runnable-task";
 import { DispatchableEvent } from "../../../../events";
 import {
   PlannedTask,
   PlanningType,
   SchedulerType,
-} from "../../../planner/planned-task";
-import { PlannedTasksStore } from "../../../../persistence/planned-tasks-store";
-import { checkIfTaskExists } from "../../../provider";
-import { SingleTaskRunner } from "../../../runners/single-task-runner";
+} from "../../planner/planned-task";
+import { PlannedTasksStore } from "../../../persistence/planned-tasks-store";
+import { checkIfTaskExists } from "../../provider";
+import { SingleTaskRunner } from "../../runners/single-task-runner";
 
 export class InstantTaskRunner implements TaskRunner {
   private taskRunner: SingleTaskRunner;

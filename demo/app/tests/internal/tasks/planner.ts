@@ -18,7 +18,7 @@ import {
 import { createPlannedTaskStoreMock } from "../persistence";
 import { createTaskCancelManagerMock } from ".";
 import { TaskNotFoundError } from "nativescript-task-dispatcher/internal/tasks/provider";
-import { TaskRunner } from "nativescript-task-dispatcher/internal/tasks/schedulers/event-driven/internal/instant-task-runner";
+import { TaskRunner } from "nativescript-task-dispatcher/internal/tasks/schedulers/immediate/instant-task-runner";
 
 describe("Task planner", () => {
     const taskScheduler = createTaskSchedulerMock();

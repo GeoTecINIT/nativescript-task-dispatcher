@@ -18,7 +18,7 @@ import { checkIfTaskExists } from "../provider";
 import {
   TaskRunner,
   InstantTaskRunner,
-} from "../schedulers/event-driven/internal/instant-task-runner";
+} from "../schedulers/immediate/instant-task-runner";
 import { TaskResultStatus, TaskChainResult } from "../task";
 import { TaskCancelManager, taskCancelManager } from "../cancel-manager";
 
