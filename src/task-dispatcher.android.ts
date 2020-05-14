@@ -5,14 +5,14 @@ import { Common, ConfigParams } from "./task-dispatcher.common";
 import { Task } from "./tasks";
 import { TaskGraph } from "./tasks/graph";
 
-import { BootReceiver } from "./internal/tasks/scheduler/android/boot-receiver.android";
-import { AlarmReceiver } from "./internal/tasks/scheduler/android/alarms/alarm/receiver.android";
-import { AlarmRunnerService } from "./internal/tasks/scheduler/android/alarms/alarm/runner-service.android";
-import { WatchdogReceiver } from "./internal/tasks/scheduler/android/alarms/watchdog/receiver.android";
-import { setTaskSchedulerCreator } from "./internal/tasks/scheduler/common";
-import { AndroidTaskScheduler } from "./internal/tasks/scheduler/android";
-import { setupNotificationChannels } from "./internal/tasks/scheduler/android/notification-manager.android";
-import { AndroidAlarmScheduler } from "./internal/tasks/scheduler/android/alarms/alarm/scheduler.android";
+import { BootReceiver } from "./internal/tasks/schedulers/time-based/android/boot-receiver.android";
+import { AlarmReceiver } from "./internal/tasks/schedulers/time-based/android/alarms/alarm/receiver.android";
+import { AlarmRunnerService } from "./internal/tasks/schedulers/time-based/android/alarms/alarm/runner-service.android";
+import { WatchdogReceiver } from "./internal/tasks/schedulers/time-based/android/alarms/watchdog/receiver.android";
+import { setTaskSchedulerCreator } from "./internal/tasks/schedulers/time-based/common";
+import { AndroidTaskScheduler } from "./internal/tasks/schedulers/time-based/android";
+import { setupNotificationChannels } from "./internal/tasks/schedulers/time-based/android/notification-manager.android";
+import { AndroidAlarmScheduler } from "./internal/tasks/schedulers/time-based/android/alarms/alarm/scheduler.android";
 
 class TaskDispatcher extends Common {
   public init(

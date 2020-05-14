@@ -1,13 +1,13 @@
 import { TaskScheduler } from "..";
-import { RunnableTask } from "../../runnable-task";
-import { PlannedTask, PlanningType } from "../../planner/planned-task";
+import { RunnableTask } from "../../../runnable-task";
+import { PlannedTask, PlanningType } from "../../../planner/planned-task";
 import { AndroidAlarmScheduler } from "./alarms/alarm/scheduler.android";
 import {
   plannedTasksDB,
   PlannedTasksStore,
-} from "../../../persistence/planned-tasks-store";
-import { checkIfTaskExists } from "../../provider";
-import { toSeconds } from "../../../utils/time-converter";
+} from "../../../../persistence/planned-tasks-store";
+import { checkIfTaskExists } from "../../../provider";
+import { toSeconds } from "../../../../utils/time-converter";
 
 export class AndroidTaskScheduler implements TaskScheduler {
   constructor(

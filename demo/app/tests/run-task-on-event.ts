@@ -13,7 +13,7 @@ import {
     EventListenerGenerator,
     RunnableTaskDescriptor,
 } from "nativescript-task-dispatcher/internal/tasks/graph";
-import { plannedTasksDB } from "../../../src/internal/persistence/planned-tasks-store";
+import { plannedTasksDB } from "nativescript-task-dispatcher/internal/persistence/planned-tasks-store";
 
 describe("Event-based task runner", () => {
     setTasks(testTasks);

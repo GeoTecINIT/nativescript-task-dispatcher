@@ -1,7 +1,7 @@
 import {
   PlannedTasksStore,
   plannedTasksDB,
-} from "../../../../../persistence/planned-tasks-store";
+} from "../../../../../../persistence/planned-tasks-store";
 import { AlarmManager } from "../abstract-alarm-manager.android";
 import { AndroidAlarmManager } from "./manager.android";
 import { WatchdogManager } from "../watchdog/manager.android";
@@ -9,9 +9,9 @@ import {
   PlannedTask,
   PlanningType,
   SchedulerType,
-} from "../../../../planner/planned-task";
-import { RunnableTask } from "../../../../runnable-task";
-import { Logger, getLogger } from "../../../../../utils/logger";
+} from "../../../../../planner/planned-task";
+import { RunnableTask } from "../../../../../runnable-task";
+import { Logger, getLogger } from "../../../../../../utils/logger";
 
 const MIN_ALARM_INTERVAL = 60000;
 

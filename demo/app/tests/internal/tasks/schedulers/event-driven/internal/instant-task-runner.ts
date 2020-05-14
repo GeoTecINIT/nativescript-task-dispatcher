@@ -2,9 +2,9 @@ import {
     setTasks,
     TaskNotFoundError,
 } from "nativescript-task-dispatcher/internal/tasks/provider";
-import { testTasks } from "..";
-import { createPlannedTaskStoreMock } from "../../persistence";
-import { InstantTaskRunner } from "nativescript-task-dispatcher/internal/tasks/runners/instant-task-runner";
+import { testTasks } from "../../..";
+import { createPlannedTaskStoreMock } from "../../../../persistence";
+import { InstantTaskRunner } from "nativescript-task-dispatcher/internal/tasks/schedulers/event-driven/internal/instant-task-runner";
 import { RunnableTask } from "nativescript-task-dispatcher/internal/tasks/runnable-task";
 import {
     createEvent,

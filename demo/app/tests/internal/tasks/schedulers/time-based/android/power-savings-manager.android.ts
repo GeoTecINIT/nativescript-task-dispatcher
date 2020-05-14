@@ -1,4 +1,4 @@
-import { PowerSavingsManager } from "nativescript-task-dispatcher/internal/tasks/scheduler/android/alarms/power-savings-manager.android";
+import { PowerSavingsManager } from "nativescript-task-dispatcher/internal/tasks/schedulers/time-based/android/alarms/power-savings-manager.android";
 
 describe("Power savings manager", () => {
     if (typeof android === "undefined") {

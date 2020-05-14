@@ -1,5 +1,5 @@
 import { AndroidAlarmScheduler } from "./alarms/alarm/scheduler.android";
-import { getLogger } from "../../../utils/logger";
+import { getLogger } from "../../../../utils/logger";
 
 export class BootReceiver
   implements es.uji.geotec.taskdispatcher.BootReceiverDelegate {

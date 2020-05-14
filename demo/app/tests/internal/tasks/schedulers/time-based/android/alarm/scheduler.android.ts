@@ -1,5 +1,5 @@
-import { AlarmManager } from "nativescript-task-dispatcher/internal/tasks/scheduler/android/alarms/abstract-alarm-manager.android";
-import { AndroidAlarmScheduler } from "nativescript-task-dispatcher/internal/tasks/scheduler/android/alarms/alarm/scheduler.android";
+import { AlarmManager } from "nativescript-task-dispatcher/internal/tasks/schedulers/time-based/android/alarms/abstract-alarm-manager.android";
+import { AndroidAlarmScheduler } from "nativescript-task-dispatcher/internal/tasks/schedulers/time-based/android/alarms/alarm/scheduler.android";
 import {
     PlannedTask,
     PlanningType,

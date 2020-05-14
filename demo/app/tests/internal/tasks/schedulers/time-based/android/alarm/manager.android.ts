@@ -1,6 +1,6 @@
-import { AndroidAlarmManager } from "nativescript-task-dispatcher/internal/tasks/scheduler/android/alarms/alarm/manager.android";
+import { AndroidAlarmManager } from "nativescript-task-dispatcher/internal/tasks/schedulers/time-based/android/alarms/alarm/manager.android";
 import { createOsAlarmManagerMock } from "..";
-import { PowerSavingsManager } from "nativescript-task-dispatcher/internal/tasks/scheduler/android/alarms/power-savings-manager.android";
+import { PowerSavingsManager } from "nativescript-task-dispatcher/internal/tasks/schedulers/time-based/android/alarms/power-savings-manager.android";
 
 describe("Android alarm manager", () => {
     if (typeof android === "undefined") {

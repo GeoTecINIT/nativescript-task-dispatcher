@@ -1,7 +1,7 @@
 import { android as androidApp } from "tns-core-modules/application/application";
 import { AbstractAlarmManager } from "../abstract-alarm-manager.android";
 import { createWatchdogReceiverIntent } from "../../intents.android";
-import { getLogger } from "../../../../../utils/logger";
+import { getLogger } from "../../../../../../utils/logger";
 
 const WATCHDOG_INTERVAL = 15 * 60 * 1000;
 

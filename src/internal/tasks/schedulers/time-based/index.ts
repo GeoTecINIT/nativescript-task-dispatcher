@@ -1,5 +1,5 @@
-import { RunnableTask } from "../runnable-task";
-import { PlannedTask } from "../planner/planned-task";
+import { RunnableTask } from "../../runnable-task";
+import { PlannedTask } from "../../planner/planned-task";
 
 export interface TaskScheduler {
   schedule(task: RunnableTask): Promise<PlannedTask>;

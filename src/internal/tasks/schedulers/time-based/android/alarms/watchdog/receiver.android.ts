@@ -1,5 +1,5 @@
 import { AndroidAlarmScheduler } from "../alarm/scheduler.android";
-import { getLogger } from "../../../../../utils/logger";
+import { getLogger } from "../../../../../../utils/logger";
 
 export class WatchdogReceiver
   implements es.uji.geotec.taskdispatcher.alarms.WatchdogReceiverDelegate {

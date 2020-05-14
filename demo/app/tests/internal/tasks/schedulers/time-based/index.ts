@@ -4,11 +4,11 @@ import {
     TaskNotFoundError,
     setTasks,
 } from "nativescript-task-dispatcher/internal/tasks/provider";
-import { testTasks } from "..";
-import { TaskScheduler } from "nativescript-task-dispatcher/internal/tasks/scheduler";
+import { testTasks } from "../..";
+import { TaskScheduler } from "nativescript-task-dispatcher/internal/tasks/schedulers/time-based";
 import { plannedTasksDB } from "nativescript-task-dispatcher/internal/persistence/planned-tasks-store";
 import { RunnableTask } from "nativescript-task-dispatcher/internal/tasks/runnable-task";
-import { AndroidTaskScheduler } from "../../../../../../src/internal/tasks/scheduler/android";
+import { AndroidTaskScheduler } from "nativescript-task-dispatcher/internal/tasks/schedulers/time-based/android";
 
 describe("Task scheduler", () => {
     setTasks(testTasks);

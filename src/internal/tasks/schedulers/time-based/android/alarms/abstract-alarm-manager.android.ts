@@ -1,5 +1,5 @@
 import { android as androidApp } from "tns-core-modules/application/application";
-import { Logger } from "../../../../utils/logger";
+import { Logger } from "../../../../../utils/logger";
 
 export interface AlarmManager {
   alarmUp: boolean;

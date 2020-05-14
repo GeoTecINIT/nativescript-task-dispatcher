@@ -2,7 +2,7 @@ import { android as androidApp } from "tns-core-modules/application/application"
 import { createAlarmReceiverIntent } from "../../intents.android";
 import { AbstractAlarmManager } from "../abstract-alarm-manager.android";
 import { PowerSavingsManager } from "../power-savings-manager.android";
-import { getLogger } from "../../../../../utils/logger";
+import { getLogger } from "../../../../../../utils/logger";
 import { planningTimestamp } from "../../../planning-timestamp";
 
 const BATTERY_SAVINGS_THRESHOLD = 15 * 60 * 1000;

@@ -1,5 +1,5 @@
 import { TaskPlanner } from "nativescript-task-dispatcher/internal/tasks/planner";
-import { TaskScheduler } from "nativescript-task-dispatcher/internal/tasks/scheduler";
+import { TaskScheduler } from "nativescript-task-dispatcher/internal/tasks/schedulers/time-based";
 import { RunnableTask } from "nativescript-task-dispatcher/internal/tasks/runnable-task";
 import { RunnableTaskBuilderImpl } from "nativescript-task-dispatcher/internal/tasks/runnable-task/builder";
 import {
@@ -18,7 +18,7 @@ import {
 import { createPlannedTaskStoreMock } from "../persistence";
 import { createTaskCancelManagerMock } from ".";
 import { TaskNotFoundError } from "nativescript-task-dispatcher/internal/tasks/provider";
-import { TaskRunner } from "nativescript-task-dispatcher/internal/tasks/runners/instant-task-runner";
+import { TaskRunner } from "nativescript-task-dispatcher/internal/tasks/schedulers/event-driven/internal/instant-task-runner";
 
 describe("Task planner", () => {
     const taskScheduler = createTaskSchedulerMock();

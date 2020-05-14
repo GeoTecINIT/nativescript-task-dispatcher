@@ -1,4 +1,4 @@
-import { WatchdogManager } from "nativescript-task-dispatcher/internal/tasks/scheduler/android/alarms/watchdog/manager.android";
+import { WatchdogManager } from "nativescript-task-dispatcher/internal/tasks/schedulers/time-based/android/alarms/watchdog/manager.android";
 import { createOsAlarmManagerMock } from "..";
 
 describe("Android watchdog manager", () => {

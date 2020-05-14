@@ -1,10 +1,10 @@
-import { TaskManager } from "../../../../manager";
+import { TaskManager } from "../../../../../manager";
 import { AlarmManager } from "../abstract-alarm-manager.android";
 import { AndroidAlarmManager } from "./manager.android";
-import { plannedTasksDB } from "../../../../../persistence/planned-tasks-store";
+import { plannedTasksDB } from "../../../../../../persistence/planned-tasks-store";
 import { createAlarmRunnerServiceIntent } from "../../intents.android";
-import { PlanningType } from "../../../../planner/planned-task";
-import { Logger, getLogger } from "../../../../../utils/logger";
+import { PlanningType } from "../../../../../planner/planned-task";
+import { Logger, getLogger } from "../../../../../../utils/logger";
 
 const MIN_INTERVAL = 60000;
 
