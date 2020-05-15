@@ -1,9 +1,9 @@
-export const libPackage = "es.uji.geotec.taskdispatcher";
+import { createLibComponentIntent } from "../../intent-tools.android";
 
 // TODO: Add a way to configure MainActivity reference
 // in order to support apps with custom launch activities
 export function createAppLaunchIntent(appContext: android.content.Context) {
-  const intent = createAppComponentIntent(appContext, {
+  const intent = createLibComponentIntent(appContext, {
     pathPrefix: "com.tns",
     relativeClassPath: ".NativeScriptActivity",
   });
@@ -12,7 +12,7 @@ export function createAppLaunchIntent(appContext: android.content.Context) {
 }
 
 export function createAlarmReceiverIntent(appContext: android.content.Context) {
-  return createAppComponentIntent(appContext, {
+  return createLibComponentIntent(appContext, {
     relativeClassPath: ".alarms.AlarmReceiver",
   });
 }
@@ -20,7 +20,7 @@ export function createAlarmReceiverIntent(appContext: android.content.Context) {
 export function createWatchdogReceiverIntent(
   appContext: android.content.Context
 ) {
-  return createAppComponentIntent(appContext, {
+  return createLibComponentIntent(appContext, {
     relativeClassPath: ".alarms.WatchdogReceiver",
   });
 }
@@ -45,7 +45,7 @@ export function createAlarmRunnerServiceIntent(
   appContext: android.content.Context,
   params: AlarmRunnerParams
 ) {
-  const intent = createAppComponentIntent(appContext, {
+  const intent = createLibComponentIntent(appContext, {
     relativeClassPath: ".alarms.AlarmRunnerService",
   });
   intent.putExtra(ARS_RUN_IN_FOREGROUND, params.runInForeground);
@@ -70,25 +70,4 @@ export function unpackAlarmRunnerServiceIntent(
       new Date().getTime()
     ),
   };
-}
-
-function createAppComponentIntent(
-  appContext: android.content.Context,
-  componentReference: AppComponentRef
-): android.content.Intent {
-  const { pathPrefix, relativeClassPath } = componentReference;
-  const pkg = pathPrefix ? pathPrefix : libPackage;
-  const intent = new android.content.Intent();
-  const componentRef = new android.content.ComponentName(
-    appContext,
-    pkg + relativeClassPath
-  );
-  intent.setComponent(componentRef);
-
-  return intent;
-}
-
-interface AppComponentRef {
-  pathPrefix?: string;
-  relativeClassPath: string;
 }
