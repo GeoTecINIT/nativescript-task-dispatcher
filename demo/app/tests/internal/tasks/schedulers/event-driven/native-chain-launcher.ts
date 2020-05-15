@@ -1,4 +1,7 @@
-import { android as androidApp } from "tns-core-modules/application/application";
+import {
+    android as androidApp,
+    launchEvent,
+} from "tns-core-modules/application/application";
 
 import { setTasks } from "nativescript-task-dispatcher/internal/tasks/provider";
 import { testTasks } from "../..";
@@ -16,6 +19,9 @@ import {
 import { run } from "nativescript-task-dispatcher/internal/tasks";
 import { RunnableTask } from "nativescript-task-dispatcher/internal/tasks/runnable-task";
 import { plannedTasksDB } from "nativescript-task-dispatcher/internal/persistence/planned-tasks-store";
+import { setTaskSchedulerCreator } from "../../../../../../../src/internal/tasks/schedulers/time-based/common";
+
+const MILLIS_BETWEEN = 100;
 
 describe("Native task chain launcher", () => {
     setTasks(testTasks);
@@ -36,6 +42,7 @@ describe("Native task chain launcher", () => {
             taskChainLauncher = null; // TODO: Add iOS task chain launcher
             taskScheduler = null; // TODO: Add iOS task scheduler
         }
+        setTaskSchedulerCreator(() => taskScheduler);
     });
 
     it("runs a single task dependant on a launch event", async () => {
@@ -46,7 +53,7 @@ describe("Native task chain launcher", () => {
         taskChainLauncher.launch(launchEventName, {}, chainId);
         await chainFinished;
 
-        unregisterEventListeners([launchEventName]);
+        unregisterEventListeners([launchEvent]);
     });
 
     it("runs a task chain composed by multiple tasks bootstrapped by a launch event", async () => {
@@ -61,7 +68,7 @@ describe("Native task chain launcher", () => {
     });
 
     it("runs two task chains in parallel if they fit in the same time window", async () => {
-        const simpleChainId = "simpleTaskChain";
+        const simpleChainId = "anotherSimpleTaskChain";
         const simpleChainFinished = createTaskChainFinishedListener(
             simpleChainId
         );
@@ -89,7 +96,7 @@ describe("Native task chain launcher", () => {
             runnableDeferredTask,
         ] = createDeferredTaskChain();
 
-        taskChainLauncher.launch(launchEventName);
+        taskChainLauncher.launch(launchEventName, {});
         await milliseconds(500);
 
         const deferredTask = await plannedTasksDB.get(runnableDeferredTask);
@@ -97,7 +104,7 @@ describe("Native task chain launcher", () => {
         taskScheduler.cancel(deferredTask.id);
     });
 
-    afterEach(async () => await milliseconds(100));
+    afterEach(async () => await milliseconds(MILLIS_BETWEEN));
 });
 
 function wireUpTaskChainRunnerService() {
@@ -131,12 +138,18 @@ function createAdvancedTaskChain(): Array<string> {
 
 function createDeferredTaskChain(): [string, RunnableTask] {
     const launchEvent = "deferredTaskChainCanStart";
-    const taskName = "dummyTask";
-    const interval = 60000;
+    const taskName = "failedTask";
+    const interval = 900;
     on(launchEvent, run(taskName).every(interval));
     return [
         launchEvent,
-        { name: taskName, startAt: -1, interval, recurrent: true, params: {} },
+        {
+            name: taskName,
+            startAt: -1,
+            interval: interval * 1000,
+            recurrent: true,
+            params: {},
+        },
     ];
 }
 

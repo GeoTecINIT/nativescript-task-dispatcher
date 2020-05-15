@@ -195,8 +195,8 @@ export class AlarmRunnerService
       clearTimeout(this.timeoutId);
     }
     if (this.wakeLock.isHeld()) {
-      this.logger.debug("Lock released");
       this.wakeLock.release();
+      this.logger.debug("Lock released");
     }
   }
 

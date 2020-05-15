@@ -17,7 +17,7 @@ export function createTaskChainRunnerServiceIntent(
   return intent;
 }
 
-export function unpackAlarmRunnerServiceIntent(
+export function unpackTaskChainRunnerServiceIntent(
   intent: android.content.Intent
 ): TaskChainRunnerParams {
   if (!intent) {
@@ -40,7 +40,7 @@ const TCRS_LAUNCH_EVENT = "launchEvent";
 const TCRS_EVENT_DATA = "eventData";
 const TCRS_EVENT_ID = "eventId";
 
-interface TaskChainRunnerParams {
+export interface TaskChainRunnerParams {
   launchEvent: string;
   eventData: EventData;
   eventId?: string;
