@@ -2,6 +2,7 @@ import { android as androidApp } from "tns-core-modules/application/application"
 
 import { setTasks } from "nativescript-task-dispatcher/internal/tasks/provider";
 import { testTasks } from "../..";
+import { TaskChainRunnerService } from "nativescript-task-dispatcher/internal/tasks/schedulers/event-driven/android/runner-service.android";
 import { TaskChainLauncher } from "nativescript-task-dispatcher/internal/tasks/schedulers/event-driven";
 import { AndroidTaskChainLauncher } from "nativescript-task-dispatcher/internal/tasks/schedulers/event-driven/android";
 import { TaskScheduler } from "nativescript-task-dispatcher/internal/tasks/schedulers/time-based";
@@ -20,6 +21,12 @@ describe("Native task chain launcher", () => {
     setTasks(testTasks);
     let taskChainLauncher: TaskChainLauncher;
     let taskScheduler: TaskScheduler;
+
+    beforeAll(() => {
+        if (androidApp) {
+            wireUpTaskChainRunnerService();
+        }
+    });
 
     beforeEach(() => {
         if (androidApp) {
@@ -83,13 +90,30 @@ describe("Native task chain launcher", () => {
         ] = createDeferredTaskChain();
 
         taskChainLauncher.launch(launchEventName);
-        await new Promise((resolve) => setTimeout(() => resolve(), 500));
+        await milliseconds(500);
 
         const deferredTask = await plannedTasksDB.get(runnableDeferredTask);
         expect(deferredTask).not.toBeNull();
         taskScheduler.cancel(deferredTask.id);
     });
+
+    afterEach(async () => await milliseconds(100));
 });
+
+function wireUpTaskChainRunnerService() {
+    const runnerService = new TaskChainRunnerService();
+    es.uji.geotec.taskdispatcher.runners.TaskChainRunnerService.setTaskChainRunnerServiceDelegate(
+        new es.uji.geotec.taskdispatcher.runners.TaskChainRunnerServiceDelegate(
+            {
+                onCreate: (nativeService) =>
+                    runnerService.onCreate(nativeService),
+                onStartCommand: (intent, flags, startId) =>
+                    runnerService.onStartCommand(intent, flags, startId),
+                onDestroy: () => runnerService.onDestroy(),
+            }
+        )
+    );
+}
 
 function createSimpleTaskChain(): string {
     const launchEvent = "simpleTaskChainCanStart";
@@ -129,4 +153,10 @@ function createTaskChainFinishedListener(chainId: string): Promise<void> {
 
 function unregisterEventListeners(eventNames: Array<string>) {
     eventNames.forEach((eventName) => off(eventName));
+}
+
+function milliseconds(millis: number): Promise<void> {
+    return new Promise((resolve) => {
+        setTimeout(() => resolve(), millis);
+    });
 }
