@@ -112,7 +112,7 @@ function createDeferredTaskChain(): [string, RunnableTask] {
     on(launchEvent, run(taskName).every(interval));
     return [
         launchEvent,
-        { name, startAt: -1, interval, recurrent: true, params: {} },
+        { name: taskName, startAt: -1, interval, recurrent: true, params: {} },
     ];
 }
 
