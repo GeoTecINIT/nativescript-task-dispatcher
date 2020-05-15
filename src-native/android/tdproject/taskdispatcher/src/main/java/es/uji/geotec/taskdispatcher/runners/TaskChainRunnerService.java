@@ -1,4 +1,4 @@
-package es.uji.geotec.taskdispatcher.alarms;
+package es.uji.geotec.taskdispatcher.runners;
 
 import android.annotation.SuppressLint;
 import android.app.Service;
@@ -8,13 +8,13 @@ import android.util.Log;
 
 import es.uji.geotec.taskdispatcher.common.ServiceActivationCache;
 
-public class AlarmRunnerService extends Service {
+public class TaskChainRunnerService extends Service {
 
-    private static String tag = "AlarmRunnerService";
+    private static String tag = "TaskChainRunnerService";
 
     @SuppressLint("StaticFieldLeak")
     private static ServiceActivationCache activationCache;
-    private static AlarmRunnerServiceDelegate delegate;
+    private static TaskChainRunnerServiceDelegate delegate;
 
     @Override
     public void onCreate() {
@@ -59,7 +59,7 @@ public class AlarmRunnerService extends Service {
         return null;
     }
 
-    public static void setAlarmRunnerServiceDelegate(AlarmRunnerServiceDelegate serviceDelegate) {
+    public static void setTaskChainRunnerServiceDelegate(TaskChainRunnerServiceDelegate serviceDelegate) {
         delegate = serviceDelegate;
         if (activationCache == null) return;
         if (activationCache.onCreateWasEarlyCalled()) {

@@ -1,5 +1,6 @@
 package es.uji.geotec.taskdispatcher;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -11,8 +12,9 @@ public class BootReceiver extends BroadcastReceiver {
 
     private static String tag = "BootReceive";
 
-    private static BootReceiverDelegate delegate;
+    @SuppressLint("StaticFieldLeak")
     private static ReceiverActivationCache activationCache;
+    private static BootReceiverDelegate delegate;
 
     @Override
     public void onReceive(Context context, Intent intent) {

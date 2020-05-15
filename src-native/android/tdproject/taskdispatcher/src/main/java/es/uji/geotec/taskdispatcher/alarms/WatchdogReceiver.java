@@ -1,5 +1,6 @@
 package es.uji.geotec.taskdispatcher.alarms;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -11,8 +12,9 @@ public class WatchdogReceiver extends BroadcastReceiver {
 
     private static String tag = "WatchdogReceiver";
 
-    private static WatchdogReceiverDelegate delegate;
+    @SuppressLint("StaticFieldLeak")
     private static ReceiverActivationCache activationCache;
+    private static WatchdogReceiverDelegate delegate;
 
     @Override
     public void onReceive(Context context, Intent intent) {
