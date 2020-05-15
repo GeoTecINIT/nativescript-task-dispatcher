@@ -6,7 +6,6 @@ import {
 } from "nativescript-task-dispatcher/internal/tasks/provider";
 import { testTasks } from "../..";
 import { TaskScheduler } from "nativescript-task-dispatcher/internal/tasks/schedulers/time-based";
-import { plannedTasksDB } from "nativescript-task-dispatcher/internal/persistence/planned-tasks-store";
 import { RunnableTask } from "nativescript-task-dispatcher/internal/tasks/runnable-task";
 import { AndroidTaskScheduler } from "nativescript-task-dispatcher/internal/tasks/schedulers/time-based/android";
 
@@ -34,7 +33,7 @@ describe("Task scheduler", () => {
         };
         const task = await scheduler.schedule(knownTask);
         expect(task).not.toBeNull();
-        plannedTasksDB.delete(task.id);
+        scheduler.cancel(task.id);
     });
 
     it("raises an error when task is unknown", async () => {

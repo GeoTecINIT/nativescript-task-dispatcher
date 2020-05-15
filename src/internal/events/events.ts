@@ -13,7 +13,7 @@ export interface DispatchableEvent {
   data: EventData;
 }
 
-interface EventData {
+export interface EventData {
   [key: string]: any;
 }
 

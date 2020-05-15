@@ -15,6 +15,7 @@ import {
 } from "nativescript-task-dispatcher/internal/tasks/graph";
 import { plannedTasksDB } from "nativescript-task-dispatcher/internal/persistence/planned-tasks-store";
 
+// TODO: Update E2E tests
 describe("Event-based task runner", () => {
     setTasks(testTasks);
 
