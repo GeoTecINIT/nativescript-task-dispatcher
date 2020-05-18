@@ -22,11 +22,12 @@ This plugin bases its way of working in three software primitives:
   - In a recurrent interval
   - At a certain time and in a specified recurrent interval since that time
 - **Task schedulers:** These are completely transparent to the user of the plugin, right now there are two schedulers and another three planned:
-  - _Immediate tasks scheduler (Android/iOS):_ in charge of running tasks that have to run a task immediately, with zero delay. This scheduler is in charge of running tasks whose execution has been triggered by another task.
+
   - _> 1 minute tasks scheduler (Android only):_ An alarm-based task scheduler. In charge of running tasks whose execution window falls in a minute or more in the future.
+  - _Event-driven tasks scheduler (Android/iOS **[Planned]**):_ Ensures tasks triggered by external events in the background (e.g. a change in the activity of the user, a server-sent event, a system event, etc.) to reliably run while the app is not visible to the user. Android version is fully functional, iOS version is on our roadmap (**PRs are welcome!**)
+  - _Immediate tasks scheduler (Android/iOS):_ in charge of running tasks that have to run with zero delay. This scheduler is in charge of running tasks whose execution has been triggered by another task. Requires another scheduler to be already running, i.e. a time-based scheduler or an event-driven one. The process of bootstrapping the required scheduler is completely transparent to the developer and the user.
   - _**(Planned)** < 1 minute tasks scheduler (Android only):_ A background service-based tasks scheduler. That will be in charge of running time-critical tasks that need to run bellow a 1 minute period (e.g. tasks running every 15 seconds)
   - _**(Planned)** Delayed tasks scheduler (iOS only):_ Will allow running time-triggered tasks in iOS. We cannot make any promises about its time accuracy or its possibilities. We are still studying how to implement this (**PRs are welcome!**)
-  - _**(Planned)** Event-driven tasks scheduler (Android/iOS):_ Two implementations, identical functionality. Will reliably run tasks triggered by external events in the background (e.g. a change in the activity of the user, a server-sent event, a system event, etc.). A basic multi-platform version of this scheduler is already running but can only execute tasks reliably when the app is visible to the user or another scheduler is already running.
 
 To illustrate how the three aforementioned components link together, let's present the following simple (yet relatively complex) use case. Let's say that we want to wake-up our app every minute. To run a dummy task, collect the battery level of the device and log the task execution. In parallel, we want to follow the same workflow but with a task that collects user location, another task which collects battery level and finally another tasks that logs the execution of the whole pipeline branch. The following figure depicts the whole process:
 
@@ -259,7 +260,6 @@ Finally, you'll need to decide where does your app generate the external event t
 ```ts
 // home-page.ts
 import { taskDispatcher } from "nativescript-task-dispatcher";
-import { emit, createEvent } from "nativescript-task-dispatcher/events";
 
 import { NavigatedData, Page } from "tns-core-modules/ui/page";
 import { HomeViewModel } from "./home-view-model";
@@ -275,9 +275,11 @@ export function onNavigatingTo(args: NavigatedData) {
 async function emitStartEvent() {
   const isReady = await taskDispatcher.isReady();
   if (!isReady) {
+    const tasksNotReady = await taskDispatcher.tasksNotReady;
+    console.log(`The following tasks are not ready!: ${tasksNotReady}`);
     await taskDispatcher.prepare();
   }
-  emit(createEvent("startEvent"));
+  taskDispatcher.emitEvent("startEvent");
 }
 ```
 
@@ -287,11 +289,13 @@ async function emitStartEvent() {
 
 Plugin's entry point. A singleton instance that can be used as needed throughout your app.
 
-| Name                                                                          | Return type        | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| ----------------------------------------------------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `init(appTasks: Array<Task>, appTaskGraph: TaskGraph, config?: ConfigParams)` | `Promise<void>`    | Allows to initialize the plugin with your own custom tasks and a task graph to describe how do they relate to each other. In order for the plugin to work, **it must be called only once** at your app's entry point (`app.ts` or `main.ts`). Through the configuration you can enable library's info and debug logging and also inject your custom logger which will inherently enable library's logging.                                                                                           |
-| `isReady()`                                                                   | `Promise<boolean>` | Allows to check (and wait for) plugin initialization status. It also iterates over your app's tasks to check if they are [ready](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/task.ts#L107) for its execution. You should call this method before emitting any external event. The promise is stored internally, it is safe to call this method as many times as needed.                                                                                |
-| `prepare()`                                                                   | `Promise<void>`    | Method to be called if isReady() returns false. If your app has one or more tasks that have reported not to be ready, it will call their [prepare()](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/task.ts#L114) method (e.g. to ask for missing permissions or enable disabled capabilities). **WARNING! This method is only meant to be called while the UI is visible.** Follow this guideline to foster the creation of a consistent task ecosystem. |
+| Name                                                                          | Return type            | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ----------------------------------------------------------------------------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `init(appTasks: Array<Task>, appTaskGraph: TaskGraph, config?: ConfigParams)` | `Promise<void>`        | Allows to initialize the plugin with your own custom tasks and a task graph to describe how do they relate to each other. In order for the plugin to work, **it must be called only once** at your app's entry point (`app.ts` or `main.ts`). Through the configuration you can enable library's info and debug logging and also inject your custom logger which will inherently enable library's logging.                                                                                           |
+| `isReady()`                                                                   | `Promise<boolean>`     | Allows to check (and wait for) plugin initialization status. It also iterates over your app's tasks to check if they are [ready](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/task.ts#L107) for its execution. You should call this method before emitting any external event. The promise is stored internally, it is safe to call this method as many times as needed.                                                                                |
+| `tasksNotReady` _(property)_                                                  | `Promise<Array<Task>>` | Method to be called if isReady() returns false. Here you can check the tasks that did not pass the ready check. Useful in case you want to customize te UI before calling prepare(). For example, to give an explanation to the user of why you are asking his/her consent                                                                                                                                                                                                                           |
+| `prepare()`                                                                   | `Promise<void>`        | Method to be called if isReady() returns false. If your app has one or more tasks that have reported not to be ready, it will call their [prepare()](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/task.ts#L114) method (e.g. to ask for missing permissions or enable disabled capabilities). **WARNING! This method is only meant to be called while the UI is visible.** Follow this guideline to foster the creation of a consistent task ecosystem. |
+| `emitEvent(name: string, data?: EventData)`                                   | `void`                 | A fire and forget method. Call this method whenever you want to propagate an external event towards the plugin. Dependant tasks will be executed inside a safe environment. User can safely navigate to another app, we bootstrap a safe execution context to ensure it completes its life-cycle (we guarantee a maximum of 3 minutes execution time). Optionally, You can provide an additional key-value data dictionary that will be delivered to the task getting the event                      |
 
 ### Task ([see code](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/task.ts#L10))
 
@@ -466,26 +470,12 @@ The only (advised) way to create a ReadyRunnableTaskBuilder from within a TaskGr
 | `build()`                                   | [`RunnableTaskBuilder`](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/runnable-task/builder.ts#L24) | Will be called once the event gets triggered. Useful for **debugging purposes**.                                                                                                                                                       |
 | `plan(invocationEvent?: DispatchableEvent)` | `void`                                                                                                                                          | Will plan the task for its execution. For internal usage only. Can play with it at your own risk. **WARNING! There are no guarantees at the moment regarding how this method will behave if it is called outside the event system.**   |
 
-### Events
-
-In order to interact with the plugin from any point of your app we offer two methods to create and emit events.
-
-> [createEvent](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/events/events.ts#L20)(name: string, params: [CreateEventParams](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/events/events.ts#L34)): [DispatchableEvent](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/events/events.ts#L34)
-
-The id contained in event params is heavily use through the plugin to track event chains. When not provided, the plugin creates one. Only overwrite it when the event to be emitted results from another event.
-
-> [emit](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/events/events.ts#L34)(dispatchableEvent: [DispatchableEvent](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/events/events.ts#L34)): void
-
-Emit an event created by `createEvent`.
-
-> **Note:** This last part of the API could probably change in the future to support bootstrapping task chains from anywhere. Stay tunned to future changes before updating to a newer version of the plugin.
-
 ## Limitations
 
-- **No support for scheduled tasks on iOS**. We currently cannot commit to an estimated time until this limitation gets addressed.
-- **Scheduled tasks can run in parallel, in contrast _an event cannot spawn the execution of multiple tasks at the same time._** We are aware of that this might pose severe constraints for certain setups. That's why solving this limitation is one of our priorities
+- **No support for scheduled tasks and event-driven tasks on iOS**. We currently cannot commit to an estimated time until this limitation gets addressed.
+- **Event-driven tasks can only run sequentially (one depending on the output of the previous one), in contrast scheduled tasks can run in parallel.** To put it simple _an event cannot spawn the execution of multiple tasks at the same time._ We are aware of that this might pose severe constraints for certain setups. That's why solving this limitation is one of our priorities
 - **No support for foreground tasks in the middle of a task chain**. If one of your tasks requires foreground execution and depends on another task that does not require it, it will not be executed in foreground. This happens because currently we do not back-propagate the foreground execution setting (but it is something planned). As a temporal fix, if a task could make a foreground task to be executed, declare the first task as a foreground task too.
-- **Task chains initiated by external events might not be able to finish its execution at some point if the user switches to a different app or the task chain starts in background.** Again, we are aware of that this can pose a problem for executing tasks reliably under certain circumstances. That's why solving this limitation is another of our priorities.
+- **No support for event-driven foreground tasks** We have yet to evaluate if this is a common scenario. If you feel like this is a must-have functionality, please open an issue or comment on a existing one related to the topic. A quick workaround is to schedule the task in 1 minute by the time the event gets triggered.
 
 ## Plugin authors
 
