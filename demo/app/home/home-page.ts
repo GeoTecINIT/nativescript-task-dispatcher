@@ -1,5 +1,4 @@
 import { taskDispatcher } from "nativescript-task-dispatcher";
-import { emit, createEvent } from "nativescript-task-dispatcher/events";
 
 /*
 In NativeScript, a file with the same name as an XML file is known as
@@ -22,7 +21,11 @@ export function onNavigatingTo(args: NavigatedData) {
 async function emitStartEvent() {
     const isReady = await taskDispatcher.isReady();
     if (!isReady) {
+        const tasksNotReady = await taskDispatcher.tasksNotReady;
+        console.log(
+            `The following tasks are not ready!: ${tasksNotReady}.Going to prepare them...`
+        );
         await taskDispatcher.prepare();
     }
-    emit(createEvent("startEvent"));
+    taskDispatcher.emitEvent("startEvent");
 }
