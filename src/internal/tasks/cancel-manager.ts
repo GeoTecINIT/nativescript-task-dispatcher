@@ -2,7 +2,10 @@ import {
   PlannedTasksStore,
   plannedTasksDB,
 } from "../persistence/planned-tasks-store";
-import { TaskScheduler, taskScheduler as getTaskScheduler } from "./scheduler";
+import {
+  TaskScheduler,
+  taskScheduler as getTaskScheduler,
+} from "./schedulers/time-based";
 import { on, off } from "../events";
 import { PlannedTask, PlanningType } from "./planner/planned-task";
 import { Logger, getLogger } from "../utils/logger";

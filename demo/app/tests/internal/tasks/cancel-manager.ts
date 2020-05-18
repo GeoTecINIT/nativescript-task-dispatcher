@@ -1,6 +1,6 @@
 import { createPlannedTaskStoreMock } from "../persistence";
 import { TaskCancelManager } from "nativescript-task-dispatcher/internal/tasks/cancel-manager";
-import { TaskScheduler } from "nativescript-task-dispatcher/internal/tasks/scheduler";
+import { TaskScheduler } from "nativescript-task-dispatcher/internal/tasks/schedulers/time-based";
 import { RunnableTask } from "nativescript-task-dispatcher/internal/tasks/runnable-task";
 import {
     hasListeners,

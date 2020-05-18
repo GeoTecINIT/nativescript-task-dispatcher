@@ -6,13 +6,19 @@ import {
   createEvent,
 } from "../../events";
 import { PlannedTask } from "./planned-task";
-import { TaskScheduler, taskScheduler as getTaskScheduler } from "../scheduler";
+import {
+  TaskScheduler,
+  taskScheduler as getTaskScheduler,
+} from "../schedulers/time-based";
 import {
   PlannedTasksStore,
   plannedTasksDB,
 } from "../../persistence/planned-tasks-store";
 import { checkIfTaskExists } from "../provider";
-import { TaskRunner, InstantTaskRunner } from "../runners/instant-task-runner";
+import {
+  TaskRunner,
+  InstantTaskRunner,
+} from "../schedulers/immediate/instant-task-runner";
 import { TaskResultStatus, TaskChainResult } from "../task";
 import { TaskCancelManager, taskCancelManager } from "../cancel-manager";
 

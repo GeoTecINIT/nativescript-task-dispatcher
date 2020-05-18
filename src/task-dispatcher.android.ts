@@ -1,18 +1,17 @@
-import { android as androidApp } from "tns-core-modules/application/application";
-
 import { Common, ConfigParams } from "./task-dispatcher.common";
 
 import { Task } from "./tasks";
 import { TaskGraph } from "./tasks/graph";
 
-import { BootReceiver } from "./internal/tasks/scheduler/android/boot-receiver.android";
-import { AlarmReceiver } from "./internal/tasks/scheduler/android/alarms/alarm/receiver.android";
-import { AlarmRunnerService } from "./internal/tasks/scheduler/android/alarms/alarm/runner-service.android";
-import { WatchdogReceiver } from "./internal/tasks/scheduler/android/alarms/watchdog/receiver.android";
-import { setTaskSchedulerCreator } from "./internal/tasks/scheduler/common";
-import { AndroidTaskScheduler } from "./internal/tasks/scheduler/android";
-import { setupNotificationChannels } from "./internal/tasks/scheduler/android/notification-manager.android";
-import { AndroidAlarmScheduler } from "./internal/tasks/scheduler/android/alarms/alarm/scheduler.android";
+import { setTaskSchedulerCreator } from "./internal/tasks/schedulers/time-based/common";
+import { getAndroidTaskScheduler } from "./internal/tasks/schedulers/time-based/android";
+import { setTaskChainLauncherCreator } from "./internal/tasks/schedulers/event-driven/common";
+import { getAndroidTaskChainLauncher } from "./internal/tasks/schedulers/event-driven/android";
+import { getBootReceiver } from "./internal/tasks/schedulers/time-based/android/boot-receiver.android";
+import { getAlarmReceiver } from "./internal/tasks/schedulers/time-based/android/alarms/alarm/receiver.android";
+import { getAlarmRunnerService } from "./internal/tasks/schedulers/time-based/android/alarms/alarm/runner-service.android";
+import { getWatchDogReceiver } from "./internal/tasks/schedulers/time-based/android/alarms/watchdog/receiver.android";
+import { getTaskChainRunnerService } from "./internal/tasks/schedulers/event-driven/android/runner-service.android";
 
 class TaskDispatcher extends Common {
   public init(
@@ -22,11 +21,12 @@ class TaskDispatcher extends Common {
   ): Promise<void> {
     this.wireUpNativeComponents();
     setTaskSchedulerCreator(() => getAndroidTaskScheduler());
+    setTaskChainLauncherCreator(() => getAndroidTaskChainLauncher());
     return super.init(appTasks, appTaskGraph, config);
   }
 
   public isReady() {
-    new AndroidAlarmScheduler().setup();
+    getAndroidTaskScheduler().setup();
     return super.isReady();
   }
 
@@ -35,6 +35,7 @@ class TaskDispatcher extends Common {
     this.wireUpAlarmReceiver();
     this.wireUpAlarmRunnerService();
     this.wireUpWatchdogReceiver();
+    this.wireUpTaskChainRunnerService();
   }
 
   private wireUpBootReceiver() {
@@ -75,47 +76,18 @@ class TaskDispatcher extends Common {
       })
     );
   }
-}
 
-let _bootReceiver: BootReceiver;
-function getBootReceiver(): BootReceiver {
-  if (!_bootReceiver) {
-    _bootReceiver = new BootReceiver();
+  private wireUpTaskChainRunnerService() {
+    es.uji.geotec.taskdispatcher.runners.TaskChainRunnerService.setTaskChainRunnerServiceDelegate(
+      new es.uji.geotec.taskdispatcher.runners.TaskChainRunnerServiceDelegate({
+        onCreate: (nativeService) =>
+          getTaskChainRunnerService().onCreate(nativeService),
+        onStartCommand: (intent, flags, startId) =>
+          getTaskChainRunnerService().onStartCommand(intent, flags, startId),
+        onDestroy: () => getTaskChainRunnerService().onDestroy(),
+      })
+    );
   }
-  return _bootReceiver;
-}
-
-let _alarmReceiver: AlarmReceiver;
-function getAlarmReceiver(): AlarmReceiver {
-  if (!_alarmReceiver) {
-    _alarmReceiver = new AlarmReceiver();
-  }
-  return _alarmReceiver;
-}
-
-let _alarmRunnerService: AlarmRunnerService;
-function getAlarmRunnerService(): AlarmRunnerService {
-  if (!_alarmRunnerService) {
-    setupNotificationChannels(androidApp.context);
-    _alarmRunnerService = new AlarmRunnerService();
-  }
-  return _alarmRunnerService;
-}
-
-let _watchdogReceiver: WatchdogReceiver;
-function getWatchDogReceiver(): WatchdogReceiver {
-  if (!_watchdogReceiver) {
-    _watchdogReceiver = new WatchdogReceiver();
-  }
-  return _watchdogReceiver;
-}
-
-let _androidTaskScheduler: AndroidTaskScheduler;
-function getAndroidTaskScheduler(): AndroidTaskScheduler {
-  if (!_androidTaskScheduler) {
-    _androidTaskScheduler = new AndroidTaskScheduler();
-  }
-  return _androidTaskScheduler;
 }
 
 export const taskDispatcher = new TaskDispatcher();

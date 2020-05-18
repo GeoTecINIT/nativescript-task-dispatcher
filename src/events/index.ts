@@ -1,1 +1,1 @@
-export { createEvent, emit, DispatchableEvent } from "../internal/events";
+export { DispatchableEvent, EventData } from "../internal/events";

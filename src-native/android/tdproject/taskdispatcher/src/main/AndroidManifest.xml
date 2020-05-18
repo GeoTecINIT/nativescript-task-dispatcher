@@ -29,5 +29,9 @@
             android:exported="false"
             android:foregroundServiceType="location|connectedDevice|dataSync" />
 
+        <service
+            android:name=".runners.TaskChainRunnerService"
+            android:exported="false" />
+
     </application>
 </manifest>

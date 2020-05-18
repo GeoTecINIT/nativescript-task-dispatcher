@@ -4,7 +4,12 @@ import { EventCallback, EventReceiver } from "./event-receivers";
 
 const internalEventManager = new InternalEventManager();
 
-export { TaskDispatcherEvent, DispatchableEvent, createEvent } from "./events";
+export {
+  TaskDispatcherEvent,
+  DispatchableEvent,
+  EventData,
+  createEvent,
+} from "./events";
 export { EventCallback, EventReceiver } from "./event-receivers";
 
 export function on(

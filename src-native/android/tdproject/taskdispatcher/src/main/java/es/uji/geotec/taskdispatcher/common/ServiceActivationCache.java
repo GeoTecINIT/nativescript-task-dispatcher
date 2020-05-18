@@ -7,7 +7,6 @@ public class ServiceActivationCache {
 
     private boolean onCreateCalled;
     private boolean onStartCommandCalled;
-    private boolean onDestroyCalled;
 
     private Service service;
 
@@ -39,24 +38,12 @@ public class ServiceActivationCache {
         startId = -1;
     }
 
-    public void onDestroyEarlyCalled() {
-        onDestroyCalled = true;
-    }
-
-    public void onDestroyEarlyCalledHandled() {
-        onDestroyCalled = false;
-    }
-
     public boolean onCreateWasEarlyCalled() {
         return onCreateCalled;
     }
 
     public boolean onStartCommandWasEarlyCalled() {
         return onStartCommandCalled;
-    }
-
-    public boolean onDestroyWasEarlyCalled() {
-        return onDestroyCalled;
     }
 
     public Service getService() {

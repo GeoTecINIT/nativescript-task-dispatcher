@@ -312,22 +312,19 @@ declare namespace es {
               es.uji.geotec.taskdispatcher.common.ServiceActivationCache
             >;
             public constructor();
+            public onStartCommandWasEarlyCalled(): boolean;
+            public onStartCommandEarlyCalledHandled(): void;
+            public onCreateWasEarlyCalled(): boolean;
+            public getStartFlags(): number;
             public onCreateEarlyCalled(param0: globalAndroid.app.Service): void;
             public getStartIntent(): globalAndroid.content.Intent;
             public onCreateEarlyCalledHandled(): void;
-            public getService(): globalAndroid.app.Service;
-            public onDestroyWasEarlyCalled(): boolean;
-            public onStartCommandWasEarlyCalled(): boolean;
-            public onStartCommandEarlyCalledHandled(): void;
-            public onDestroyEarlyCalled(): void;
-            public onDestroyEarlyCalledHandled(): void;
-            public onCreateWasEarlyCalled(): boolean;
-            public getStartFlags(): number;
             public onStartCommandEarlyCalled(
               param0: globalAndroid.content.Intent,
               param1: number,
               param2: number
             ): void;
+            public getService(): globalAndroid.app.Service;
             public getStartId(): number;
           }
         }
@@ -347,6 +344,73 @@ declare namespace es {
             >;
             /**
              * Constructs a new instance of the es.uji.geotec.taskdispatcher.common.ServiceDelegate interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
+             */
+            public constructor(implementation: {
+              onCreate(param0: globalAndroid.app.Service): void;
+              onStartCommand(
+                param0: globalAndroid.content.Intent,
+                param1: number,
+                param2: number
+              ): number;
+              onDestroy(): void;
+            });
+            public constructor();
+            public onDestroy(): void;
+            public onCreate(param0: globalAndroid.app.Service): void;
+            public onStartCommand(
+              param0: globalAndroid.content.Intent,
+              param1: number,
+              param2: number
+            ): number;
+          }
+        }
+      }
+    }
+  }
+}
+
+declare namespace es {
+  export namespace uji {
+    export namespace geotec {
+      export namespace taskdispatcher {
+        export namespace runners {
+          export class TaskChainRunnerService {
+            public static class: java.lang.Class<
+              es.uji.geotec.taskdispatcher.runners.TaskChainRunnerService
+            >;
+            public constructor();
+            public onDestroy(): void;
+            public onCreate(): void;
+            public onBind(
+              param0: globalAndroid.content.Intent
+            ): globalAndroid.os.IBinder;
+            public static setTaskChainRunnerServiceDelegate(
+              param0: es.uji.geotec.taskdispatcher.runners.TaskChainRunnerServiceDelegate
+            ): void;
+            public onStartCommand(
+              param0: globalAndroid.content.Intent,
+              param1: number,
+              param2: number
+            ): number;
+          }
+        }
+      }
+    }
+  }
+}
+
+declare namespace es {
+  export namespace uji {
+    export namespace geotec {
+      export namespace taskdispatcher {
+        export namespace runners {
+          export class TaskChainRunnerServiceDelegate extends es.uji.geotec
+            .taskdispatcher.common.ServiceDelegate {
+            public static class: java.lang.Class<
+              es.uji.geotec.taskdispatcher.runners.TaskChainRunnerServiceDelegate
+            >;
+            /**
+             * Constructs a new instance of the es.uji.geotec.taskdispatcher.runners.TaskChainRunnerServiceDelegate interface with the provided implementation. An empty constructor exists calling super() when extending the interface class.
              */
             public constructor(implementation: {
               onCreate(param0: globalAndroid.app.Service): void;
