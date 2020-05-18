@@ -15,6 +15,10 @@ export class AndroidTaskScheduler implements TaskScheduler {
     private tasksStore: PlannedTasksStore = plannedTasksDB
   ) {}
 
+  setup() {
+    this.alarmScheduler.setup();
+  }
+
   async schedule(task: RunnableTask): Promise<PlannedTask> {
     checkIfTaskExists(task.name);
 
@@ -47,4 +51,12 @@ export class AndroidTaskScheduler implements TaskScheduler {
         throw new Error("Method not implemented.");
     }
   }
+}
+
+let _androidTaskScheduler: AndroidTaskScheduler;
+export function getAndroidTaskScheduler(): AndroidTaskScheduler {
+  if (!_androidTaskScheduler) {
+    _androidTaskScheduler = new AndroidTaskScheduler();
+  }
+  return _androidTaskScheduler;
 }

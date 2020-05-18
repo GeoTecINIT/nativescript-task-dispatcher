@@ -16,3 +16,11 @@ export class BootReceiver
       });
   }
 }
+
+let _bootReceiver: BootReceiver;
+export function getBootReceiver(): BootReceiver {
+  if (!_bootReceiver) {
+    _bootReceiver = new BootReceiver();
+  }
+  return _bootReceiver;
+}

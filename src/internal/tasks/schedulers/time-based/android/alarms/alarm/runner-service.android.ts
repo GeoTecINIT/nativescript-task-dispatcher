@@ -1,7 +1,9 @@
+import { android as androidApp } from "tns-core-modules/application/application";
 import { unpackAlarmRunnerServiceIntent } from "../../intents.android";
 import {
   AndroidNotification,
   createNotification,
+  setupNotificationChannels,
 } from "../../notification-manager.android";
 import {
   plannedTasksDB,
@@ -240,4 +242,13 @@ function alarmRunnerWakeLock(
     android.os.PowerManager.PARTIAL_WAKE_LOCK,
     wakeLockName
   );
+}
+
+let _alarmRunnerService: AlarmRunnerService;
+export function getAlarmRunnerService(): AlarmRunnerService {
+  if (!_alarmRunnerService) {
+    setupNotificationChannels(androidApp.context);
+    _alarmRunnerService = new AlarmRunnerService();
+  }
+  return _alarmRunnerService;
 }

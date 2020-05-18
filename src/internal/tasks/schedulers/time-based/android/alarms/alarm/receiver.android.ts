@@ -86,3 +86,11 @@ export class AlarmReceiver
     }
   }
 }
+
+let _alarmReceiver: AlarmReceiver;
+export function getAlarmReceiver(): AlarmReceiver {
+  if (!_alarmReceiver) {
+    _alarmReceiver = new AlarmReceiver();
+  }
+  return _alarmReceiver;
+}

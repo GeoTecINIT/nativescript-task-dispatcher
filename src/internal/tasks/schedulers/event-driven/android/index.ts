@@ -1,7 +1,7 @@
 import { android as androidApp } from "tns-core-modules/application/application";
 
 import { TaskChainLauncher } from "..";
-import { EventData } from "../../../../events/events";
+import { EventData } from "../../../../events";
 import { createTaskChainRunnerServiceIntent } from "./intents.android";
 
 export class AndroidTaskChainLauncher implements TaskChainLauncher {
@@ -18,4 +18,12 @@ export class AndroidTaskChainLauncher implements TaskChainLauncher {
 
     context.startService(startTaskChainRunnerService);
   }
+}
+
+let _androidTaskChainLauncher: AndroidTaskChainLauncher;
+export function getAndroidTaskChainLauncher(): AndroidTaskChainLauncher {
+  if (!_androidTaskChainLauncher) {
+    _androidTaskChainLauncher = new AndroidTaskChainLauncher();
+  }
+  return _androidTaskChainLauncher;
 }

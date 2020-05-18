@@ -8,10 +8,12 @@ import { taskGraph } from "./internal/tasks/graph/loader";
 
 import { LoggerCreator } from "./utils/logger";
 import { setLoggerCreator, enableLogging } from "./internal/utils/logger";
+import { EventData } from "./events";
+import { taskChainLauncher } from "./internal/tasks/schedulers/event-driven";
 
 export abstract class Common extends Observable {
-  constructor() {
-    super();
+  public get tasksNotReady(): Promise<Array<Task>> {
+    return taskGraph.tasksNotReady();
   }
 
   public init(
@@ -30,6 +32,10 @@ export abstract class Common extends Observable {
 
   public prepare(): Promise<void> {
     return taskGraph.prepare();
+  }
+
+  public emitEvent(eventName: string, eventData: EventData = {}) {
+    taskChainLauncher().launch(eventName, eventData);
   }
 
   private configure(config: ConfigParams) {

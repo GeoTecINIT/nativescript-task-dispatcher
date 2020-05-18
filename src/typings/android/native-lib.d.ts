@@ -436,4 +436,4 @@ declare namespace es {
   }
 }
 
-//Generics information:
+// Generics information:

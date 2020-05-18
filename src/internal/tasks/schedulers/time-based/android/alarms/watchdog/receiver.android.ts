@@ -16,3 +16,11 @@ export class WatchdogReceiver
       });
   }
 }
+
+let _watchdogReceiver: WatchdogReceiver;
+export function getWatchDogReceiver(): WatchdogReceiver {
+  if (!_watchdogReceiver) {
+    _watchdogReceiver = new WatchdogReceiver();
+  }
+  return _watchdogReceiver;
+}

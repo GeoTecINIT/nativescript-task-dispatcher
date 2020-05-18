@@ -198,3 +198,11 @@ function taskChainRunnerWakeLock(
     wakeLockName
   );
 }
+
+let _taskChainRunnerService: TaskChainRunnerService;
+export function getTaskChainRunnerService(): TaskChainRunnerService {
+  if (!_taskChainRunnerService) {
+    _taskChainRunnerService = new TaskChainRunnerService();
+  }
+  return _taskChainRunnerService;
+}
