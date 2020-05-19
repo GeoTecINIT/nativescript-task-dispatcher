@@ -1,15 +1,16 @@
-import { uuid } from "../utils/uuid";
+import { uuid } from '../utils/uuid';
 
 export enum TaskDispatcherEvent {
-  TaskExecutionStarted = "taskExecutionStarted",
-  TaskExecutionTimedOut = "taskExecutionTimedOut",
-  TaskChainFinished = "taskChainFinished",
-  DefaultCancelEvent = "defaultCancelEvent",
+  TaskExecutionStarted = 'taskExecutionStarted',
+  TaskExecutionTimedOut = 'taskExecutionTimedOut',
+  TaskChainFinished = 'taskChainFinished',
+  DefaultCancelEvent = 'defaultCancelEvent',
 }
 
 export interface DispatchableEvent {
   name: string;
   id: string;
+  timeoutDate: number;
   data: EventData;
 }
 
@@ -23,10 +24,12 @@ export function createEvent(
 ): DispatchableEvent {
   const id = params.id ? params.id : uuid();
   const data = params.data ? params.data : {};
+  const timeoutDate = params.timeoutDate ? params.timeoutDate : null;
 
   return {
     name,
     id,
+    timeoutDate,
     data,
   };
 }
@@ -34,4 +37,5 @@ export function createEvent(
 interface CreateEventParams {
   data?: EventData;
   id?: string;
+  timeoutDate?: number;
 }

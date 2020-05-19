@@ -33,16 +33,19 @@ describe("Event-based task runner", () => {
         startEvent = {
             name: "startEvent",
             id: uuid(),
+            timeoutDate: 10,
             data: {},
         };
         stopEvent = {
             name: "stopEvent",
             id: uuid(),
+            timeoutDate: null,
             data: {},
         };
         expectedEvent = {
             name: "patataCooked",
             id: startEvent.id,
+            timeoutDate: 10,
             data: { status: "slightlyBaked" },
         };
     });
@@ -104,5 +107,6 @@ const testTaskGraph = {
             "startEvent",
             run("dummyTask").every(1, "minutes").cancelOn("stopEvent")
         );
+        onEvt("emitterTaskFinished", run("dummyTask"));
     },
 };

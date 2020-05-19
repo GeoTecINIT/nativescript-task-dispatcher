@@ -1,8 +1,8 @@
-import { Logger, getLogger } from "../../../../utils/logger";
+import { Logger, getLogger } from '../../../../utils/logger';
 import {
   unpackTaskChainRunnerServiceIntent,
   TaskChainRunnerParams,
-} from "./intents.android";
+} from './intents.android';
 import {
   createEvent,
   TaskDispatcherEvent,
@@ -10,7 +10,7 @@ import {
   on,
   DispatchableEvent,
   off,
-} from "../../../../events";
+} from '../../../../events';
 
 const TIMEOUT = 180000;
 const TIMEOUT_EVENT_OFFSET = 5000;
@@ -33,8 +33,8 @@ export class TaskChainRunnerService
     this.wakeLock = taskChainRunnerWakeLock(nativeService);
     this.timeoutIds = new Set();
 
-    this.logger = getLogger("TaskChainRunnerService");
-    this.logger.debug("onCreate called");
+    this.logger = getLogger('TaskChainRunnerService');
+    this.logger.debug('onCreate called');
 
     this.initializeExecutionWindow();
   }
@@ -49,7 +49,7 @@ export class TaskChainRunnerService
       this.taskChainStarted();
       this.processRequest(intent)
         .then(() => {
-          this.logger.debug("Task chain finished running");
+          this.logger.debug('Task chain finished running');
           this.taskChainDone();
         })
         .catch((err) => {
@@ -62,7 +62,7 @@ export class TaskChainRunnerService
   }
 
   public onDestroy(): void {
-    this.logger.debug("onDestroy called");
+    this.logger.debug('onDestroy called');
   }
 
   private initializeExecutionWindow() {
@@ -94,7 +94,7 @@ export class TaskChainRunnerService
       `Request params {launchEvent=${
         params.launchEvent
       }, eventData=${JSON.stringify(params.eventData)}${
-        params.eventId ? `, eventId=${params.eventId}` : ""
+        params.eventId ? `, eventId=${params.eventId}` : ''
       }}`
     );
     return params;
@@ -122,6 +122,8 @@ export class TaskChainRunnerService
     this.logger.info(
       `Execution will timeout in ${timeout}, for tasks running with execution id: ${id}`
     );
+
+    launchEvent.timeoutDate = this.getTimeoutDate(timeout);
 
     const timeoutId = setTimeout(() => {
       emit(timeoutEvent);
@@ -160,15 +162,19 @@ export class TaskChainRunnerService
     return TIMEOUT - TIMEOUT_EVENT_OFFSET - diff;
   }
 
+  private getTimeoutDate(timeout: number): number {
+    return new Date().getTime() + timeout;
+  }
+
   private gracefullyStop() {
-    this.logger.debug("Stopping service");
+    this.logger.debug('Stopping service');
     this.killWithFire();
     for (const timeoutId of this.timeoutIds) {
       clearTimeout(timeoutId);
     }
     if (this.wakeLock.isHeld()) {
       this.wakeLock.release();
-      this.logger.debug("Lock released");
+      this.logger.debug('Lock released');
     }
   }
 
@@ -188,7 +194,7 @@ export class TaskChainRunnerService
 function taskChainRunnerWakeLock(
   context: android.content.Context
 ): android.os.PowerManager.WakeLock {
-  const wakeLockName = "TaskDispatcher::TaskChainRunnerWakeLock";
+  const wakeLockName = 'TaskDispatcher::TaskChainRunnerWakeLock';
   const powerManager = context.getSystemService(
     android.content.Context.POWER_SERVICE
   ) as android.os.PowerManager;

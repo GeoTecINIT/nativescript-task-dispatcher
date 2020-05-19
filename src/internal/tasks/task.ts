@@ -4,8 +4,8 @@ import {
   TaskDispatcherEvent,
   emit,
   hasListeners,
-} from "../events";
-import { Logger, getLogger } from "../utils/logger";
+} from '../events';
+import { Logger, getLogger } from '../utils/logger';
 
 export abstract class Task {
   get name(): string {
@@ -52,7 +52,7 @@ export abstract class Task {
     this._taskParams = taskParams;
     this._invocationEvent = invocationEvent;
 
-    this.log(`Run triggered by ${invocationEvent.name} event`);
+    this.log(`Run triggered by ${JSON.stringify(invocationEvent)} event`);
 
     try {
       await this.checkIfCanRun();
@@ -97,7 +97,7 @@ export abstract class Task {
       this.removeCancelFunction();
     }
 
-    this.log("Cancelled");
+    this.log('Cancelled');
   }
 
   /**
@@ -180,7 +180,7 @@ export abstract class Task {
     );
 
     const reason = new Error(
-      "Concurrent Execution: Executing multiple instances of a task concurrently is not allowed"
+      'Concurrent Execution: Executing multiple instances of a task concurrently is not allowed'
     );
     this.emitEndEvent(TaskResultStatus.Cancelled, reason, invocationEvent.id);
   }
@@ -193,7 +193,7 @@ export abstract class Task {
         Received outcome: ${JSON.stringify(outcome)}`
       );
 
-      const reason = new Error("Cannot choose which event to emit");
+      const reason = new Error('Cannot choose which event to emit');
       this.emitEndEvent(TaskResultStatus.Error, reason);
 
       return;
@@ -231,7 +231,7 @@ export abstract class Task {
     }
 
     const data = result
-      ? typeof result === "object"
+      ? typeof result === 'object'
         ? { ...result }
         : { result }
       : {};
@@ -239,6 +239,7 @@ export abstract class Task {
     emit({
       name: eventName,
       id: this._invocationEvent.id,
+      timeoutDate: this._invocationEvent.timeoutDate,
       data,
     });
 
@@ -308,9 +309,9 @@ export interface TaskChainResult {
 }
 
 export enum TaskResultStatus {
-  Ok = "ok",
-  Error = "error",
-  Cancelled = "cancelled",
+  Ok = 'ok',
+  Error = 'error',
+  Cancelled = 'cancelled',
 }
 
 export type CancelFunction = () => void;

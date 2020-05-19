@@ -1,24 +1,24 @@
-import { android as androidApp } from "tns-core-modules/application/application";
-import { unpackAlarmRunnerServiceIntent } from "../../intents.android";
+import { android as androidApp } from 'tns-core-modules/application/application';
+import { unpackAlarmRunnerServiceIntent } from '../../intents.android';
 import {
   AndroidNotification,
   createNotification,
   setupNotificationChannels,
-} from "../../notification-manager.android";
+} from '../../notification-manager.android';
 import {
   plannedTasksDB,
   PlannedTasksStore,
-} from "../../../../../../persistence/planned-tasks-store";
-import { BatchTaskRunner } from "../../../../../runners/batch-task-runner";
+} from '../../../../../../persistence/planned-tasks-store';
+import { BatchTaskRunner } from '../../../../../runners/batch-task-runner';
 import {
   DispatchableEvent,
   TaskDispatcherEvent,
   emit,
   createEvent,
-} from "../../../../../../events";
-import { TaskManager } from "../../../../../manager";
-import { PlanningType } from "../../../../../planner/planned-task";
-import { Logger, getLogger } from "../../../../../../utils/logger";
+} from '../../../../../../events';
+import { TaskManager } from '../../../../../manager';
+import { PlanningType } from '../../../../../planner/planned-task';
+import { Logger, getLogger } from '../../../../../../utils/logger';
 
 const MIN_TIMEOUT = 60000;
 const TIMEOUT_EVENT_OFFSET = 5000;
@@ -53,8 +53,8 @@ export class AlarmRunnerService
     this.wakeLock = alarmRunnerWakeLock(nativeService);
     this.taskStore = plannedTasksDB;
 
-    this.logger = getLogger("AlarmRunnerService");
-    this.logger.debug("onCreate called");
+    this.logger = getLogger('AlarmRunnerService');
+    this.logger.debug('onCreate called');
   }
 
   onStartCommand(
@@ -76,7 +76,7 @@ export class AlarmRunnerService
 
     this.runTasks()
       .then(() => {
-        this.logger.debug("Tasks finished running");
+        this.logger.debug('Tasks finished running');
         this.gracefullyStop();
       })
       .catch((err) => {
@@ -88,7 +88,7 @@ export class AlarmRunnerService
   }
 
   onDestroy() {
-    this.logger.debug("onDestroy called");
+    this.logger.debug('onDestroy called');
     this.gracefullyStop();
     this.nativeService = null;
   }
@@ -96,7 +96,7 @@ export class AlarmRunnerService
   private alreadyRunning(startId: number) {
     if (startId === 1) {
       this.started = true;
-      this.logger.debug("Service started");
+      this.logger.debug('Service started');
 
       return false;
     }
@@ -127,7 +127,7 @@ export class AlarmRunnerService
       createNotification(this.nativeService, AndroidNotification.LocationUsage)
     );
     this.inForeground = true;
-    this.logger.debug("Running in foreground");
+    this.logger.debug('Running in foreground');
   }
 
   private async runTasks() {
@@ -143,7 +143,7 @@ export class AlarmRunnerService
       this.logger.info(`Running ${taskCount} tasks`);
       await taskRunner.run(tasksToRun, executionStartedEvt);
     } else {
-      this.logger.warn("Service was called but no tasks were run!");
+      this.logger.warn('Service was called but no tasks were run!');
     }
   }
 
@@ -158,7 +158,9 @@ export class AlarmRunnerService
 
   private initializeExecutionWindow(timeout: number): DispatchableEvent {
     this.wakeLock.acquire(timeout);
-    const startEvent = createEvent(TaskDispatcherEvent.TaskExecutionStarted);
+    const startEvent = createEvent(TaskDispatcherEvent.TaskExecutionStarted, {
+      timeoutDate: this.getTimeoutDate(timeout),
+    });
     const { id } = startEvent;
     const timeoutEvent = createEvent(
       TaskDispatcherEvent.TaskExecutionTimedOut,
@@ -186,10 +188,14 @@ export class AlarmRunnerService
     return Math.max(nextExecutionTime, MIN_TIMEOUT);
   }
 
+  private getTimeoutDate(timeout: number): number {
+    return new Date().getTime() + timeout;
+  }
+
   private gracefullyStop() {
     this.moveToBackground();
     if (this.started) {
-      this.logger.debug("Stopping service");
+      this.logger.debug('Stopping service');
       this.killWithFire();
       this.started = false;
     }
@@ -198,7 +204,7 @@ export class AlarmRunnerService
     }
     if (this.wakeLock.isHeld()) {
       this.wakeLock.release();
-      this.logger.debug("Lock released");
+      this.logger.debug('Lock released');
     }
   }
 
@@ -209,7 +215,7 @@ export class AlarmRunnerService
     const andRemoveNotification = true;
     this.nativeService.stopForeground(andRemoveNotification);
     this.inForeground = false;
-    this.logger.debug("Running in background");
+    this.logger.debug('Running in background');
   }
 
   /**
@@ -233,7 +239,7 @@ export class AlarmRunnerService
 function alarmRunnerWakeLock(
   context: android.content.Context
 ): android.os.PowerManager.WakeLock {
-  const wakeLockName = "TaskDispatcher::AlarmRunnerWakeLock";
+  const wakeLockName = 'TaskDispatcher::AlarmRunnerWakeLock';
   const powerManager = context.getSystemService(
     android.content.Context.POWER_SERVICE
   ) as android.os.PowerManager;
