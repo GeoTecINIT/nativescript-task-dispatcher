@@ -4,8 +4,8 @@ import {
   TaskDispatcherEvent,
   emit,
   hasListeners,
-} from '../events';
-import { Logger, getLogger } from '../utils/logger';
+} from "../events";
+import { Logger, getLogger } from "../utils/logger";
 
 export abstract class Task {
   get name(): string {
@@ -52,7 +52,13 @@ export abstract class Task {
     this._taskParams = taskParams;
     this._invocationEvent = invocationEvent;
 
-    this.log(`Run triggered by ${JSON.stringify(invocationEvent)} event`);
+    this.log(
+      `Run triggered by ${invocationEvent.name} event ${
+        invocationEvent.expirationTimestamp !== -1
+          ? `with ${invocationEvent.expirationTimestamp} expirationTimestamp`
+          : ``
+      }`
+    );
 
     try {
       await this.checkIfCanRun();
@@ -97,7 +103,7 @@ export abstract class Task {
       this.removeCancelFunction();
     }
 
-    this.log('Cancelled');
+    this.log("Cancelled");
   }
 
   /**
@@ -180,7 +186,7 @@ export abstract class Task {
     );
 
     const reason = new Error(
-      'Concurrent Execution: Executing multiple instances of a task concurrently is not allowed'
+      "Concurrent Execution: Executing multiple instances of a task concurrently is not allowed"
     );
     this.emitEndEvent(TaskResultStatus.Cancelled, reason, invocationEvent.id);
   }
@@ -193,7 +199,7 @@ export abstract class Task {
         Received outcome: ${JSON.stringify(outcome)}`
       );
 
-      const reason = new Error('Cannot choose which event to emit');
+      const reason = new Error("Cannot choose which event to emit");
       this.emitEndEvent(TaskResultStatus.Error, reason);
 
       return;
@@ -231,7 +237,7 @@ export abstract class Task {
     }
 
     const data = result
-      ? typeof result === 'object'
+      ? typeof result === "object"
         ? { ...result }
         : { result }
       : {};
@@ -239,7 +245,7 @@ export abstract class Task {
     emit({
       name: eventName,
       id: this._invocationEvent.id,
-      timeoutDate: this._invocationEvent.timeoutDate,
+      expirationTimestamp: this._invocationEvent.expirationTimestamp,
       data,
     });
 
@@ -253,6 +259,21 @@ export abstract class Task {
   private markAsDone(invocationId?: string) {
     const id = invocationId ? invocationId : this._invocationEvent.id;
     this._executionHistory.add(id);
+  }
+
+  private remainingTime(eventName: string): number {
+    if (this._invocationEvent.expirationTimestamp === -1) {
+      return -1;
+    }
+
+    let timeForExpiration =
+      new Date().getTime() - this._invocationEvent.expirationTimestamp;
+
+    if (hasListeners(eventName)) {
+      timeForExpiration *= 0.8;
+    }
+
+    return Math.floor(timeForExpiration);
   }
 
   private emitEndEvent(
@@ -309,9 +330,9 @@ export interface TaskChainResult {
 }
 
 export enum TaskResultStatus {
-  Ok = 'ok',
-  Error = 'error',
-  Cancelled = 'cancelled',
+  Ok = "ok",
+  Error = "error",
+  Cancelled = "cancelled",
 }
 
 export type CancelFunction = () => void;

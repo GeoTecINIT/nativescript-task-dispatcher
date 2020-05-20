@@ -1,5 +1,5 @@
-import { PlannedTasksStore } from '../../persistence/planned-tasks-store';
-import { PlannedTask } from '../planner/planned-task';
+import { PlannedTasksStore } from "../../persistence/planned-tasks-store";
+import { PlannedTask } from "../planner/planned-task";
 import {
   DispatchableEvent,
   on,
@@ -7,8 +7,8 @@ import {
   off,
   createEvent,
   emit,
-} from '../../events';
-import { SingleTaskRunner } from './single-task-runner';
+} from "../../events";
+import { SingleTaskRunner } from "./single-task-runner";
 
 export class BatchTaskRunner {
   private taskRunner: SingleTaskRunner;
@@ -30,10 +30,12 @@ export class BatchTaskRunner {
 
   private runTaskWithCustomStartEvent(
     plannedTask: PlannedTask,
-    startEvent: DispatchableEvent
+    batchStartEvent: DispatchableEvent
   ): Promise<void> {
+    const startEvent = createEvent(TaskDispatcherEvent.TaskExecutionStarted);
+    startEvent.expirationTimestamp = batchStartEvent.expirationTimestamp;
     const listenerId = on(TaskDispatcherEvent.TaskExecutionTimedOut, (evt) => {
-      if (evt.id === startEvent.id) {
+      if (evt.id === batchStartEvent.id) {
         off(TaskDispatcherEvent.TaskExecutionTimedOut, listenerId);
         emit(
           createEvent(TaskDispatcherEvent.TaskExecutionTimedOut, {

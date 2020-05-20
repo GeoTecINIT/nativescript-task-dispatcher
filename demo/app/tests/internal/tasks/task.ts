@@ -95,7 +95,7 @@ describe("Task", () => {
         const taskFinishedEvt: DispatchableEvent = {
             name: dumbTaskEndEvtName,
             id: startEvent.id,
-            timeoutDate: null,
+            expirationTimestamp: -1,
             data: {},
         };
         expect(eventCallback).toHaveBeenCalledWith(taskFinishedEvt);
@@ -108,7 +108,7 @@ describe("Task", () => {
         const taskChainFinishedEvt: DispatchableEvent = {
             name: TaskDispatcherEvent.TaskChainFinished,
             id: startEvent.id,
-            timeoutDate: null,
+            expirationTimestamp: -1,
             data: { result: { status: "ok" } },
         };
         expect(eventCallback).toHaveBeenCalledWith(taskChainFinishedEvt);
@@ -122,7 +122,7 @@ describe("Task", () => {
         const taskChainFinishedEvt: DispatchableEvent = {
             name: TaskDispatcherEvent.TaskChainFinished,
             id: startEvent.id,
-            timeoutDate: null,
+            expirationTimestamp: -1,
             data: { result: { status: "error", reason: expectedError } },
         };
         expect(eventCallback).toHaveBeenCalledWith(taskChainFinishedEvt);
@@ -136,7 +136,7 @@ describe("Task", () => {
         const taskChainFinishedEvt: DispatchableEvent = {
             name: TaskDispatcherEvent.TaskChainFinished,
             id: startEvent.id,
-            timeoutDate: null,
+            expirationTimestamp: -1,
             data: { result: { status: "cancelled" } },
         };
         expect(eventCallback).toHaveBeenCalledWith(taskChainFinishedEvt);
@@ -150,7 +150,7 @@ describe("Task", () => {
         const emitterTaskEndEvt: DispatchableEvent = {
             name: emitterTaskEndEvtName,
             id: startEvent.id,
-            timeoutDate: null,
+            expirationTimestamp: -1,
             data: { result: ":)" },
         };
         expect(eventCallback).toHaveBeenCalledWith(emitterTaskEndEvt);
@@ -164,7 +164,7 @@ describe("Task", () => {
         const parameterizedTaskEvt: DispatchableEvent = {
             name: parameterizedTaskEndEvtName,
             id: startEvent.id,
-            timeoutDate: null,
+            expirationTimestamp: -1,
             data: { params },
         };
         expect(eventCallback).toHaveBeenCalledWith(parameterizedTaskEvt);
@@ -176,7 +176,7 @@ describe("Task", () => {
         const eventualTaskEvt: DispatchableEvent = {
             name: eventualTaskEndEvtName,
             id: startEvent.id,
-            timeoutDate: null,
+            expirationTimestamp: -1,
             data: { eventData },
         };
         expect(eventCallback).toHaveBeenCalledWith(eventualTaskEvt);

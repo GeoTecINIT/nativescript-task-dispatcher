@@ -33,19 +33,19 @@ describe("Event-based task runner", () => {
         startEvent = {
             name: "startEvent",
             id: uuid(),
-            timeoutDate: 10,
+            expirationTimestamp: -1,
             data: {},
         };
         stopEvent = {
             name: "stopEvent",
             id: uuid(),
-            timeoutDate: null,
+            expirationTimestamp: -1,
             data: {},
         };
         expectedEvent = {
             name: "patataCooked",
             id: startEvent.id,
-            timeoutDate: 10,
+            expirationTimestamp: -1,
             data: { status: "slightlyBaked" },
         };
     });
