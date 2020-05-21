@@ -26,6 +26,7 @@ describe("Event-based task runner", () => {
     let startEvent: DispatchableEvent;
     let stopEvent: DispatchableEvent;
     let expectedEvent: DispatchableEvent;
+    let expectedEventSlicer: DispatchableEvent;
 
     beforeEach(() => {
         taskGraph = new TaskGraphLoader();
@@ -33,7 +34,7 @@ describe("Event-based task runner", () => {
         startEvent = {
             name: "startEvent",
             id: uuid(),
-            expirationTimestamp: -1,
+            expirationTimestamp: 100,
             data: {},
         };
         stopEvent = {
@@ -45,8 +46,14 @@ describe("Event-based task runner", () => {
         expectedEvent = {
             name: "patataCooked",
             id: startEvent.id,
-            expirationTimestamp: -1,
+            expirationTimestamp: 100,
             data: { status: "slightlyBaked" },
+        };
+        expectedEventSlicer = {
+            name: "patataSliced",
+            id: startEvent.id,
+            expirationTimestamp: 100,
+            data: { status: "sliced" },
         };
     });
 
@@ -89,6 +96,31 @@ describe("Event-based task runner", () => {
         expect(plannedTask).toBeNull();
     });
 
+    it("runs a chained tasks secuence", async () => {
+        await taskGraph.load(testTaskGraph);
+        const callbackPromise = new Promise((resolve) => {
+            on(expectedEvent.name, (evt) => {
+                eventCallback(evt);
+                resolve();
+            });
+        });
+
+        const chainedEventCallback = jasmine.createSpy("eventCallback");
+        const chainedEventCallbackPromise = new Promise((resolve) => {
+            on(expectedEventSlicer.name, (evt) => {
+                chainedEventCallback(evt);
+                resolve();
+            });
+        });
+
+        emit(startEvent);
+        await callbackPromise;
+        await chainedEventCallbackPromise;
+
+        expect(eventCallback).toHaveBeenCalledWith(expectedEvent);
+        expect(chainedEventCallback).toHaveBeenCalledWith(expectedEventSlicer);
+    });
+
     afterEach(() => {
         off(startEvent.name);
         off(stopEvent.name);
@@ -108,5 +140,6 @@ const testTaskGraph = {
             run("dummyTask").every(1, "minutes").cancelOn("stopEvent")
         );
         onEvt("emitterTaskFinished", run("dummyTask"));
+        onEvt("patataCooked", run("patataSlicer"));
     },
 };
