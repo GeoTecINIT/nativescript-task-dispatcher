@@ -32,13 +32,13 @@ describe("Event-based task runner", () => {
         taskGraph = new TaskGraphLoader();
         eventCallback = jasmine.createSpy("eventCallback");
         startEvent = {
-            name: "startEvent",
+            name: "e2eStartEvent",
             id: uuid(),
             expirationTimestamp: 1588550400,
             data: {},
         };
         stopEvent = {
-            name: "stopEvent",
+            name: "e2eStopEvent",
             id: uuid(),
             expirationTimestamp: -1,
             data: {},
@@ -106,31 +106,27 @@ describe("Event-based task runner", () => {
         });
 
         emit(startEvent);
-        await callbackPromise;
-        await chainedEventCallbackPromise;
+        await Promise.all([callbackPromise, chainedEventCallbackPromise]);
 
         expect(eventCallback).toHaveBeenCalledWith(expectedEvent);
         expect(chainedEventCallback).toHaveBeenCalledWith(expectedEventSlicer);
         off(expectedEventSlicer.name);
     });
 
-    afterEach(() => {
+    afterAll(() => {
+        emit(stopEvent);
         off(startEvent.name);
         off(stopEvent.name);
         off(expectedEvent.name);
-    });
-
-    afterAll(() => {
-        emit(stopEvent);
     });
 });
 
 const testTaskGraph = {
     async describe(onEvt: EventListenerGenerator, run: RunnableTaskDescriptor) {
-        onEvt("startEvent", run("emitterTask"));
+        onEvt("e2eStartEvent", run("emitterTask"));
         onEvt(
-            "startEvent",
-            run("dummyTask").every(1, "minutes").cancelOn("stopEvent")
+            "e2eStartEvent",
+            run("dummyTask").every(1, "minutes").cancelOn("e2eStopEvent")
         );
         onEvt("emitterTaskFinished", run("dummyTask"));
         onEvt("patataCooked", run("patataSlicer"));

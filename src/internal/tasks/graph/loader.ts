@@ -1,6 +1,6 @@
 import { TaskGraph, RunnableTaskDescriptor } from ".";
 import { Task } from "../task";
-import { on, off } from "../../events";
+import { on } from "../../events";
 import { run } from "..";
 import { getTask, checkIfTaskExists } from "../provider";
 import {
