@@ -40,4 +40,16 @@ export const appTasks: Array<Task> = [
             execCount: execCount + 1,
         });
     }),
+    new SimpleTask("highFrequencySubTasks", async ({ remainingTime }) => {
+        new Promise((resolve) => {
+            const interval = 5000;
+            const intervalId = setInterval(() => {
+                console.log("SubTask executed");
+                if (remainingTime() < interval) {
+                    clearInterval(intervalId);
+                    resolve();
+                }
+            }, interval);
+        });
+    }),
 ];

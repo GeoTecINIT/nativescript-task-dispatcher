@@ -34,7 +34,7 @@ describe("Event-based task runner", () => {
         startEvent = {
             name: "startEvent",
             id: uuid(),
-            expirationTimestamp: 100,
+            expirationTimestamp: 1588550400,
             data: {},
         };
         stopEvent = {
@@ -46,13 +46,13 @@ describe("Event-based task runner", () => {
         expectedEvent = {
             name: "patataCooked",
             id: startEvent.id,
-            expirationTimestamp: 100,
+            expirationTimestamp: 1588550400,
             data: { status: "slightlyBaked" },
         };
         expectedEventSlicer = {
             name: "patataSliced",
             id: startEvent.id,
-            expirationTimestamp: 100,
+            expirationTimestamp: 1588550400,
             data: { status: "sliced" },
         };
     });
@@ -119,6 +119,7 @@ describe("Event-based task runner", () => {
 
         expect(eventCallback).toHaveBeenCalledWith(expectedEvent);
         expect(chainedEventCallback).toHaveBeenCalledWith(expectedEventSlicer);
+        off(expectedEventSlicer.name);
     });
 
     afterEach(() => {

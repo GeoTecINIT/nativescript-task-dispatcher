@@ -32,8 +32,9 @@ export class BatchTaskRunner {
     plannedTask: PlannedTask,
     batchStartEvent: DispatchableEvent
   ): Promise<void> {
-    const startEvent = createEvent(TaskDispatcherEvent.TaskExecutionStarted);
-    startEvent.expirationTimestamp = batchStartEvent.expirationTimestamp;
+    const startEvent = createEvent(TaskDispatcherEvent.TaskExecutionStarted, {
+      expirationTimestamp: batchStartEvent.expirationTimestamp,
+    });
     const listenerId = on(TaskDispatcherEvent.TaskExecutionTimedOut, (evt) => {
       if (evt.id === batchStartEvent.id) {
         off(TaskDispatcherEvent.TaskExecutionTimedOut, listenerId);

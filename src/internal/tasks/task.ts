@@ -261,7 +261,7 @@ export abstract class Task {
     this._executionHistory.add(id);
   }
 
-  private remainingTime(eventName: string): number {
+  protected remainingTime(): number {
     if (this._invocationEvent.expirationTimestamp === -1) {
       return -1;
     }
@@ -269,7 +269,7 @@ export abstract class Task {
     let timeForExpiration =
       new Date().getTime() - this._invocationEvent.expirationTimestamp;
 
-    if (hasListeners(eventName)) {
+    if (this.outputEventNames.some(hasListeners)) {
       timeForExpiration *= 0.8;
     }
 

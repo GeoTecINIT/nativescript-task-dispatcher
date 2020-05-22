@@ -103,8 +103,11 @@ export class TaskChainRunnerService
   private prepareTaskChainExecution(
     params: TaskChainRunnerParams
   ): [DispatchableEvent, number] {
+    const timeout = this.calculateTimeout();
+
     const launchEvent = createEvent(params.launchEvent, {
       data: params.eventData,
+      expirationTimestamp: this.getExpirationTimestamp(timeout),
     });
 
     if (params.eventId) {
@@ -118,12 +121,9 @@ export class TaskChainRunnerService
         id,
       }
     );
-    const timeout = this.calculateTimeout();
     this.logger.info(
       `Execution will timeout in ${timeout}, for tasks running with execution id: ${id}`
     );
-
-    launchEvent.expirationTimestamp = this.getExpirationTimestamp(timeout);
 
     const timeoutId = setTimeout(() => {
       emit(timeoutEvent);
