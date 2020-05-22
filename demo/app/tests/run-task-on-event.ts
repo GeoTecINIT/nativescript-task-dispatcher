@@ -74,17 +74,9 @@ describe("Event-based task runner", () => {
 
     it("removes a delayed task if it has been canceled", async () => {
         await taskGraph.load(testTaskGraph);
-        const done = new Promise((resolve) => {
-            const listenerId = on(stopEvent.name, (evt) => {
-                if (evt.id === stopEvent.id) {
-                    off(stopEvent.name, listenerId);
-                    resolve();
-                }
-            });
-        });
 
         emit(stopEvent);
-        await done;
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         const plannedTask = await plannedTasksDB.get({
             name: "dummyTask",
