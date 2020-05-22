@@ -2,11 +2,15 @@ import { Task, SimpleTask } from "nativescript-task-dispatcher/tasks";
 import { toSeconds } from "nativescript-task-dispatcher/utils/time-converter";
 
 export const appTasks: Array<Task> = [
-    new SimpleTask("fastTask", async ({ log }) => log("Fast task run!")),
+    new SimpleTask("fastTask", async ({ log, remainingTime }) => {
+        log(`Available time: ${remainingTime()}`);
+        log("Fast task run!");
+    }),
     new SimpleTask(
         "mediumTask",
-        ({ log, onCancel }) =>
+        ({ log, onCancel, remainingTime }) =>
             new Promise((resolve) => {
+                log(`Available time: ${remainingTime()}`);
                 const timeoutId = setTimeout(() => {
                     log("Medium task run!");
                     resolve();
@@ -19,8 +23,9 @@ export const appTasks: Array<Task> = [
     ),
     new SimpleTask(
         "slowTask",
-        ({ log, onCancel }) =>
+        ({ log, onCancel, remainingTime }) =>
             new Promise((resolve) => {
+                log(`Available time: ${remainingTime()}`);
                 const timeoutId = setTimeout(() => {
                     log("Slow task run!");
                     resolve();

@@ -1,7 +1,7 @@
 import { planningTimestamp } from "nativescript-task-dispatcher/internal/tasks/schedulers/time-based/planning-timestamp";
 
 const A_BIT = 500;
-const ATTEMPTS = 3;
+const ATTEMPTS = 2;
 
 describe("Planning timestamp", () => {
     it("returns the planning timestamp of the current invocation in successive runs", async () => {

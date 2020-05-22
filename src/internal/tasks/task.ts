@@ -165,6 +165,24 @@ export abstract class Task {
     );
   }
 
+  /**
+   * Meant to be used by the task itself. Provides the amount of time until the timeout will fire.
+   */
+  protected remainingTime(): number {
+    if (this._invocationEvent.expirationTimestamp === -1) {
+      return -1;
+    }
+
+    let timeForExpiration =
+      this._invocationEvent.expirationTimestamp - new Date().getTime();
+
+    if (this.outputEventNames.some(hasListeners)) {
+      timeForExpiration *= 0.9;
+    }
+
+    return Math.floor(timeForExpiration);
+  }
+
   private configureTask(taskConfig: TaskConfig) {
     this._taskConfig = {
       foreground: taskConfig.foreground ? true : false,
@@ -259,21 +277,6 @@ export abstract class Task {
   private markAsDone(invocationId?: string) {
     const id = invocationId ? invocationId : this._invocationEvent.id;
     this._executionHistory.add(id);
-  }
-
-  protected remainingTime(): number {
-    if (this._invocationEvent.expirationTimestamp === -1) {
-      return -1;
-    }
-
-    let timeForExpiration =
-      new Date().getTime() - this._invocationEvent.expirationTimestamp;
-
-    if (this.outputEventNames.some(hasListeners)) {
-      timeForExpiration *= 0.8;
-    }
-
-    return Math.floor(timeForExpiration);
   }
 
   private emitEndEvent(

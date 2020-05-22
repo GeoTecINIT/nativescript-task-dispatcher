@@ -158,8 +158,9 @@ export class AlarmRunnerService
 
   private initializeExecutionWindow(timeout: number): DispatchableEvent {
     this.wakeLock.acquire(timeout);
+    const executionTimeout = timeout - TIMEOUT_EVENT_OFFSET;
     const startEvent = createEvent(TaskDispatcherEvent.TaskExecutionStarted, {
-      expirationTimestamp: this.getExpirationTimestamp(timeout),
+      expirationTimestamp: this.getExpirationTimestamp(executionTimeout),
     });
     const { id } = startEvent;
     const timeoutEvent = createEvent(
@@ -168,7 +169,6 @@ export class AlarmRunnerService
         id,
       }
     );
-    const executionTimeout = timeout - TIMEOUT_EVENT_OFFSET;
     this.logger.info(
       `Execution will timeout in ${executionTimeout}, for tasks running with execution id: ${id}`
     );
@@ -177,7 +177,7 @@ export class AlarmRunnerService
       this.logger.warn(
         `Execution timed out for tasks running with execution id: ${id}`
       );
-    }, timeout - TIMEOUT_EVENT_OFFSET);
+    }, executionTimeout);
 
     return startEvent;
   }
