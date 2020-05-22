@@ -10,6 +10,7 @@ export enum TaskDispatcherEvent {
 export interface DispatchableEvent {
   name: string;
   id: string;
+  expirationTimestamp: number;
   data: EventData;
 }
 
@@ -23,10 +24,14 @@ export function createEvent(
 ): DispatchableEvent {
   const id = params.id ? params.id : uuid();
   const data = params.data ? params.data : {};
+  const expirationTimestamp = params.expirationTimestamp
+    ? params.expirationTimestamp
+    : -1;
 
   return {
     name,
     id,
+    expirationTimestamp,
     data,
   };
 }
@@ -34,4 +39,5 @@ export function createEvent(
 interface CreateEventParams {
   data?: EventData;
   id?: string;
+  expirationTimestamp?: number;
 }

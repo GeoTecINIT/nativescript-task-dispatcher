@@ -26,7 +26,7 @@ This plugin bases its way of working in three software primitives:
   - _> 1 minute tasks scheduler (Android only):_ An alarm-based task scheduler. In charge of running tasks whose execution window falls in a minute or more in the future.
   - _Event-driven tasks scheduler (Android/iOS **[Planned]**):_ Ensures tasks triggered by external events in the background (e.g. a change in the activity of the user, a server-sent event, a system event, etc.) to reliably run while the app is not visible to the user. Android version is fully functional, iOS version is on our roadmap (**PRs are welcome!**)
   - _Immediate tasks scheduler (Android/iOS):_ in charge of running tasks that have to run with zero delay. This scheduler is in charge of running tasks whose execution has been triggered by another task. Requires another scheduler to be already running, i.e. a time-based scheduler or an event-driven one. The process of bootstrapping the required scheduler is completely transparent to the developer and the user.
-  - _**(Planned)** < 1 minute tasks scheduler (Android only):_ A background service-based tasks scheduler. That will be in charge of running time-critical tasks that need to run bellow a 1 minute period (e.g. tasks running every 15 seconds)
+  - _**(Planned)** < 1 minute tasks scheduler (Android only):_ A background service-based tasks scheduler. That will be in charge of running time-critical tasks that need to run below a 1 minute period (e.g. tasks running every 15 seconds). **If you need to run a task below a 1 minute period, see `highFrequencySubTasks` in [Quick start](#quick-start).**
   - _**(Planned)** Delayed tasks scheduler (iOS only):_ Will allow running time-triggered tasks in iOS. We cannot make any promises about its time accuracy or its possibilities. We are still studying how to implement this (**PRs are welcome!**)
 
 To illustrate how the three aforementioned components link together, let's present the following simple (yet relatively complex) use case. Let's say that we want to wake-up our app every minute. To run a dummy task, collect the battery level of the device and log the task execution. In parallel, we want to follow the same workflow but with a task that collects user location, another task which collects battery level and finally another tasks that logs the execution of the whole pipeline branch. The following figure depicts the whole process:
@@ -34,6 +34,8 @@ To illustrate how the three aforementioned components link together, let's prese
 ![](./img/alarm-scheduler-lifecycle.png)
 
 Here **_> 1 minute tasks scheduler_** and **_Immediate tasks scheduler_** take place. The first scheduler bootstraps both task chains every minute, running them in parallel and waiting for them to finish before putting the device again to sleep. The task which logs the execution of a task chain depends on the battery (%) collection task successfully finishing in order to run. At the same time, battery level collection task won't run if the dummy task or the GPS task don't run before.
+
+### Use
 
 ## Prerequisites
 
@@ -167,6 +169,23 @@ export const appTasks: Array<Task> = [
       execCount: execCount + 1,
     });
   }),
+
+  // A task to run tasks that need to run bellow a 1 minute period.
+  // Simulates a task that needs to run another task every 5 seconds.
+  // The task uses remainingTime() to know when the execution window is ending.
+  new SimpleTask("highFrequencySubTasks", async ({ remainingTime }) => {
+    new Promise((resolve) => {
+      const interval = 5000;
+      const intervalId = setInterval(() => {
+        console.log("SubTask executed");
+        //remainingTime is calculated in every execution
+        if (remainingTime() < interval) {
+          clearInterval(intervalId);
+          resolve();
+        }
+      }, interval);
+    });
+  }),
 ];
 ```
 
@@ -176,6 +195,7 @@ Explanation of the example tasks:
 - **mediumTask:** An example of a task which takes a barely small amount of time to do some work. It uses NativeScript `setTimeout()` proxy to simulate that the task is running for 2 seconds.
 - **slowTask:** An example of a task which takes a life to complete. It simulates a slow behavior, like when the location provider is taking more time than usual to get a coordinate fix. Aside from this, this task also declares that requires a foreground execution context in order to run without issues.
 - **incrementalTask:** A task meant to accumulatively delay its execution after each run.
+- **highFrecuencySubTasks**: A task which job is to execute subtasks that need to run below a 1 minute period. This is an alternative solution to the _< 1 minute tasks scheduler **(Planned)**_ for executing tasks at < 1 minute frequency.
 
 Next you will need a way to describe how all the defined tasks work together. In order to do so, you will have to define your app's task graph. Again, as a mater of an example, we have created an example task graph in the demo application for you (located in: `demo/app/tasks/graph.ts`):
 
@@ -396,6 +416,7 @@ export class DataProviderTask extends Task {
 | -------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `setCancelFunction(f: () => void)`                 | `void`      | Because of OS restrictions your task could end up being stopped at some moment if it takes too long to execute. Use this method to pass by a function to define actions to be performed in case your task has to finish its execution earlier than expected. You can cancel requests here or save partial results to start from the saved progress when the task gets invoked again.                                     |
 | `runAgainIn(seconds: number, params?: TaskParams)` | `void`      | Schedule task to run again in a certain amount of seconds. Task params can be redefined. **WARNING! Calling this method from inside recurrent tasks could lead to unexpected results**. Always use this method in tasks declared as non-repeating.                                                                                                                                                                       |
+| `remainingTime()`                                  | `number`    | Returns the remaining time that the task has to run. Useful when your taks has a recurrent behaviour over time, such as gathering GPS, accelerometer, gyroscope, etc. Use this method to know how much time is left for your task in order to manage and distribute the time among its several actions.                                                                                                                  |
 | `log(message: any)`                                | `void`      | Allows you to log info messages and tie them to the task name and the task invocation id which is propagated from one task to another inside task's invocationEvent. If you set a custom [Logger](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/utils/logger/common.ts#L1) at plugin's initialization time, all log() method calls will pass through your logger as info messages. |
 
 ### SimpleTask ([see code](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/tasks/simple-task.ts#L6))
@@ -412,6 +433,7 @@ The result of calling `functionToRun` will be interpreted as a task outcome. It 
 | `evt`                                              | [`DispatchableEvent`](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/events/events.ts#L10) | The event that triggered task                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | `onCancel(f: () => void)`                          | `void`                                                                                                                          | _Equivalent to Task setCancelFunction() method._ Because of OS restrictions your task could end up being stopped at some moment if it takes too long to execute. Use this method to pass by a function to define actions to be performed in case your task has to finish its execution earlier than expected. You can cancel requests here or save partial results to start from the saved progress when the task gets invoked again.                       |
 | `runAgainIn(seconds: number, params?: TaskParams)` | `void`                                                                                                                          | _Equivalent to Task runAgainIn() method._ Schedule task to run again in a certain amount of seconds. Task params can be redefined. **WARNING! Calling this method from inside recurrent tasks could lead to unexpected results**. Always use this method in tasks declared as non-repeating.                                                                                                                                                                |
+| `remainingTime()`                                  | `number`                                                                                                                        | _Equivalent to Task remainingTime()._ Returns the remaining time that the task has to run. Useful when your taks has a recurrent behaviour over time, such as gathering GPS, accelerometer, gyroscope, etc. Use this method to know how much time is left for your task in order to manage and distribute the time among its several actions.                                                                                                               |
 | `log(message: any)`                                | `void`                                                                                                                          | _Equivalent to Task log() method._ Allows you to log info messages and tie them to the task name and the task invocation id which is propagated from one task to another inside task's invocationEvent. If you set a custom [Logger](https://github.com/GeoTecINIT/nativescript-task-dispatcher/blob/master/src/internal/utils/logger/common.ts#L1) at plugin's initialization time, all log() method calls will pass through your logger as info messages. |
 
 Due to context parameter being an object you can use JavaScript's [object destructuring](https://developer.mozilla.org/es/docs/Web/JavaScript/Referencia/Operadores/Destructuring_assignment#Object_destructuring) mechanism while developing your own tasks to only use the properties that you need. In the following example you can see how all the context properties of the context object can be extracted by using this technique:

@@ -23,18 +23,20 @@ export class BatchTaskRunner {
   ): Promise<void> {
     await Promise.all(
       plannedTasks.map((plannedTask) =>
-        this.runTaskWithCustomStartEvent(plannedTask, startEvent.id)
+        this.runTaskWithCustomStartEvent(plannedTask, startEvent)
       )
     );
   }
 
   private runTaskWithCustomStartEvent(
     plannedTask: PlannedTask,
-    batchStartId: string
+    batchStartEvent: DispatchableEvent
   ): Promise<void> {
-    const startEvent = createEvent(TaskDispatcherEvent.TaskExecutionStarted);
+    const startEvent = createEvent(TaskDispatcherEvent.TaskExecutionStarted, {
+      expirationTimestamp: batchStartEvent.expirationTimestamp,
+    });
     const listenerId = on(TaskDispatcherEvent.TaskExecutionTimedOut, (evt) => {
-      if (evt.id === batchStartId) {
+      if (evt.id === batchStartEvent.id) {
         off(TaskDispatcherEvent.TaskExecutionTimedOut, listenerId);
         emit(
           createEvent(TaskDispatcherEvent.TaskExecutionTimedOut, {

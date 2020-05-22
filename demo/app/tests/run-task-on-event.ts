@@ -26,24 +26,34 @@ describe("Event-based task runner", () => {
     let startEvent: DispatchableEvent;
     let stopEvent: DispatchableEvent;
     let expectedEvent: DispatchableEvent;
+    let expectedEventSlicer: DispatchableEvent;
 
     beforeEach(() => {
         taskGraph = new TaskGraphLoader();
         eventCallback = jasmine.createSpy("eventCallback");
         startEvent = {
-            name: "startEvent",
+            name: "e2eStartEvent",
             id: uuid(),
+            expirationTimestamp: 1588550400,
             data: {},
         };
         stopEvent = {
-            name: "stopEvent",
+            name: "e2eStopEvent",
             id: uuid(),
+            expirationTimestamp: -1,
             data: {},
         };
         expectedEvent = {
             name: "patataCooked",
             id: startEvent.id,
+            expirationTimestamp: 1588550400,
             data: { status: "slightlyBaked" },
+        };
+        expectedEventSlicer = {
+            name: "patataSliced",
+            id: startEvent.id,
+            expirationTimestamp: 1588550400,
+            data: { status: "sliced" },
         };
     });
 
@@ -64,17 +74,9 @@ describe("Event-based task runner", () => {
 
     it("removes a delayed task if it has been canceled", async () => {
         await taskGraph.load(testTaskGraph);
-        const done = new Promise((resolve) => {
-            const listenerId = on(stopEvent.name, (evt) => {
-                if (evt.id === stopEvent.id) {
-                    off(stopEvent.name, listenerId);
-                    resolve();
-                }
-            });
-        });
 
         emit(stopEvent);
-        await done;
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         const plannedTask = await plannedTasksDB.get({
             name: "dummyTask",
@@ -86,23 +88,47 @@ describe("Event-based task runner", () => {
         expect(plannedTask).toBeNull();
     });
 
-    afterEach(() => {
-        off(startEvent.name);
-        off(stopEvent.name);
-        off(expectedEvent.name);
+    it("runs a chained tasks secuence", async () => {
+        await taskGraph.load(testTaskGraph);
+        const callbackPromise = new Promise((resolve) => {
+            on(expectedEvent.name, (evt) => {
+                eventCallback(evt);
+                resolve();
+            });
+        });
+
+        const chainedEventCallback = jasmine.createSpy("eventCallback");
+        const chainedEventCallbackPromise = new Promise((resolve) => {
+            on(expectedEventSlicer.name, (evt) => {
+                chainedEventCallback(evt);
+                resolve();
+            });
+        });
+
+        emit(startEvent);
+        await Promise.all([callbackPromise, chainedEventCallbackPromise]);
+
+        expect(eventCallback).toHaveBeenCalledWith(expectedEvent);
+        expect(chainedEventCallback).toHaveBeenCalledWith(expectedEventSlicer);
+        off(expectedEventSlicer.name);
     });
 
     afterAll(() => {
         emit(stopEvent);
+        off(startEvent.name);
+        off(stopEvent.name);
+        off(expectedEvent.name);
     });
 });
 
 const testTaskGraph = {
     async describe(onEvt: EventListenerGenerator, run: RunnableTaskDescriptor) {
-        onEvt("startEvent", run("emitterTask"));
+        onEvt("e2eStartEvent", run("emitterTask"));
         onEvt(
-            "startEvent",
-            run("dummyTask").every(1, "minutes").cancelOn("stopEvent")
+            "e2eStartEvent",
+            run("dummyTask").every(1, "minutes").cancelOn("e2eStopEvent")
         );
+        onEvt("emitterTaskFinished", run("dummyTask"));
+        onEvt("patataCooked", run("patataSlicer"));
     },
 };

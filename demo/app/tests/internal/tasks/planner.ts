@@ -35,6 +35,7 @@ describe("Task planner", () => {
     const dummyEvent: DispatchableEvent = {
         name: "dummyEvent",
         id: "unknown",
+        expirationTimestamp: -1,
         data: {},
     };
 

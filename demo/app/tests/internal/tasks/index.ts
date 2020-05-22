@@ -35,6 +35,13 @@ export const testTasks: Array<Task> = [
         }),
         { outputEventNames: ["patataCooked"] }
     ),
+    new SimpleTask(
+        "patataSlicer",
+        async () => ({
+            result: { status: "sliced" },
+        }),
+        { outputEventNames: ["patataSliced"] }
+    ),
 ];
 
 export function createTaskCancelManagerMock(): TaskCancelManager {

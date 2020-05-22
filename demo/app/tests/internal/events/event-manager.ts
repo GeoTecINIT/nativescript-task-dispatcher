@@ -6,6 +6,7 @@ describe("Event manager", () => {
     const dispatchableEvent = {
         name: eventName,
         id: "uniqueEventId",
+        expirationTimestamp: -1,
         data: { param: "patata" },
     };
     let internalEventManager: InternalEventManager;

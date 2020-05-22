@@ -26,6 +26,8 @@ export class SimpleTask extends Task {
     const runAgainIn = (seconds: number, taskParams: TaskParams) =>
       this.runAgainIn(seconds, taskParams);
 
+    const remainingTime = () => this.remainingTime();
+
     const log = (message: any) => this.log(message);
 
     const ctx: SimpleTaskContext = {
@@ -33,6 +35,7 @@ export class SimpleTask extends Task {
       evt,
       onCancel,
       runAgainIn,
+      remainingTime,
       log,
     };
     return this.functionToRun(ctx);
@@ -44,5 +47,6 @@ interface SimpleTaskContext {
   evt: DispatchableEvent;
   onCancel(cancelFunction: CancelFunction): void;
   runAgainIn(seconds: number, params?: TaskParams): void;
+  remainingTime(): number;
   log(message: any): void;
 }

@@ -52,7 +52,13 @@ export abstract class Task {
     this._taskParams = taskParams;
     this._invocationEvent = invocationEvent;
 
-    this.log(`Run triggered by ${invocationEvent.name} event`);
+    this.log(
+      `Run triggered by ${invocationEvent.name} event ${
+        invocationEvent.expirationTimestamp !== -1
+          ? `with ${invocationEvent.expirationTimestamp} expirationTimestamp`
+          : ``
+      }`
+    );
 
     try {
       await this.checkIfCanRun();
@@ -159,6 +165,24 @@ export abstract class Task {
     );
   }
 
+  /**
+   * Meant to be used by the task itself. Provides the amount of time until the timeout will fire.
+   */
+  protected remainingTime(): number {
+    if (this._invocationEvent.expirationTimestamp === -1) {
+      return -1;
+    }
+
+    let timeForExpiration =
+      this._invocationEvent.expirationTimestamp - new Date().getTime();
+
+    if (this.outputEventNames.some(hasListeners)) {
+      timeForExpiration *= 0.9;
+    }
+
+    return Math.floor(timeForExpiration);
+  }
+
   private configureTask(taskConfig: TaskConfig) {
     this._taskConfig = {
       foreground: taskConfig.foreground ? true : false,
@@ -239,6 +263,7 @@ export abstract class Task {
     emit({
       name: eventName,
       id: this._invocationEvent.id,
+      expirationTimestamp: this._invocationEvent.expirationTimestamp,
       data,
     });
 
