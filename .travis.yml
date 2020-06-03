@@ -111,22 +111,22 @@ matrix:
         - cd ../demo
         - tns test ios --watch false --justlaunch
     - stage: "Release"
+      env:
+        - NPM_RELEASE="true"
       language: node_js
       os: linux
       node_js: "10"
       deploy:
         provider: script
-        before_script:
-          - echo "registry=https://registry.npmjs.com/" >> ~\.npmrc
-          - echo "//registry.npmjs.com/:_authToken=$NPM_AUTH_TOKEN" >> ~\.npmrc
-        script: cd publish && ./publish.sh
+        script: ./publish/publish.sh
         on:
           tags: true
   allow_failures:
     - env:
         - TestiOS="12"
         - Xcode="11.2"
-
+    - env:
+        - NPM_RELEASE="true"
 android:
   components:
     - tools
