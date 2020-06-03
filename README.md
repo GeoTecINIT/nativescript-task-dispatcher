@@ -1,4 +1,4 @@
-# nativescript-task-dispatcher
+# NativeScript Task Dispatcher
 
 [![Build Status](https://travis-ci.com/GeoTecINIT/nativescript-task-dispatcher.svg?token=cYMN5eetmCX8aPqFVaQb&branch=master)](https://travis-ci.com/GeoTecINIT/nativescript-task-dispatcher)
 
@@ -8,7 +8,7 @@ It abstracts all the platform-specific details, leaving a clear and easy-to-use,
 
 This plugin uses native mechanisms to carry out its function. All the code is executed in the main thread, we don't use web workers. It is not intended to free the main thread from intensive workloads, but rather to allow tasks to be performed while the user is not actively using the application.
 
-## How it works?
+## How does it work?
 
 This plugin bases its way of working in three software primitives:
 
@@ -34,8 +34,6 @@ To illustrate how the three aforementioned components link together, let's prese
 ![](./img/alarm-scheduler-lifecycle.png)
 
 Here **_> 1 minute tasks scheduler_** and **_Immediate tasks scheduler_** take place. The first scheduler bootstraps both task chains every minute, running them in parallel and waiting for them to finish before putting the device again to sleep. The task which logs the execution of a task chain depends on the battery (%) collection task successfully finishing in order to run. At the same time, battery level collection task won't run if the dummy task or the GPS task don't run before.
-
-### Use
 
 ## Prerequisites
 
@@ -511,3 +509,5 @@ The only (advised) way to create a ReadyRunnableTaskBuilder from within a TaskGr
 ## Acknowledgements
 
 The development of this plugin has been made possible thanks to the Spanish Government. Concretely from, Spanish Ministry of Education, Culture and Sports (grant reference FPU17/03832), and “Programa Estatal de I+D+i Orientada a los Retos de la Sociedad" (reference RTI2018-099939-BI-00).
+
+This project is an open-sourced excerpt coming from [SyMptOMS](http://geotec.uji.es/projects/symptoms/) project at [Geotec](http://geotec.uji.es/). Concretely, it has been heavily used in SyMptOMS mobile app for more than two years and contains all the lessons we have learned there. SyMptOMS mobile app passively tracks patient behavior through smartphone sensors and here is where the ability to accurately execute a task of the NativeScript Task Dispatcher shines.
