@@ -1,3 +1,8 @@
+branches:
+  only:
+    - master
+    - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+
 matrix:
   fast_finish: true
   include:
@@ -104,7 +109,19 @@ matrix:
         - npm i
         - npm run tsc
         - cd ../demo
-        - tns test android --watch false --justlaunch
+        - tns test ios --watch false --justlaunch
+    - stage: "Deploy"
+      language: node_js
+      os: linux
+      node_js: "10"
+      deploy:
+        provider: script
+        before_script:
+          - echo "registry=https://registry.npmjs.com/" >> ~\.npmrc
+          - echo "//registry.npmjs.com/:_authToken=$NPM_AUTH_TOKEN" >> ~\.npmrc
+        script: cd publish && ./publish.sh
+        on:
+          tags: true
   allow_failures:
     - env:
         - TestiOS="12"
