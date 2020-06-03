@@ -1,6 +1,7 @@
 #!/bin/bash
 
-if [ ! -v $NP_AUTH_TOKEN ]; then
+if [ ! -z "$NPM_AUTH_TOKEN" ]; then
+    echo "Configuring NPM credentials..."
     echo "registry=https://registry.npmjs.com/" >> ~/.npmrc
     echo "//registry.npmjs.com/:_authToken=$NPM_AUTH_TOKEN" >> ~/.npmrc
 fi

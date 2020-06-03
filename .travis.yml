@@ -118,7 +118,7 @@ matrix:
       node_js: "10"
       deploy:
         provider: script
-        script: ./publish/publish.sh
+        script: cd publish && ./publish.sh
         on:
           tags: true
   allow_failures:
