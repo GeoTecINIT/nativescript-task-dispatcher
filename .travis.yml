@@ -110,7 +110,7 @@ matrix:
         - npm run tsc
         - cd ../demo
         - tns test ios --watch false --justlaunch
-    - stage: "Deploy"
+    - stage: "Release"
       language: node_js
       os: linux
       node_js: "10"
