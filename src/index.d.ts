@@ -15,4 +15,5 @@ declare class TaskDispatcher extends Common {
   emitEvent(eventName: string, eventData?: EventData);
 }
 export declare const taskDispatcher: TaskDispatcher;
+export { ConfigParams } from "./task-dispatcher.common";
 export {};
