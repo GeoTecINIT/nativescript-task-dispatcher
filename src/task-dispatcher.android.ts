@@ -19,9 +19,9 @@ class TaskDispatcher extends Common {
     appTaskGraph: TaskGraph,
     config?: ConfigParams
   ): Promise<void> {
-    this.wireUpNativeComponents();
     setTaskSchedulerCreator(() => getAndroidTaskScheduler());
     setTaskChainLauncherCreator(() => getAndroidTaskChainLauncher());
+    this.wireUpNativeComponents();
     return super.init(appTasks, appTaskGraph, config);
   }
 

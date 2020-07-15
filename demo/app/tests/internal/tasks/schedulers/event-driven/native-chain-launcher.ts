@@ -2,7 +2,7 @@ import { android as androidApp } from "tns-core-modules/application/application"
 
 import { setTasks } from "nativescript-task-dispatcher/internal/tasks/provider";
 import { testTasks } from "../..";
-import { TaskChainRunnerService } from "nativescript-task-dispatcher/internal/tasks/schedulers/event-driven/android/runner-service.android";
+import { getTaskChainRunnerService } from "nativescript-task-dispatcher/internal/tasks/schedulers/event-driven/android/runner-service.android";
 import { TaskChainLauncher } from "nativescript-task-dispatcher/internal/tasks/schedulers/event-driven";
 import { AndroidTaskChainLauncher } from "nativescript-task-dispatcher/internal/tasks/schedulers/event-driven/android";
 import { TaskScheduler } from "nativescript-task-dispatcher/internal/tasks/schedulers/time-based";
@@ -118,15 +118,18 @@ describe("Native task chain launcher", () => {
 });
 
 function wireUpTaskChainRunnerService() {
-    const runnerService = new TaskChainRunnerService();
     es.uji.geotec.taskdispatcher.runners.TaskChainRunnerService.setTaskChainRunnerServiceDelegate(
         new es.uji.geotec.taskdispatcher.runners.TaskChainRunnerServiceDelegate(
             {
                 onCreate: (nativeService) =>
-                    runnerService.onCreate(nativeService),
+                    getTaskChainRunnerService().onCreate(nativeService),
                 onStartCommand: (intent, flags, startId) =>
-                    runnerService.onStartCommand(intent, flags, startId),
-                onDestroy: () => runnerService.onDestroy(),
+                    getTaskChainRunnerService().onStartCommand(
+                        intent,
+                        flags,
+                        startId
+                    ),
+                onDestroy: () => getTaskChainRunnerService().onDestroy(),
             }
         )
     );
