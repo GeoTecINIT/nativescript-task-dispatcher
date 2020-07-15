@@ -60,7 +60,8 @@ describe("Event-based task runner", () => {
     it("runs a task at the moment an event rises", async () => {
         await taskGraph.load(testTaskGraph);
         const callbackPromise = new Promise((resolve) => {
-            on(expectedEvent.name, (evt) => {
+            const listenerId = on(expectedEvent.name, (evt) => {
+                off(expectedEvent.name, listenerId);
                 eventCallback(evt);
                 resolve();
             });
@@ -90,34 +91,24 @@ describe("Event-based task runner", () => {
 
     it("runs a chained tasks secuence", async () => {
         await taskGraph.load(testTaskGraph);
-        const callbackPromise = new Promise((resolve) => {
-            on(expectedEvent.name, (evt) => {
-                eventCallback(evt);
-                resolve();
-            });
-        });
 
         const chainedEventCallback = jasmine.createSpy("eventCallback");
         const chainedEventCallbackPromise = new Promise((resolve) => {
-            on(expectedEventSlicer.name, (evt) => {
+            const listenerId = on(expectedEventSlicer.name, (evt) => {
+                off(expectedEventSlicer.name, listenerId);
                 chainedEventCallback(evt);
                 resolve();
             });
         });
 
         emit(startEvent);
-        await Promise.all([callbackPromise, chainedEventCallbackPromise]);
+        await chainedEventCallbackPromise;
 
-        expect(eventCallback).toHaveBeenCalledWith(expectedEvent);
         expect(chainedEventCallback).toHaveBeenCalledWith(expectedEventSlicer);
-        off(expectedEventSlicer.name);
     });
 
     afterAll(() => {
         emit(stopEvent);
-        off(startEvent.name);
-        off(stopEvent.name);
-        off(expectedEvent.name);
     });
 });
 

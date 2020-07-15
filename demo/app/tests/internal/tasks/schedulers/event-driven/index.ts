@@ -23,14 +23,14 @@ describe("Task chain launcher", () => {
         const event = "interestingEvent";
         const data = { param: "a param" };
         const eventId = "anId";
-        on(event, () => null);
+        const listenerId = on(event, () => null);
         taskChainLauncher.launch(event, data, eventId);
         expect(nativeTaskChainLauncher.launch).toHaveBeenCalledWith(
             event,
             data,
             eventId
         );
-        off(event);
+        off(event, listenerId);
     });
 
     it("does nothing when event has no listeners", () => {
