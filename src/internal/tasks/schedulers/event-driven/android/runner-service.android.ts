@@ -14,6 +14,7 @@ import {
 
 const TIMEOUT = 180000;
 const TIMEOUT_EVENT_OFFSET = 5000;
+const IDLE_TIME = 1000;
 
 export class TaskChainRunnerService
   implements
@@ -24,6 +25,8 @@ export class TaskChainRunnerService
   private executionStart: number;
   private timeoutIds: Set<number>;
   private taskChainCount = 0;
+
+  private killed = false;
 
   private logger: Logger;
 
@@ -75,6 +78,7 @@ export class TaskChainRunnerService
     const [launchEvent, timeoutId] = this.prepareTaskChainExecution(params);
 
     await this.startTaskChainExecution(launchEvent, timeoutId);
+    await this.stayIdleIfPossible(IDLE_TIME);
   }
 
   private taskChainStarted() {
@@ -156,6 +160,14 @@ export class TaskChainRunnerService
     });
   }
 
+  private stayIdleIfPossible(idleTime: number): Promise<void> {
+    const timeout = this.calculateTimeout();
+    if (timeout < idleTime) {
+      return Promise.resolve();
+    }
+    return new Promise((resolve) => setTimeout(resolve, idleTime));
+  }
+
   private calculateTimeout() {
     const now = new Date().getTime();
     const diff = now - this.executionStart;
@@ -180,10 +192,11 @@ export class TaskChainRunnerService
 
   private killWithFire() {
     let startId = 1;
-    let last = false;
-    while (!last) {
-      last = this.nativeService.stopSelfResult(startId);
-      if (!last) {
+    while (!this.killed) {
+      const last = this.nativeService.stopSelfResult(startId);
+      if (last) {
+        this.killed = true;
+      } else {
         startId++;
       }
     }
