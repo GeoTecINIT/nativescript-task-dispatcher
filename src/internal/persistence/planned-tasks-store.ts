@@ -59,6 +59,7 @@ class PlannedTaskDBStore implements PlannedTasksStore {
     }
 
     const instance = await this.db();
+    nSQL(PLANNED_TASKS_TABLE).useDatabase(DB_NAME); // <- "Dark sourcery" (TM)
     const rows = await instance.query("select").where(whereStatement).exec();
     if (rows.length === 0) {
       return null;
