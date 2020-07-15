@@ -11,8 +11,6 @@ class PlannedTaskDBStore implements PlannedTasksStore {
   private createDBProcedure: Promise<void>;
 
   async insert(plannedTask: PlannedTask): Promise<void> {
-    await this.createDB();
-
     const {
       name,
       startAt,
@@ -36,22 +34,16 @@ class PlannedTaskDBStore implements PlannedTasksStore {
       throw new PlannedTaskAlreadyExistsError(plannedTask);
     }
 
-    await nSQL(PLANNED_TASKS_TABLE)
-      .query("upsert", { ...plannedTask })
-      .exec();
+    const instance = await this.db();
+    await instance.query("upsert", { ...plannedTask }).exec();
   }
 
   async delete(taskId: string): Promise<void> {
-    await this.createDB();
-    await nSQL(PLANNED_TASKS_TABLE)
-      .query("delete")
-      .where(["id", "=", taskId])
-      .exec();
+    const instance = await this.db();
+    await instance.query("delete").where(["id", "=", taskId]).exec();
   }
 
   async get(task: string | RunnableTask): Promise<PlannedTask> {
-    await this.createDB();
-
     let whereStatement: Array<any> = ["id", "=", task];
     if (typeof task !== "string") {
       const runnableTask = task as RunnableTask;
@@ -66,10 +58,8 @@ class PlannedTaskDBStore implements PlannedTasksStore {
       ];
     }
 
-    const rows = await nSQL(PLANNED_TASKS_TABLE)
-      .query("select")
-      .where(whereStatement)
-      .exec();
+    const instance = await this.db();
+    const rows = await instance.query("select").where(whereStatement).exec();
     if (rows.length === 0) {
       return null;
     }
@@ -80,9 +70,8 @@ class PlannedTaskDBStore implements PlannedTasksStore {
   async getAllSortedByNextRun(
     planningType?: PlanningType
   ): Promise<Array<PlannedTask>> {
-    await this.createDB();
-
-    let query = nSQL(PLANNED_TASKS_TABLE).query("select");
+    const instance = await this.db();
+    let query = instance.query("select");
     if (planningType) {
       query = query.where(["planningType", "=", planningType]);
     }
@@ -95,9 +84,8 @@ class PlannedTaskDBStore implements PlannedTasksStore {
   }
 
   async getAllCancelEvents(): Promise<Array<string>> {
-    await this.createDB();
-
-    const rows = await nSQL(PLANNED_TASKS_TABLE)
+    const instance = await this.db();
+    const rows = await instance
       .query("select")
       .distinct(["cancelEvent"])
       .exec();
@@ -108,8 +96,8 @@ class PlannedTaskDBStore implements PlannedTasksStore {
   async getAllFilteredByCancelEvent(
     cancelEvent: string
   ): Promise<Array<PlannedTask>> {
-    await this.createDB();
-    const rows = await nSQL(PLANNED_TASKS_TABLE)
+    const instance = await this.db();
+    const rows = await instance
       .query("select")
       .where(["cancelEvent", "=", cancelEvent])
       .exec();
@@ -118,11 +106,11 @@ class PlannedTaskDBStore implements PlannedTasksStore {
   }
 
   async increaseErrorCount(taskId: string): Promise<void> {
-    await this.createDB();
     const plannedTask = await this.get(taskId);
 
     if (plannedTask) {
-      await nSQL(`${PLANNED_TASKS_TABLE}.errorCount`)
+      const instance = await this.db(`${PLANNED_TASKS_TABLE}.errorCount`);
+      await instance
         .query("upsert", plannedTask.errorCount + 1)
         .where(["id", "=", taskId])
         .exec();
@@ -132,11 +120,11 @@ class PlannedTaskDBStore implements PlannedTasksStore {
   }
 
   async increaseTimeoutCount(taskId: string): Promise<void> {
-    await this.createDB();
     const plannedTask = await this.get(taskId);
 
     if (plannedTask) {
-      await nSQL(`${PLANNED_TASKS_TABLE}.timeoutCount`)
+      const instance = await this.db(`${PLANNED_TASKS_TABLE}.timeoutCount`);
+      await instance
         .query("upsert", plannedTask.timeoutCount + 1)
         .where(["id", "=", taskId])
         .exec();
@@ -146,11 +134,11 @@ class PlannedTaskDBStore implements PlannedTasksStore {
   }
 
   async updateLastRun(taskId: string, timestamp: number): Promise<void> {
-    await this.createDB();
     const plannedTask = await this.get(taskId);
 
     if (plannedTask) {
-      await nSQL(`${PLANNED_TASKS_TABLE}.lastRun`)
+      const instance = await this.db(`${PLANNED_TASKS_TABLE}.lastRun`);
+      await instance
         .query("upsert", timestamp)
         .where(["id", "=", taskId])
         .exec();
@@ -160,8 +148,16 @@ class PlannedTaskDBStore implements PlannedTasksStore {
   }
 
   async deleteAll(): Promise<void> {
+    const instance = await this.db();
+    await instance.query("delete").exec();
+  }
+
+  private async db(tableName = PLANNED_TASKS_TABLE) {
     await this.createDB();
-    await nSQL(PLANNED_TASKS_TABLE).query("delete").exec();
+    if (nSQL().selectedDB !== DB_NAME) {
+      nSQL().useDatabase(DB_NAME);
+    }
+    return nSQL(tableName);
   }
 
   // TODO: Extract to an isolated class
