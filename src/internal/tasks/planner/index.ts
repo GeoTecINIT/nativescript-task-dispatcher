@@ -1,26 +1,23 @@
-import { RunnableTask } from "../runnable-task";
-import {
-  DispatchableEvent,
-  emit,
-  TaskDispatcherEvent,
-  createEvent,
-} from "../../events";
-import { PlannedTask } from "./planned-task";
 import {
   TaskScheduler,
   taskScheduler as getTaskScheduler,
 } from "../schedulers/time-based";
 import {
-  PlannedTasksStore,
-  plannedTasksDB,
-} from "../../persistence/planned-tasks-store";
-import { checkIfTaskExists } from "../provider";
-import {
-  TaskRunner,
   InstantTaskRunner,
+  TaskRunner,
 } from "../schedulers/immediate/instant-task-runner";
-import { TaskResultStatus, TaskChainResult } from "../task";
+import {
+  plannedTasksDB,
+  PlannedTasksStore,
+} from "../../persistence/planned-tasks-store";
 import { TaskCancelManager, taskCancelManager } from "../cancel-manager";
+
+import { RunnableTask } from "../runnable-task";
+import { DispatchableEvent } from "../../events";
+import { PlannedTask } from "./planned-task";
+
+import { checkIfTaskExists } from "../provider";
+import { TaskChain, TaskResultStatus } from "../task-chain";
 
 export class TaskPlanner {
   constructor(
@@ -37,14 +34,11 @@ export class TaskPlanner {
     try {
       checkIfTaskExists(runnableTask.name);
 
-      const plannedTask = await (runnableTask.interval > 0 ||
-      runnableTask.startAt !== -1
+      return await (runnableTask.interval > 0 || runnableTask.startAt !== -1
         ? this.planScheduled(runnableTask, dispatchableEvent)
         : this.planImmediate(runnableTask, dispatchableEvent));
-
-      return plannedTask;
     } catch (err) {
-      this.emitTaskChainFinished(dispatchableEvent, err);
+      emitTaskChainFinished(dispatchableEvent, err);
       throw err;
     }
   }
@@ -71,35 +65,16 @@ export class TaskPlanner {
   ): Promise<PlannedTask> {
     const possibleExisting = await this.taskStore.get(runnableTask);
     if (possibleExisting) {
-      this.emitTaskChainFinished(dispatchableEvent);
+      emitTaskChainFinished(dispatchableEvent);
 
       return possibleExisting;
     }
 
     const plannedTask = await this.getTaskScheduler().schedule(runnableTask);
-    this.emitTaskChainFinished(dispatchableEvent);
+    emitTaskChainFinished(dispatchableEvent);
     this.cancelManager.add(plannedTask);
 
     return plannedTask;
-  }
-
-  private emitTaskChainFinished(
-    dispatchableEvent?: DispatchableEvent,
-    error?: Error
-  ) {
-    if (!dispatchableEvent) {
-      return;
-    }
-    let result: TaskChainResult = { status: TaskResultStatus.Ok };
-    if (error) {
-      result = { status: TaskResultStatus.Error, reason: error };
-    }
-    emit(
-      createEvent(TaskDispatcherEvent.TaskChainFinished, {
-        id: dispatchableEvent.id,
-        data: { result },
-      })
-    );
   }
 
   private getTaskScheduler(): TaskScheduler {
@@ -109,4 +84,16 @@ export class TaskPlanner {
 
     return this.taskScheduler;
   }
+}
+
+function emitTaskChainFinished(
+  dispatchableEvent?: DispatchableEvent,
+  error?: Error
+) {
+  if (!dispatchableEvent) {
+    return;
+  }
+
+  const status = error ? TaskResultStatus.Error : TaskResultStatus.Ok;
+  TaskChain.finalize(dispatchableEvent.id, status, error);
 }
