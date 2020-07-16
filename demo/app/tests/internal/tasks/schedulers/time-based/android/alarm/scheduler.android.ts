@@ -9,6 +9,10 @@ import { createPlannedTaskStoreMock } from "../../../../../persistence";
 import { RunnableTask } from "nativescript-task-dispatcher/internal/tasks/runnable-task";
 
 describe("Android Alarm Scheduler", () => {
+    if (typeof android === "undefined") {
+        return;
+    }
+
     const manager = createAlarmManagerMock();
     const watchdog = createAlarmManagerMock();
     const taskStore = createPlannedTaskStoreMock();
@@ -35,7 +39,7 @@ describe("Android Alarm Scheduler", () => {
     let equalFreqPT: PlannedTask;
 
     beforeEach(() => {
-        now = new Date().getTime();
+        now = java.lang.System.currentTimeMillis();
         dummyTask = {
             name: "dummyTask",
             startAt: -1,

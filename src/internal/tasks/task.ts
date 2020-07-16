@@ -169,7 +169,7 @@ export abstract class Task {
     }
 
     let timeForExpiration =
-      this._invocationEvent.expirationTimestamp - new Date().getTime();
+      this._invocationEvent.expirationTimestamp - Date.now();
 
     if (this.outputEventNames.some(hasListeners)) {
       timeForExpiration *= 0.9;

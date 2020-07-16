@@ -22,7 +22,7 @@ export class AlarmReceiver
     this.logger.info("Alarm triggered");
 
     this.timeOffset = 30000;
-    this.currentTime = new Date().getTime();
+    this.currentTime = java.lang.System.currentTimeMillis();
     this.taskManager = new TaskManager(
       PlanningType.Scheduled,
       plannedTasksDB,

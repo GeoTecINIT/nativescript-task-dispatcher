@@ -70,7 +70,7 @@ export class TaskChainRunnerService
   }
 
   private initializeExecutionWindow() {
-    this.executionStart = new Date().getTime();
+    this.executionStart = java.lang.System.currentTimeMillis();
     this.wakeLock.acquire(TIMEOUT);
   }
 
@@ -170,13 +170,13 @@ export class TaskChainRunnerService
   }
 
   private calculateTimeout() {
-    const now = new Date().getTime();
+    const now = java.lang.System.currentTimeMillis();
     const diff = now - this.executionStart;
     return TIMEOUT - TIMEOUT_EVENT_OFFSET - diff;
   }
 
   private getExpirationTimestamp(timeout: number): number {
-    return new Date().getTime() + timeout;
+    return java.lang.System.currentTimeMillis() + timeout;
   }
 
   private gracefullyStop() {

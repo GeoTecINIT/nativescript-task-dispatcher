@@ -17,7 +17,7 @@ describe("Task manager", () => {
     let taskPlanner: TaskManager;
 
     const stdInterval = 60000;
-    const currentTime = new Date().getTime();
+    const currentTime = Date.now();
 
     // To be run in 30s
     const ephemeralTaskToBeRun = new PlannedTask(
@@ -230,7 +230,7 @@ describe("Task manager", () => {
 
 describe("Tasks manager next interval", () => {
     const minute = 60000;
-    const initialTime = new Date().getTime();
+    const initialTime = Date.now();
     const plannedTasksStore = createPlannedTaskStoreMock();
     let taskPlanner: TaskManager;
 

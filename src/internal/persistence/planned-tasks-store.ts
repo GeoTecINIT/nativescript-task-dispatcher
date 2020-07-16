@@ -79,7 +79,7 @@ class PlannedTaskDBStore implements PlannedTasksStore {
 
     const rows = await query.exec();
     const plannedTasks = rows.map((row) => this.plannedTaskFromRow(row));
-    const now = new Date().getTime();
+    const now = Date.now();
 
     return plannedTasks.sort((t1, t2) => t1.nextRun(now) - t2.nextRun(now));
   }

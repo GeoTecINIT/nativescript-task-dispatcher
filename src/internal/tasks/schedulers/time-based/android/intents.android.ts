@@ -3,12 +3,10 @@ import { createLibComponentIntent } from "../../intent-tools.android";
 // TODO: Add a way to configure MainActivity reference
 // in order to support apps with custom launch activities
 export function createAppLaunchIntent(appContext: android.content.Context) {
-  const intent = createLibComponentIntent(appContext, {
+  return createLibComponentIntent(appContext, {
     pathPrefix: "com.tns",
     relativeClassPath: ".NativeScriptActivity",
   });
-
-  return intent;
 }
 
 export function createAlarmReceiverIntent(appContext: android.content.Context) {
@@ -67,7 +65,7 @@ export function unpackAlarmRunnerServiceIntent(
     timeOffset: intent.getIntExtra(ARS_TIME_OFFSET, 0),
     invocationTime: intent.getLongExtra(
       ARS_INVOCATION_TIME,
-      new Date().getTime()
+      java.lang.System.currentTimeMillis()
     ),
   };
 }

@@ -9,17 +9,13 @@ export class TaskManager {
     private planningType: PlanningType,
     private plannedTasksStore: PlannedTasksStore,
     private intervalOffset: number,
-    private currentTime = new Date().getTime()
+    private currentTime = Date.now()
   ) {}
 
   async tasksToRun(): Promise<Array<PlannedTask>> {
     const allTasks = await this.allTasks();
 
-    const tasksToRunNow = allTasks.filter((task) =>
-      this.determineIfTaskShouldBeRun(task)
-    );
-
-    return tasksToRunNow;
+    return allTasks.filter((task) => this.determineIfTaskShouldBeRun(task));
   }
 
   async requiresForeground(): Promise<boolean> {

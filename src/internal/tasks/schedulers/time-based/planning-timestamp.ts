@@ -21,7 +21,7 @@ class PlanningTimestamp {
 
   updateCurrent(): void {
     const previousCurrent = this.current;
-    const newCurrent = new Date().getTime();
+    const newCurrent = Date.now();
     this._previous = previousCurrent;
     this._current = newCurrent;
     setNumber(PREVIOUS_PLANNING_TIMESTAMP, previousCurrent);

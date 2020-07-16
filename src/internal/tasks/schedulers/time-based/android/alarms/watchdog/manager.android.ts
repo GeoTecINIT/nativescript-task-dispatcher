@@ -23,7 +23,8 @@ export class WatchdogManager extends AbstractAlarmManager {
       this.cancel();
     }
     const alarmType = android.app.AlarmManager.RTC_WAKEUP;
-    const triggerAtMillis = new Date().getTime() + WATCHDOG_INTERVAL;
+    const triggerAtMillis =
+      java.lang.System.currentTimeMillis() + WATCHDOG_INTERVAL;
     const pendingIntent = this.getPendingIntent();
 
     this.osAlarmManager.setRepeating(

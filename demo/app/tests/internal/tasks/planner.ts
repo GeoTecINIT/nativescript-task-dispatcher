@@ -49,7 +49,7 @@ describe("Task planner", () => {
         .in(10)
         .build();
     const delayedTask = new RunnableTaskBuilderImpl("dummyTask", {})
-        .at(new Date(new Date().getTime() + 3600 * 1000))
+        .at(new Date(Date.now() + 3600 * 1000))
         .build();
 
     const immediatePlannedTask = new PlannedTask(

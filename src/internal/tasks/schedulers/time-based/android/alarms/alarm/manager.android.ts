@@ -31,7 +31,7 @@ export class AndroidAlarmManager extends AbstractAlarmManager {
       this.cancel();
     }
     const alarmType = android.app.AlarmManager.RTC_WAKEUP;
-    const triggerAtMillis = new Date().getTime() + interval;
+    const triggerAtMillis = java.lang.System.currentTimeMillis() + interval;
     const pendingIntent = this.getPendingIntent();
 
     if (this.sdkVersion >= 23) {

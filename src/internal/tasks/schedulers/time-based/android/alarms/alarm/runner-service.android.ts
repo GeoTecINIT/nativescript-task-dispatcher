@@ -45,7 +45,7 @@ export class AlarmRunnerService
 
     this.runsInForeground = false;
     this.timeOffset = 0;
-    this.currentTime = new Date().getTime();
+    this.currentTime = java.lang.System.currentTimeMillis();
 
     this.started = false;
     this.inForeground = false;
@@ -189,7 +189,7 @@ export class AlarmRunnerService
   }
 
   private getExpirationTimestamp(timeout: number): number {
-    return new Date().getTime() + timeout;
+    return java.lang.System.currentTimeMillis() + timeout;
   }
 
   private gracefullyStop() {

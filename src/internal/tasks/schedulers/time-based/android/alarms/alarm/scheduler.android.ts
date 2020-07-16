@@ -75,7 +75,7 @@ export class AndroidAlarmScheduler {
     const allTasks = await this.plannedTaskStore.getAllSortedByNextRun(
       PlanningType.Scheduled
     );
-    const now = new Date().getTime();
+    const now = java.lang.System.currentTimeMillis();
     const plannedTask = new PlannedTask(
       PlanningType.Scheduled,
       SchedulerType.Alarm,
@@ -104,7 +104,7 @@ export class AndroidAlarmScheduler {
     const allTasks = await this.plannedTaskStore.getAllSortedByNextRun(
       PlanningType.Scheduled
     );
-    const now = new Date().getTime();
+    const now = java.lang.System.currentTimeMillis();
     if (allTasks.length === 1) {
       this.alarmManager.cancel();
       this.watchdogManager.cancel();

@@ -29,7 +29,7 @@ export class PlannedTask {
     public schedulerType: SchedulerType,
     task: RunnableTask,
     public id = uuid(),
-    public createdAt = new Date().getTime(),
+    public createdAt = Date.now(),
     public lastRun = -1,
     public errorCount = 0,
     public timeoutCount = 0
@@ -42,7 +42,7 @@ export class PlannedTask {
     this.cancelEvent = task.cancelEvent;
   }
 
-  nextRun(now: number = new Date().getTime()): number {
+  nextRun(now: number = Date.now()): number {
     if (this.startAt !== -1 && now < this.startAt) {
       return this.startAt - now;
     }

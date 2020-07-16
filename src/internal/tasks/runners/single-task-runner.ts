@@ -21,7 +21,7 @@ export class SingleTaskRunner {
     const { name, id, params } = plannedTask;
     const task = getTask(name);
 
-    await this.taskStore.updateLastRun(id, new Date().getTime());
+    await this.taskStore.updateLastRun(id, Date.now());
 
     try {
       const parameterizedTask = new ParameterizedTask(task, params, startEvent);
