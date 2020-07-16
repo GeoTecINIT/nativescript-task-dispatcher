@@ -24,9 +24,8 @@ export class TaskChainRunnerService
 
   private executionStart: number;
   private timeoutIds: Set<number>;
-  private taskChainCount = 0;
-
-  private killed = false;
+  private taskChainCount: number;
+  private killed: boolean;
 
   private logger: Logger;
 
@@ -35,6 +34,8 @@ export class TaskChainRunnerService
 
     this.wakeLock = taskChainRunnerWakeLock(nativeService);
     this.timeoutIds = new Set();
+    this.taskChainCount = 0;
+    this.killed = false;
 
     this.logger = getLogger("TaskChainRunnerService");
     this.logger.debug("onCreate called");
