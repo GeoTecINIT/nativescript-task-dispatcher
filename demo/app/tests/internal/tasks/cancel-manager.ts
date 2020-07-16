@@ -3,7 +3,9 @@ import { TaskCancelManager } from "nativescript-task-dispatcher/internal/tasks/c
 import { TaskScheduler } from "nativescript-task-dispatcher/internal/tasks/schedulers/time-based";
 import { RunnableTask } from "nativescript-task-dispatcher/internal/tasks/runnable-task";
 import {
+    TaskDispatcherEvent,
     hasListeners,
+    on,
     off,
     createEvent,
     emit,
@@ -37,7 +39,7 @@ describe("Task cancel manager", () => {
 
     const secondScheduledTask = new PlannedTask(
         PlanningType.Scheduled,
-        SchedulerType.None,
+        SchedulerType.Alarm,
         {
             name: "dummyTask",
             startAt: -1,
@@ -99,26 +101,17 @@ describe("Task cancel manager", () => {
     });
 
     it("cancels scheduled tasks when its cancellation event gets received", async () => {
-        const fetchPromise = new Promise((resolve) => {
-            let cancelCount = 0;
-            spyOn(taskStore, "getAllFilteredByCancelEvent")
-                .withArgs(cancelScheduledTasks)
-                .and.returnValue(
-                    Promise.resolve([firstScheduledTask, secondScheduledTask])
-                );
-            spyOn(taskScheduler, "cancel").and.callFake(() => {
-                cancelCount++;
-                if (cancelCount === 2) {
-                    resolve();
-                }
+        spyOn(taskStore, "getAllFilteredByCancelEvent")
+            .withArgs(cancelScheduledTasks)
+            .and.returnValue(
+                Promise.resolve([firstScheduledTask, secondScheduledTask])
+            );
+        spyOn(taskScheduler, "cancel").and.returnValue(Promise.resolve());
 
-                return Promise.resolve();
-            });
-        });
-
-        await cancelManager.init();
-        emit(createEvent(cancelScheduledTasks));
-        await fetchPromise;
+        await initCancelManagerAndListenForTaskCancel(
+            cancelManager,
+            cancelScheduledTasks
+        );
 
         expect(taskStore.getAllFilteredByCancelEvent).toHaveBeenCalledWith(
             cancelScheduledTasks
@@ -132,26 +125,17 @@ describe("Task cancel manager", () => {
     });
 
     it("removes immediate tasks data when its cancellation event gets received", async () => {
-        const fetchPromise = new Promise((resolve) => {
-            let cancelCount = 0;
-            spyOn(taskStore, "getAllFilteredByCancelEvent")
-                .withArgs(cancelImmediateTasks)
-                .and.returnValue(
-                    Promise.resolve([firstImmediateTask, secondImmediateTask])
-                );
-            spyOn(taskStore, "delete").and.callFake(() => {
-                cancelCount++;
-                if (cancelCount === 2) {
-                    resolve();
-                }
+        spyOn(taskStore, "getAllFilteredByCancelEvent")
+            .withArgs(cancelImmediateTasks)
+            .and.returnValue(
+                Promise.resolve([firstImmediateTask, secondImmediateTask])
+            );
+        spyOn(taskStore, "delete").and.returnValue(Promise.resolve());
 
-                return Promise.resolve();
-            });
-        });
-
-        await cancelManager.init();
-        emit(createEvent(cancelImmediateTasks));
-        await fetchPromise;
+        await initCancelManagerAndListenForTaskCancel(
+            cancelManager,
+            cancelImmediateTasks
+        );
 
         expect(taskStore.getAllFilteredByCancelEvent).toHaveBeenCalledWith(
             cancelImmediateTasks
@@ -161,18 +145,17 @@ describe("Task cancel manager", () => {
     });
 
     it("removes after-init immediate tasks data when its cancellation event gets received", async () => {
-        const fetchPromise = new Promise((resolve) => {
-            spyOn(taskStore, "getAllFilteredByCancelEvent")
-                .withArgs(cancelExtraImmediateTasks)
-                .and.returnValue(Promise.resolve([extraImmediateTask]));
-            spyOn(taskStore, "delete").and.returnValue(
-                Promise.resolve().then(() => resolve())
-            );
-        });
+        spyOn(taskStore, "getAllFilteredByCancelEvent")
+            .withArgs(cancelExtraImmediateTasks)
+            .and.returnValue(Promise.resolve([extraImmediateTask]));
+        spyOn(taskStore, "delete").and.returnValue(Promise.resolve());
+
+        const cancelEvent = createEvent(cancelExtraImmediateTasks);
+        const chainFinished = listenToTaskChainFinishedEvent(cancelEvent.id);
 
         cancelManager.add(extraImmediateTask);
-        emit(createEvent(cancelExtraImmediateTasks));
-        await fetchPromise;
+        emit(cancelEvent);
+        await chainFinished;
 
         expect(taskStore.getAllFilteredByCancelEvent).toHaveBeenCalledWith(
             cancelExtraImmediateTasks
@@ -196,4 +179,27 @@ function createTaskSchedulerMock(): TaskScheduler {
             return Promise.resolve();
         },
     };
+}
+
+async function initCancelManagerAndListenForTaskCancel(
+    cancelManager: TaskCancelManager,
+    cancelEventName: string
+) {
+    const cancelEvent = createEvent(cancelEventName);
+    const chainFinished = listenToTaskChainFinishedEvent(cancelEvent.id);
+
+    await cancelManager.init();
+    emit(cancelEvent);
+    await chainFinished;
+}
+
+function listenToTaskChainFinishedEvent(eventId: string): Promise<void> {
+    return new Promise((resolve) => {
+        const listenerId = on(TaskDispatcherEvent.TaskChainFinished, (evt) => {
+            if (evt.id === eventId) {
+                off(TaskDispatcherEvent.TaskChainFinished, listenerId);
+                resolve();
+            }
+        });
+    });
 }
