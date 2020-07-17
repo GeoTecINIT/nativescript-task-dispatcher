@@ -1,11 +1,8 @@
-import {
-    android as androidApp,
-    launchEvent,
-} from "tns-core-modules/application/application";
+import { android as androidApp } from "tns-core-modules/application/application";
 
 import { setTasks } from "nativescript-task-dispatcher/internal/tasks/provider";
 import { testTasks } from "../..";
-import { TaskChainRunnerService } from "nativescript-task-dispatcher/internal/tasks/schedulers/event-driven/android/runner-service.android";
+import { getTaskChainRunnerService } from "nativescript-task-dispatcher/internal/tasks/schedulers/event-driven/android/runner-service.android";
 import { TaskChainLauncher } from "nativescript-task-dispatcher/internal/tasks/schedulers/event-driven";
 import { AndroidTaskChainLauncher } from "nativescript-task-dispatcher/internal/tasks/schedulers/event-driven/android";
 import { TaskScheduler } from "nativescript-task-dispatcher/internal/tasks/schedulers/time-based";
@@ -48,23 +45,29 @@ describe("Native task chain launcher", () => {
     it("runs a single task dependant on a launch event", async () => {
         const chainId = "simpleTaskChain";
         const chainFinished = createTaskChainFinishedListener(chainId);
-        const launchEventName = createSimpleTaskChain();
+        const [launchEventName, listenerId] = createSimpleTaskChain();
 
         taskChainLauncher.launch(launchEventName, {}, chainId);
         await chainFinished;
 
-        unregisterEventListeners([launchEvent]);
+        off(launchEventName, listenerId);
     });
 
     it("runs a task chain composed by multiple tasks bootstrapped by a launch event", async () => {
         const chainId = "advancedTaskChain";
         const chainFinished = createTaskChainFinishedListener(chainId);
-        const eventNames = createAdvancedTaskChain();
+        const [
+            launchEvent,
+            launchListenerId,
+            intermediateEvent,
+            intermediateListenerId,
+        ] = createAdvancedTaskChain();
 
-        taskChainLauncher.launch(eventNames[0], {}, chainId);
+        taskChainLauncher.launch(launchEvent, {}, chainId);
         await chainFinished;
 
-        unregisterEventListeners(eventNames);
+        off(launchEvent, launchListenerId);
+        off(intermediateEvent, intermediateListenerId);
     });
 
     it("runs two task chains in parallel if they fit in the same time window", async () => {
@@ -72,22 +75,29 @@ describe("Native task chain launcher", () => {
         const simpleChainFinished = createTaskChainFinishedListener(
             simpleChainId
         );
-        const simpleLaunchEventName = createSimpleTaskChain();
+        const [
+            simpleLaunchEventName,
+            simpleListenerId,
+        ] = createSimpleTaskChain();
 
         const advancedChainId = "anotherAdvancedTaskChain";
         const advancedChainFinished = createTaskChainFinishedListener(
             advancedChainId
         );
-        const advancedEventNames = createAdvancedTaskChain();
+        const [
+            launchEvent,
+            launchListenerId,
+            intermediateEvent,
+            intermediateListenerId,
+        ] = createAdvancedTaskChain();
 
         taskChainLauncher.launch(simpleLaunchEventName, {}, simpleChainId);
-        taskChainLauncher.launch(advancedEventNames[0], {}, advancedChainId);
+        taskChainLauncher.launch(launchEvent, {}, advancedChainId);
 
         await Promise.all([simpleChainFinished, advancedChainFinished]);
-        unregisterEventListeners([
-            simpleLaunchEventName,
-            ...advancedEventNames,
-        ]);
+        off(simpleLaunchEventName, simpleListenerId);
+        off(launchEvent, launchListenerId);
+        off(intermediateEvent, intermediateListenerId);
     });
 
     it("schedules a task in time as a reaction to an external event", async () => {
@@ -108,32 +118,40 @@ describe("Native task chain launcher", () => {
 });
 
 function wireUpTaskChainRunnerService() {
-    const runnerService = new TaskChainRunnerService();
     es.uji.geotec.taskdispatcher.runners.TaskChainRunnerService.setTaskChainRunnerServiceDelegate(
         new es.uji.geotec.taskdispatcher.runners.TaskChainRunnerServiceDelegate(
             {
                 onCreate: (nativeService) =>
-                    runnerService.onCreate(nativeService),
+                    getTaskChainRunnerService().onCreate(nativeService),
                 onStartCommand: (intent, flags, startId) =>
-                    runnerService.onStartCommand(intent, flags, startId),
-                onDestroy: () => runnerService.onDestroy(),
+                    getTaskChainRunnerService().onStartCommand(
+                        intent,
+                        flags,
+                        startId
+                    ),
+                onDestroy: () => getTaskChainRunnerService().onDestroy(),
             }
         )
     );
 }
 
-function createSimpleTaskChain(): string {
+function createSimpleTaskChain(): [string, number] {
     const launchEvent = "simpleTaskChainCanStart";
-    on(launchEvent, run("timeoutTask"));
-    return launchEvent;
+    const listenerId = on(launchEvent, run("timeoutTask"));
+    return [launchEvent, listenerId];
 }
 
-function createAdvancedTaskChain(): Array<string> {
+function createAdvancedTaskChain(): [string, number, string, number] {
     const launchEvent = "advancedTaskChainCanStart";
-    on(launchEvent, run("dummyTask"));
+    const launchListenerId = on(launchEvent, run("dummyTask"));
     const intermediateEvent = "dummyTaskFinished";
-    on(intermediateEvent, run("emitterTask"));
-    return [launchEvent, intermediateEvent];
+    const intermediateListenerId = on(intermediateEvent, run("emitterTask"));
+    return [
+        launchEvent,
+        launchListenerId,
+        intermediateEvent,
+        intermediateListenerId,
+    ];
 }
 
 function createDeferredTaskChain(): [string, RunnableTask] {
@@ -162,10 +180,6 @@ function createTaskChainFinishedListener(chainId: string): Promise<void> {
             }
         });
     });
-}
-
-function unregisterEventListeners(eventNames: Array<string>) {
-    eventNames.forEach((eventName) => off(eventName));
 }
 
 function milliseconds(millis: number): Promise<void> {

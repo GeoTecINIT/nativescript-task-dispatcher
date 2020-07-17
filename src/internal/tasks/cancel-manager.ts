@@ -1,14 +1,15 @@
 import {
-  PlannedTasksStore,
   plannedTasksDB,
+  PlannedTasksStore,
 } from "../persistence/planned-tasks-store";
 import {
   TaskScheduler,
   taskScheduler as getTaskScheduler,
 } from "./schedulers/time-based";
-import { on, off } from "../events";
+import { off, on } from "../events";
 import { PlannedTask, PlanningType } from "./planner/planned-task";
-import { Logger, getLogger } from "../utils/logger";
+import { getLogger, Logger } from "../utils/logger";
+import { TaskChain, TaskResultStatus } from "./task-chain";
 
 export class TaskCancelManager {
   private cancelEvents: Set<string>;
@@ -44,7 +45,13 @@ export class TaskCancelManager {
       const evtName = evt.name;
       off(evtName, listenerId);
       this.cancelEvents.delete(evtName);
-      this.cancelByEventName(evtName);
+      this.cancelByEventName(evtName)
+        .then(() => {
+          TaskChain.finalize(evt.id, TaskResultStatus.Ok);
+        })
+        .catch((err) => {
+          TaskChain.finalize(evt.id, TaskResultStatus.Error, err);
+        });
     });
   }
 

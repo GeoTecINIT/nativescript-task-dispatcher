@@ -1,11 +1,6 @@
-import {
-  DispatchableEvent,
-  createEvent,
-  TaskDispatcherEvent,
-  emit,
-  hasListeners,
-} from "../events";
+import { DispatchableEvent, emit, hasListeners } from "../events";
 import { Logger, getLogger } from "../utils/logger";
+import { TaskChain, TaskResultStatus } from "./task-chain";
 
 export abstract class Task {
   get name(): string {
@@ -185,7 +180,7 @@ export abstract class Task {
 
   private configureTask(taskConfig: TaskConfig) {
     this._taskConfig = {
-      foreground: taskConfig.foreground ? true : false,
+      foreground: taskConfig.foreground,
       outputEventNames:
         taskConfig.outputEventNames && taskConfig.outputEventNames.length > 0
           ? taskConfig.outputEventNames
@@ -287,18 +282,7 @@ export abstract class Task {
     const id = invocationId ? invocationId : this._invocationEvent.id;
     this.markAsDone(id);
 
-    const result: TaskChainResult = { status };
-    if (err) {
-      result.reason = err;
-    }
-
-    const endEvent = createEvent(TaskDispatcherEvent.TaskChainFinished, {
-      id,
-      data: {
-        result,
-      },
-    });
-    emit(endEvent);
+    TaskChain.finalize(id, status, err);
   }
 
   private removeCancelFunction() {
@@ -325,17 +309,6 @@ export interface TaskParams {
 export interface TaskOutcome {
   eventName?: string;
   result?: any;
-}
-
-export interface TaskChainResult {
-  status: TaskResultStatus;
-  reason?: Error;
-}
-
-export enum TaskResultStatus {
-  Ok = "ok",
-  Error = "error",
-  Cancelled = "cancelled",
 }
 
 export type CancelFunction = () => void;

@@ -84,7 +84,10 @@ describe("Task planner", () => {
     });
 
     it("schedules a recurrent task in time", async () => {
-        on(TaskDispatcherEvent.TaskChainFinished, dummyCallback);
+        const listenerId = on(TaskDispatcherEvent.TaskChainFinished, (evt) => {
+            off(TaskDispatcherEvent.TaskChainFinished, listenerId);
+            dummyCallback(evt);
+        });
         await taskPlanner.plan(recurrentTask, dummyEvent);
         expect(taskScheduler.schedule).toHaveBeenCalledWith(recurrentTask);
         expect(dummyCallback).toHaveBeenCalled();
@@ -92,14 +95,20 @@ describe("Task planner", () => {
     });
 
     it("schedules a one-shot task in time", async () => {
-        on(TaskDispatcherEvent.TaskChainFinished, dummyCallback);
+        const listenerId = on(TaskDispatcherEvent.TaskChainFinished, (evt) => {
+            off(TaskDispatcherEvent.TaskChainFinished, listenerId);
+            dummyCallback(evt);
+        });
         await taskPlanner.plan(oneShotTask, dummyEvent);
         expect(taskScheduler.schedule).toHaveBeenCalledWith(oneShotTask);
         expect(dummyCallback).toHaveBeenCalled();
     });
 
     it("schedules a delayed task in time", async () => {
-        on(TaskDispatcherEvent.TaskChainFinished, dummyCallback);
+        const listenerId = on(TaskDispatcherEvent.TaskChainFinished, (evt) => {
+            off(TaskDispatcherEvent.TaskChainFinished, listenerId);
+            dummyCallback(evt);
+        });
         await taskPlanner.plan(delayedTask, dummyEvent);
         expect(taskScheduler.schedule).toHaveBeenCalledWith(delayedTask);
         expect(dummyCallback).toHaveBeenCalled();
@@ -122,7 +131,10 @@ describe("Task planner", () => {
                 },
             },
         });
-        on(TaskDispatcherEvent.TaskChainFinished, dummyCallback);
+        const listenerId = on(TaskDispatcherEvent.TaskChainFinished, (evt) => {
+            off(TaskDispatcherEvent.TaskChainFinished, listenerId);
+            dummyCallback(evt);
+        });
         await expectAsync(
             taskPlanner.plan(unknownTask, dummyEvent)
         ).toBeRejectedWith(new TaskNotFoundError(unknownTask.name));
@@ -149,10 +161,6 @@ describe("Task planner", () => {
         expect(taskScheduler.schedule).not.toHaveBeenCalled();
         expect(taskRunner.run).not.toHaveBeenCalled();
         expect(cancelManager.add).not.toHaveBeenCalled();
-    });
-
-    afterEach(() => {
-        off(TaskDispatcherEvent.TaskChainFinished);
     });
 });
 

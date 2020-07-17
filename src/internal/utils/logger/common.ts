@@ -21,7 +21,12 @@ export abstract class AbstractLogger implements Logger {
   }
 
   error(message: any) {
-    this.logError(this.formatMessage(LogType.Error, message));
+    this.logError(
+      this.formatMessage(
+        LogType.Error,
+        !!message.stack ? message.stack : message
+      )
+    );
   }
 
   protected abstract logDebug(message: string): void;
