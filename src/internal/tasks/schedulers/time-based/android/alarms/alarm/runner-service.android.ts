@@ -19,6 +19,7 @@ import {
 import { TaskManager } from "../../../../../manager";
 import { PlanningType } from "../../../../../planner/planned-task";
 import { Logger, getLogger } from "../../../../../../utils/logger";
+import { now } from "../../../../../../utils/time";
 
 const MIN_TIMEOUT = 60000;
 const TIMEOUT_EVENT_OFFSET = 5000;
@@ -45,7 +46,7 @@ export class AlarmRunnerService
 
     this.runsInForeground = false;
     this.timeOffset = 0;
-    this.currentTime = java.lang.System.currentTimeMillis();
+    this.currentTime = now();
 
     this.started = false;
     this.inForeground = false;
@@ -189,7 +190,7 @@ export class AlarmRunnerService
   }
 
   private getExpirationTimestamp(timeout: number): number {
-    return java.lang.System.currentTimeMillis() + timeout;
+    return now() + timeout;
   }
 
   private gracefullyStop() {

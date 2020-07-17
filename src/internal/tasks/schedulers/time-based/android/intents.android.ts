@@ -1,4 +1,5 @@
 import { createLibComponentIntent } from "../../intent-tools.android";
+import { now } from "../../../../utils/time";
 
 // TODO: Add a way to configure MainActivity reference
 // in order to support apps with custom launch activities
@@ -63,9 +64,6 @@ export function unpackAlarmRunnerServiceIntent(
   return {
     runInForeground: intent.getBooleanExtra(ARS_RUN_IN_FOREGROUND, false),
     timeOffset: intent.getIntExtra(ARS_TIME_OFFSET, 0),
-    invocationTime: intent.getLongExtra(
-      ARS_INVOCATION_TIME,
-      java.lang.System.currentTimeMillis()
-    ),
+    invocationTime: intent.getLongExtra(ARS_INVOCATION_TIME, now()),
   };
 }

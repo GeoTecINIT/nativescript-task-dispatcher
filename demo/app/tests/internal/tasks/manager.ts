@@ -8,6 +8,7 @@ import {
 import { createPlannedTaskStoreMock } from "../persistence";
 import { TaskManager } from "nativescript-task-dispatcher/internal/tasks/manager";
 import { uuid } from "nativescript-task-dispatcher/internal/utils/uuid";
+import { now } from "nativescript-task-dispatcher/internal/utils/time";
 
 describe("Task manager", () => {
     setTasks(testTasks);
@@ -17,7 +18,7 @@ describe("Task manager", () => {
     let taskPlanner: TaskManager;
 
     const stdInterval = 60000;
-    const currentTime = Date.now();
+    const currentTime = now();
 
     // To be run in 30s
     const ephemeralTaskToBeRun = new PlannedTask(
@@ -230,7 +231,7 @@ describe("Task manager", () => {
 
 describe("Tasks manager next interval", () => {
     const minute = 60000;
-    const initialTime = Date.now();
+    const initialTime = now();
     const plannedTasksStore = createPlannedTaskStoreMock();
     let taskPlanner: TaskManager;
 

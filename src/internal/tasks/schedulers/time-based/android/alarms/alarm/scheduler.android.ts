@@ -15,6 +15,7 @@ import {
   SchedulerType,
 } from "../../../../../planner/planned-task";
 import { RunnableTask } from "../../../../../runnable-task";
+import { now } from "../../../../../../utils/time";
 
 const MIN_ALARM_INTERVAL = 60000;
 
@@ -75,7 +76,7 @@ export class AndroidAlarmScheduler {
     const allTasks = await this.plannedTaskStore.getAllSortedByNextRun(
       PlanningType.Scheduled
     );
-    const now = java.lang.System.currentTimeMillis();
+    const currentMillis = now();
     const plannedTask = new PlannedTask(
       PlanningType.Scheduled,
       SchedulerType.Alarm,
@@ -83,7 +84,7 @@ export class AndroidAlarmScheduler {
     );
     if (
       allTasks.length === 0 ||
-      allTasks[0].nextRun(now) > plannedTask.nextRun(now)
+      allTasks[0].nextRun(currentMillis) > plannedTask.nextRun(currentMillis)
     ) {
       this.alarmManager.set(calculateAlarmInterval(plannedTask));
       if (!this.watchdogManager.alarmUp) {
@@ -104,13 +105,15 @@ export class AndroidAlarmScheduler {
     const allTasks = await this.plannedTaskStore.getAllSortedByNextRun(
       PlanningType.Scheduled
     );
-    const now = java.lang.System.currentTimeMillis();
+    const currentMillis = now();
     if (allTasks.length === 1) {
       this.alarmManager.cancel();
       this.watchdogManager.cancel();
     } else if (
-      allTasks[0].nextRun(now) === possibleExisting.nextRun(now) &&
-      allTasks[1].nextRun(now) !== possibleExisting.nextRun(now)
+      allTasks[0].nextRun(currentMillis) ===
+        possibleExisting.nextRun(currentMillis) &&
+      allTasks[1].nextRun(currentMillis) !==
+        possibleExisting.nextRun(currentMillis)
     ) {
       this.alarmManager.set(calculateAlarmInterval(allTasks[1]));
     }

@@ -11,6 +11,7 @@ import {
   DispatchableEvent,
   off,
 } from "../../../../events";
+import { now } from "../../../../utils/time";
 
 const TIMEOUT = 180000;
 const TIMEOUT_EVENT_OFFSET = 5000;
@@ -70,7 +71,7 @@ export class TaskChainRunnerService
   }
 
   private initializeExecutionWindow() {
-    this.executionStart = java.lang.System.currentTimeMillis();
+    this.executionStart = now();
     this.wakeLock.acquire(TIMEOUT);
   }
 
@@ -170,13 +171,13 @@ export class TaskChainRunnerService
   }
 
   private calculateTimeout() {
-    const now = java.lang.System.currentTimeMillis();
-    const diff = now - this.executionStart;
+    const currentMillis = now();
+    const diff = currentMillis - this.executionStart;
     return TIMEOUT - TIMEOUT_EVENT_OFFSET - diff;
   }
 
   private getExpirationTimestamp(timeout: number): number {
-    return java.lang.System.currentTimeMillis() + timeout;
+    return now() + timeout;
   }
 
   private gracefullyStop() {

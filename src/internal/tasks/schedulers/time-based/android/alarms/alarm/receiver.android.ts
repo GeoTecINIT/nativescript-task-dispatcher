@@ -5,6 +5,7 @@ import { plannedTasksDB } from "../../../../../../persistence/planned-tasks-stor
 import { createAlarmRunnerServiceIntent } from "../../intents.android";
 import { PlanningType } from "../../../../../planner/planned-task";
 import { Logger, getLogger } from "../../../../../../utils/logger";
+import { now } from "../../../../../../utils/time";
 
 const MIN_INTERVAL = 60000;
 
@@ -22,7 +23,7 @@ export class AlarmReceiver
     this.logger.info("Alarm triggered");
 
     this.timeOffset = 30000;
-    this.currentTime = java.lang.System.currentTimeMillis();
+    this.currentTime = now();
     this.taskManager = new TaskManager(
       PlanningType.Scheduled,
       plannedTasksDB,

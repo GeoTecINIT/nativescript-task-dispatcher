@@ -19,6 +19,7 @@ import { createPlannedTaskStoreMock } from "../persistence";
 import { createTaskCancelManagerMock } from ".";
 import { TaskNotFoundError } from "nativescript-task-dispatcher/internal/tasks/provider";
 import { TaskRunner } from "nativescript-task-dispatcher/internal/tasks/schedulers/immediate/instant-task-runner";
+import { now } from "nativescript-task-dispatcher/internal/utils/time";
 
 describe("Task planner", () => {
     const taskScheduler = createTaskSchedulerMock();
@@ -49,7 +50,7 @@ describe("Task planner", () => {
         .in(10)
         .build();
     const delayedTask = new RunnableTaskBuilderImpl("dummyTask", {})
-        .at(new Date(Date.now() + 3600 * 1000))
+        .at(new Date(now() + 3600 * 1000))
         .build();
 
     const immediatePlannedTask = new PlannedTask(
