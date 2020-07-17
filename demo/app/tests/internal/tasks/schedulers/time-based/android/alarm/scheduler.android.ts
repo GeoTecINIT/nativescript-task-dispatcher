@@ -7,8 +7,13 @@ import {
 } from "nativescript-task-dispatcher/internal/tasks/planner/planned-task";
 import { createPlannedTaskStoreMock } from "../../../../../persistence";
 import { RunnableTask } from "nativescript-task-dispatcher/internal/tasks/runnable-task";
+import { now } from "nativescript-task-dispatcher/internal/utils/time";
 
 describe("Android Alarm Scheduler", () => {
+    if (typeof android === "undefined") {
+        return;
+    }
+
     const manager = createAlarmManagerMock();
     const watchdog = createAlarmManagerMock();
     const taskStore = createPlannedTaskStoreMock();
@@ -19,7 +24,7 @@ describe("Android Alarm Scheduler", () => {
         taskStore
     );
 
-    let now: number;
+    let currentMillis: number;
     let dummyTask: RunnableTask;
     let dummyDelayedTask: RunnableTask;
     let closeDelayedTask: RunnableTask;
@@ -35,7 +40,7 @@ describe("Android Alarm Scheduler", () => {
     let equalFreqPT: PlannedTask;
 
     beforeEach(() => {
-        now = new Date().getTime();
+        currentMillis = now();
         dummyTask = {
             name: "dummyTask",
             startAt: -1,
@@ -45,11 +50,11 @@ describe("Android Alarm Scheduler", () => {
         };
         dummyDelayedTask = {
             ...dummyTask,
-            startAt: now + 75000,
+            startAt: currentMillis + 75000,
         };
         closeDelayedTask = {
             ...dummyTask,
-            startAt: now + 30000,
+            startAt: currentMillis + 30000,
         };
         lowerFreqTask = {
             ...dummyTask,
@@ -143,7 +148,7 @@ describe("Android Alarm Scheduler", () => {
         expect(
             isLastCallCloseTo(
                 manager.set,
-                expectedDelayedTask.nextRun(now),
+                expectedDelayedTask.nextRun(currentMillis),
                 1000
             )
         ).toBeTruthy();
@@ -229,7 +234,7 @@ describe("Android Alarm Scheduler", () => {
         expect(
             isLastCallCloseTo(
                 manager.set,
-                expectedDelayedTask.nextRun(now),
+                expectedDelayedTask.nextRun(currentMillis),
                 1000
             )
         ).toBeTruthy();

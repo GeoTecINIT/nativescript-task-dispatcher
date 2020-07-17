@@ -4,6 +4,7 @@ import { getTask } from "../provider";
 import { Task, TaskParams } from "../task";
 import { DispatchableEvent, on, TaskDispatcherEvent, off } from "../../events";
 import { Logger, getLogger } from "../../utils/logger";
+import { now } from "../../utils/time";
 
 const FAILURE_THRESHOLD = 3;
 
@@ -21,7 +22,7 @@ export class SingleTaskRunner {
     const { name, id, params } = plannedTask;
     const task = getTask(name);
 
-    await this.taskStore.updateLastRun(id, new Date().getTime());
+    await this.taskStore.updateLastRun(id, now());
 
     try {
       const parameterizedTask = new ParameterizedTask(task, params, startEvent);

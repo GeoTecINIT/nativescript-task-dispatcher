@@ -63,7 +63,12 @@ export class TaskGraphLoader {
     const tasksToBePrepared = await this.tasksNotReady();
     this.getLogger().info(`${tasksToBePrepared.length} are up to be prepared`);
 
-    await Promise.all(tasksToBePrepared.map((task) => task.prepare()));
+    for (let task of tasksToBePrepared) {
+      const hasYetToBePrepared = await this.hasToBePrepared(task);
+      if (hasYetToBePrepared) {
+        await task.prepare();
+      }
+    }
   }
 
   async tasksNotReady(): Promise<Array<Task>> {
@@ -116,3 +121,13 @@ export class TaskGraphLoader {
 }
 
 export const taskGraph = new TaskGraphLoader();
+
+async function hasToBePrepared(task: Task): Promise<boolean> {
+  try {
+    await task.checkIfCanRun();
+
+    return false;
+  } catch (err) {
+    return true;
+  }
+}

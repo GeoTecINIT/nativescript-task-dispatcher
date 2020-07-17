@@ -1,3 +1,4 @@
+import { now } from "nativescript-task-dispatcher/internal/utils/time";
 import {
     plannedTasksDB,
     PlannedTaskAlreadyExistsError,
@@ -22,7 +23,7 @@ describe("Planned Tasks Store", () => {
     };
     const runnableTask2: RunnableTask = {
         name: "dummyTask2",
-        startAt: new Date().getTime(),
+        startAt: now(),
         interval: 60000,
         recurrent: true,
         params: { param1: "patata1", param2: "patata2" },
@@ -30,7 +31,7 @@ describe("Planned Tasks Store", () => {
     };
     const runnableTask3: RunnableTask = {
         name: "dummyTask3",
-        startAt: new Date().getTime() + 900000,
+        startAt: now() + 900000,
         interval: 150000,
         recurrent: true,
         params: {},
@@ -39,7 +40,7 @@ describe("Planned Tasks Store", () => {
 
     const runnableTask4: RunnableTask = {
         name: "dummyTask4",
-        startAt: new Date().getTime() + 28e6,
+        startAt: now() + 28e6,
         interval: 0,
         recurrent: false,
         params: {},
@@ -108,9 +109,12 @@ describe("Planned Tasks Store", () => {
 
         const tasks = await store.getAllSortedByNextRun();
         expect(tasks.length).toBe(4);
-        const now = new Date().getTime();
+        const currentMillis = now();
         for (let i = 0; i < tasks.length - 1; i++) {
-            if (tasks[i].nextRun(now) > tasks[i + 1].nextRun(now)) {
+            if (
+                tasks[i].nextRun(currentMillis) >
+                tasks[i + 1].nextRun(currentMillis)
+            ) {
                 fail("Tasks out of order");
             }
         }
@@ -125,9 +129,12 @@ describe("Planned Tasks Store", () => {
 
         const tasks = await store.getAllSortedByNextRun(PlanningType.Scheduled);
         expect(tasks.length).toBe(3);
-        const now = new Date().getTime();
+        const currentMillis = now();
         for (let i = 0; i < tasks.length - 1; i++) {
-            if (tasks[i].nextRun(now) > tasks[i + 1].nextRun(now)) {
+            if (
+                tasks[i].nextRun(currentMillis) >
+                tasks[i + 1].nextRun(currentMillis)
+            ) {
                 fail("Tasks out of order");
             }
         }

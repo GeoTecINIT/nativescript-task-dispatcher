@@ -1,6 +1,7 @@
 import { PlannedTask, PlanningType } from "./planner/planned-task";
 import { PlannedTasksStore } from "../persistence/planned-tasks-store";
 import { getTask } from "./provider";
+import { now } from "../utils/time";
 
 export class TaskManager {
   private _allTasks: Array<PlannedTask>;
@@ -9,17 +10,13 @@ export class TaskManager {
     private planningType: PlanningType,
     private plannedTasksStore: PlannedTasksStore,
     private intervalOffset: number,
-    private currentTime = new Date().getTime()
+    private currentTime = now()
   ) {}
 
   async tasksToRun(): Promise<Array<PlannedTask>> {
     const allTasks = await this.allTasks();
 
-    const tasksToRunNow = allTasks.filter((task) =>
-      this.determineIfTaskShouldBeRun(task)
-    );
-
-    return tasksToRunNow;
+    return allTasks.filter((task) => this.determineIfTaskShouldBeRun(task));
   }
 
   async requiresForeground(): Promise<boolean> {

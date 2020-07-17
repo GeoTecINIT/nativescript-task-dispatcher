@@ -3,6 +3,7 @@ import {
   setNumber,
   flush,
 } from "tns-core-modules/application-settings/application-settings";
+import { now } from "../../../utils/time";
 
 const PREVIOUS_PLANNING_TIMESTAMP = "PREVIOUS_PLANNING_TIMESTAMP";
 const CURRENT_PLANNING_TIMESTAMP = "CURRENT_PLANNING_TIMESTAMP";
@@ -21,7 +22,7 @@ class PlanningTimestamp {
 
   updateCurrent(): void {
     const previousCurrent = this.current;
-    const newCurrent = new Date().getTime();
+    const newCurrent = now();
     this._previous = previousCurrent;
     this._current = newCurrent;
     setNumber(PREVIOUS_PLANNING_TIMESTAMP, previousCurrent);

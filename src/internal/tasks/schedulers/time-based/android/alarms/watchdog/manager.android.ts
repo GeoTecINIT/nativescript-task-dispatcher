@@ -2,6 +2,7 @@ import { android as androidApp } from "tns-core-modules/application/application"
 import { AbstractAlarmManager } from "../abstract-alarm-manager.android";
 import { createWatchdogReceiverIntent } from "../../intents.android";
 import { getLogger } from "../../../../../../utils/logger";
+import { now } from "../../../../../../utils/time";
 
 const WATCHDOG_INTERVAL = 15 * 60 * 1000;
 
@@ -23,7 +24,7 @@ export class WatchdogManager extends AbstractAlarmManager {
       this.cancel();
     }
     const alarmType = android.app.AlarmManager.RTC_WAKEUP;
-    const triggerAtMillis = new Date().getTime() + WATCHDOG_INTERVAL;
+    const triggerAtMillis = now() + WATCHDOG_INTERVAL;
     const pendingIntent = this.getPendingIntent();
 
     this.osAlarmManager.setRepeating(

@@ -2,6 +2,7 @@ import { NativeSQLite } from "@nano-sql/adapter-sqlite-nativescript";
 import { nSQL } from "@nano-sql/core/lib/index";
 import { PlannedTask, PlanningType } from "../tasks/planner/planned-task";
 import { RunnableTask } from "../tasks/runnable-task";
+import { now } from "../utils/time";
 
 const DB_NAME = "tasks-dispatcher";
 const PLANNED_TASKS_TABLE = "plannedTasks";
@@ -79,9 +80,11 @@ class PlannedTaskDBStore implements PlannedTasksStore {
 
     const rows = await query.exec();
     const plannedTasks = rows.map((row) => this.plannedTaskFromRow(row));
-    const now = new Date().getTime();
+    const currentMillis = now();
 
-    return plannedTasks.sort((t1, t2) => t1.nextRun(now) - t2.nextRun(now));
+    return plannedTasks.sort(
+      (t1, t2) => t1.nextRun(currentMillis) - t2.nextRun(currentMillis)
+    );
   }
 
   async getAllCancelEvents(): Promise<Array<string>> {

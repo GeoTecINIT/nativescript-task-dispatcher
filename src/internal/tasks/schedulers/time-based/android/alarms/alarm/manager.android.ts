@@ -4,6 +4,7 @@ import { AbstractAlarmManager } from "../abstract-alarm-manager.android";
 import { PowerSavingsManager } from "../power-savings-manager.android";
 import { getLogger } from "../../../../../../utils/logger";
 import { planningTimestamp } from "../../../planning-timestamp";
+import { now } from "../../../../../../utils/time";
 
 const BATTERY_SAVINGS_THRESHOLD = 15 * 60 * 1000;
 
@@ -31,7 +32,7 @@ export class AndroidAlarmManager extends AbstractAlarmManager {
       this.cancel();
     }
     const alarmType = android.app.AlarmManager.RTC_WAKEUP;
-    const triggerAtMillis = new Date().getTime() + interval;
+    const triggerAtMillis = now() + interval;
     const pendingIntent = this.getPendingIntent();
 
     if (this.sdkVersion >= 23) {

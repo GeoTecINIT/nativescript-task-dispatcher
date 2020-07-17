@@ -1,4 +1,5 @@
 import { uuid } from "../../utils/uuid";
+import { now } from "../../utils/time";
 import { RunnableTask } from "../runnable-task";
 import { TaskParams } from "../task";
 
@@ -29,7 +30,7 @@ export class PlannedTask {
     public schedulerType: SchedulerType,
     task: RunnableTask,
     public id = uuid(),
-    public createdAt = new Date().getTime(),
+    public createdAt = now(),
     public lastRun = -1,
     public errorCount = 0,
     public timeoutCount = 0
@@ -42,11 +43,11 @@ export class PlannedTask {
     this.cancelEvent = task.cancelEvent;
   }
 
-  nextRun(now: number = new Date().getTime()): number {
-    if (this.startAt !== -1 && now < this.startAt) {
-      return this.startAt - now;
+  nextRun(currentTime: number = now()): number {
+    if (this.startAt !== -1 && currentTime < this.startAt) {
+      return this.startAt - currentTime;
     }
 
-    return this.interval - (now - this.lastUpdate);
+    return this.interval - (currentTime - this.lastUpdate);
   }
 }
