@@ -47,6 +47,24 @@ describe("Planned Tasks Store", () => {
         cancelEvent: "cancelEvent",
     };
 
+    const runnableTask5: RunnableTask = {
+        name: "dummyTask",
+        startAt: -1,
+        interval: 0,
+        recurrent: false,
+        params: {},
+        cancelEvent: "cancelEvent",
+    };
+
+    const runnableTask6: RunnableTask = {
+        name: "dummyTask",
+        startAt: -1,
+        interval: 0,
+        recurrent: false,
+        params: { different: "params" },
+        cancelEvent: "cancelEvent",
+    };
+
     const plannedTask1 = new PlannedTask(
         PlanningType.Scheduled,
         SchedulerType.Alarm,
@@ -69,6 +87,18 @@ describe("Planned Tasks Store", () => {
         runnableTask4
     );
 
+    const plannedTask5: PlannedTask = new PlannedTask(
+        PlanningType.Immediate,
+        SchedulerType.None,
+        runnableTask5
+    );
+
+    const plannedTask6: PlannedTask = new PlannedTask(
+        PlanningType.Immediate,
+        SchedulerType.None,
+        runnableTask6
+    );
+
     beforeEach(async () => {
         await store.deleteAll();
         await store.insert(plannedTask1);
@@ -84,6 +114,11 @@ describe("Planned Tasks Store", () => {
         );
     });
 
+    it("does not throw an error when trying to store a similar task with different params", async () => {
+        await store.insert(plannedTask5);
+        await store.insert(plannedTask6);
+    });
+
     it("deletes a stored task", async () => {
         await store.delete(plannedTask1.id);
         const task = await store.get(runnableTask1);
@@ -93,6 +128,19 @@ describe("Planned Tasks Store", () => {
     it("gets a stored task by similarity criteria", async () => {
         const task = await store.get(runnableTask1);
         expect(task).toEqual(plannedTask1);
+    });
+
+    it("does not get a similar task with different params", async () => {
+        await store.insert(plannedTask5);
+        const task = await store.get(runnableTask6);
+        expect(task).toBeNull();
+    });
+
+    it("gets a task by similarity criteria with identical params", async () => {
+        await store.insert(plannedTask5);
+        await store.insert(plannedTask6);
+        const task = await store.get(runnableTask6);
+        expect(task).toEqual(plannedTask6);
     });
 
     it("gets a stored task by id", async () => {

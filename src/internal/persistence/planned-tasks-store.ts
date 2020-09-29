@@ -66,7 +66,17 @@ class PlannedTaskDBStore implements PlannedTasksStore {
       return null;
     }
 
-    return this.plannedTaskFromRow(rows[0]);
+    if (typeof task === "string") {
+      return this.plannedTaskFromRow(rows[0]);
+    }
+
+    const params = JSON.stringify(task.params);
+    for (let row of rows) {
+      if (params === JSON.stringify(row.params)) {
+        return this.plannedTaskFromRow(row);
+      }
+    }
+    return null;
   }
 
   async getAllSortedByNextRun(
