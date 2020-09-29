@@ -98,8 +98,14 @@ describe("Task graph loader", () => {
             "dataAcquired",
             jasmine.any(RunnableTaskBuilderImpl)
         );
-        expect(describedTaskRunner).toHaveBeenCalledWith("acquireData");
-        expect(describedTaskRunner).toHaveBeenCalledWith("printAcquiredData");
+        expect(describedTaskRunner).toHaveBeenCalledWith(
+            "acquireData",
+            undefined
+        );
+        expect(describedTaskRunner).toHaveBeenCalledWith(
+            "printAcquiredData",
+            undefined
+        );
         expect(cancelManager.init).toHaveBeenCalled();
     });
 

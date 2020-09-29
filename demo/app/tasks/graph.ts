@@ -11,7 +11,9 @@ class DemoTaskGraph implements TaskGraph {
     ): Promise<void> {
         on(
             "startEvent",
-            run("fastTask").every(1, "minutes").cancelOn("stopEvent")
+            run("fastTask", { triggeredBy: "schedule" })
+                .every(1, "minutes")
+                .cancelOn("stopEvent")
         );
         on(
             "startEvent",
@@ -23,7 +25,7 @@ class DemoTaskGraph implements TaskGraph {
         );
 
         on("slowTaskFinished", run("mediumTask"));
-        on("mediumTaskFinished", run("fastTask"));
+        on("mediumTaskFinished", run("fastTask", { triggeredBy: "event" }));
     }
 }
 

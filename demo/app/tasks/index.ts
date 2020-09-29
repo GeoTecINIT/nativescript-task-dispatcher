@@ -2,9 +2,9 @@ import { Task, SimpleTask } from "nativescript-task-dispatcher/tasks";
 import { toSeconds } from "nativescript-task-dispatcher/utils/time-converter";
 
 export const appTasks: Array<Task> = [
-    new SimpleTask("fastTask", async ({ log, remainingTime }) => {
+    new SimpleTask("fastTask", async ({ log, remainingTime, params }) => {
         log(`Available time: ${remainingTime()}`);
-        log("Fast task run!");
+        log(`Fast task run! With params: ${JSON.stringify(params)}`);
     }),
     new SimpleTask(
         "mediumTask",

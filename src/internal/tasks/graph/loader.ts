@@ -1,5 +1,5 @@
 import { TaskGraph, RunnableTaskDescriptor } from ".";
-import { Task } from "../task";
+import { Task, TaskParams } from "../task";
 import { on } from "../../events";
 import { run } from "..";
 import { getTask, checkIfTaskExists } from "../provider";
@@ -41,8 +41,8 @@ export class TaskGraphLoader {
       eventName: string,
       taskBuilder: RunnableTaskBuilder
     ) => this.bindTaskToStartAndCancelEvent(eventName, taskBuilder);
-    const planTaskToBeRun = (taskName: string) =>
-      this.trackTaskGoingToBeRun(taskName);
+    const planTaskToBeRun = (taskName: string, taskParams?: TaskParams) =>
+      this.trackTaskGoingToBeRun(taskName, taskParams);
 
     this.getLogger().info("Loading task graph");
     this.loadingTaskGraph = graph.describe(
@@ -95,11 +95,11 @@ export class TaskGraphLoader {
     this.taskEventBinder(eventName, taskBuilder);
   }
 
-  private trackTaskGoingToBeRun(taskName: string) {
+  private trackTaskGoingToBeRun(taskName: string, taskParams?: TaskParams) {
     this.taskVerifier(taskName);
     this.graphTasks.add(this.taskProvider(taskName));
 
-    return this.runnableTaskDescriptor(taskName);
+    return this.runnableTaskDescriptor(taskName, taskParams);
   }
 
   private async hasToBePrepared(task: Task): Promise<boolean> {
@@ -121,13 +121,3 @@ export class TaskGraphLoader {
 }
 
 export const taskGraph = new TaskGraphLoader();
-
-async function hasToBePrepared(task: Task): Promise<boolean> {
-  try {
-    await task.checkIfCanRun();
-
-    return false;
-  } catch (err) {
-    return true;
-  }
-}
