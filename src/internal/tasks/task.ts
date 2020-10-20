@@ -2,6 +2,7 @@ import { DispatchableEvent, emit, hasListeners } from "../events";
 import { Logger, getLogger } from "../utils/logger";
 import { TaskChain, TaskResultStatus } from "./task-chain";
 import { now } from "../utils/time";
+import { flatten } from "../utils/serialization";
 
 export abstract class Task {
   get name(): string {
@@ -251,7 +252,7 @@ export abstract class Task {
 
     const data = result
       ? typeof result === "object"
-        ? { ...result }
+        ? flatten(result)
         : { result }
       : {};
 
