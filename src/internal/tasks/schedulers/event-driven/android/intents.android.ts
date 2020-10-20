@@ -1,5 +1,6 @@
 import { createLibComponentIntent } from "../../intent-tools.android";
-import { EventData } from "../../../../events/events";
+import { EventData } from "../../../../events";
+import { serialize, deserialize } from "../../../../utils/serialization";
 
 export function createTaskChainRunnerServiceIntent(
   appContext: android.content.Context,
@@ -9,7 +10,7 @@ export function createTaskChainRunnerServiceIntent(
     relativeClassPath: ".runners.TaskChainRunnerService",
   });
   intent.putExtra(TCRS_LAUNCH_EVENT, params.launchEvent);
-  intent.putExtra(TCRS_EVENT_DATA, JSON.stringify(params.eventData));
+  intent.putExtra(TCRS_EVENT_DATA, serialize(params.eventData));
   if (params.eventId) {
     intent.putExtra(TCRS_EVENT_ID, params.eventId);
   }
@@ -26,7 +27,7 @@ export function unpackTaskChainRunnerServiceIntent(
 
   const taskChainRunnerParams: TaskChainRunnerParams = {
     launchEvent: intent.getStringExtra(TCRS_LAUNCH_EVENT),
-    eventData: JSON.parse(intent.getStringExtra(TCRS_EVENT_DATA)),
+    eventData: deserialize(intent.getStringExtra(TCRS_EVENT_DATA)),
   };
 
   if (intent.hasExtra(TCRS_EVENT_ID)) {
