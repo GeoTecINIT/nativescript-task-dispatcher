@@ -12,6 +12,7 @@ import {
     on,
     off,
     createEvent,
+    DispatchableEvent,
 } from "nativescript-task-dispatcher/internal/events";
 
 import { plannedTasksDB } from "nativescript-task-dispatcher/internal/persistence/planned-tasks-store";
@@ -25,6 +26,16 @@ describe("Event-based task runner", () => {
     const expectedEventSlicer = createEvent("patataSliced", {
         data: { status: "sliced" },
     });
+    const expectedPingReceivedEvent = createEvent("pingReceived", {
+        data: [
+            {
+                prop1: 0,
+                prop2: "string",
+                prop3: new Date(),
+                prop4: [{ innerAttr: new Date(Date.now() + 60000) }],
+            },
+        ],
+    });
 
     let initPromise: Promise<void>;
 
@@ -35,17 +46,8 @@ describe("Event-based task runner", () => {
 
     it("runs a task at the moment an event rises", async () => {
         await initPromise;
-        const callbackPromise = new Promise((resolve, reject) => {
-            const listenerId = on(expectedEvent.name, (evt) => {
-                off(expectedEvent.name, listenerId);
-                if (evt.name === expectedEvent.name) {
-                    resolve(evt.data);
-                } else {
-                    reject("Event name did not match");
-                }
-            });
-        });
 
+        const callbackPromise = promisifyTaskOutComeEvt(expectedEvent);
         taskDispatcher.emitEvent(startEvent);
         const data = await callbackPromise;
 
@@ -71,21 +73,25 @@ describe("Event-based task runner", () => {
     it("runs a chained tasks secuence", async () => {
         await initPromise;
 
-        const chainedEventCallbackPromise = new Promise((resolve, reject) => {
-            const listenerId = on(expectedEventSlicer.name, (evt) => {
-                off(expectedEventSlicer.name, listenerId);
-                if (evt.name === expectedEventSlicer.name) {
-                    resolve(evt.data);
-                } else {
-                    reject("Event name did not match");
-                }
-            });
-        });
-
+        const chainedEventCallbackPromise = promisifyTaskOutComeEvt(
+            expectedEventSlicer
+        );
         taskDispatcher.emitEvent(startEvent);
         const data = await chainedEventCallbackPromise;
 
         expect(data).toEqual(expectedEventSlicer.data);
+    });
+
+    it("runs a task without altering invocation event data shape", async () => {
+        await initPromise;
+
+        const pingReceivedCallbackPromise = promisifyTaskOutComeEvt(
+            expectedPingReceivedEvent
+        );
+        taskDispatcher.emitEvent("pingEmitted", expectedPingReceivedEvent.data);
+        const data = await pingReceivedCallbackPromise;
+
+        expect(data).toEqual(expectedPingReceivedEvent.data);
     });
 
     afterAll(() => {
@@ -100,7 +106,20 @@ const testTaskGraph: TaskGraph = {
             "e2eStartEvent",
             run("dummyTask").every(1, "minutes").cancelOn("e2eStopEvent")
         );
-        onEvt("emitterTaskFinished", run("dummyTask"));
         onEvt("patataCooked", run("patataSlicer"));
+        onEvt("pingEmitted", run("pongTask"));
     },
 };
+
+function promisifyTaskOutComeEvt(expectedEvt: DispatchableEvent): Promise<any> {
+    return new Promise((resolve, reject) => {
+        const listenerId = on(expectedEvt.name, (evt) => {
+            off(expectedEvt.name, listenerId);
+            if (evt.name === expectedEvt.name) {
+                resolve(evt.data);
+            } else {
+                reject("Event name did not match");
+            }
+        });
+    });
+}

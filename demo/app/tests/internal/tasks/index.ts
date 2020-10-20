@@ -42,6 +42,9 @@ export const testTasks: Array<Task> = [
         }),
         { outputEventNames: ["patataSliced"] }
     ),
+    new SimpleTask("pongTask", async ({ evt }) => ({ result: evt.data }), {
+        outputEventNames: ["pingReceived"],
+    }),
 ];
 
 export function createTaskCancelManagerMock(): TaskCancelManager {
