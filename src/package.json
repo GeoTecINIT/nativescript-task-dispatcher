@@ -63,6 +63,7 @@
   "dependencies": {
     "@nano-sql/adapter-sqlite-nativescript": "^2.0.3",
     "await-lock": "^2.0.1",
+    "nativescript-couchbase-plugin": "^0.9.6",
     "serialize-javascript": "^5.0.1"
   },
   "bootstrapper": "nativescript-plugin-seed"
