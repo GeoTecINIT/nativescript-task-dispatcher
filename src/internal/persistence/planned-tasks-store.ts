@@ -216,7 +216,7 @@ function documentFrom(plannedTask: PlannedTask): any {
   } = plannedTask;
 
   return {
-    type: DOC_TYPE,
+    docType: DOC_TYPE,
     ...runnableTask,
     planningType,
     schedulerType,
