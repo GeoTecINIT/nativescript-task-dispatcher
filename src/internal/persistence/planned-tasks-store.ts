@@ -7,7 +7,8 @@ import {
 } from "nativescript-couchbase-plugin";
 import { now } from "../utils/time";
 
-const DB_NAME = "td-planned-tasks";
+const DB_NAME = "task-dispatcher";
+const DOC_TYPE = "planned-task";
 
 export interface PlannedTasksStore {
   insert(plannedTask: PlannedTask): Promise<void>;
@@ -215,6 +216,7 @@ function documentFrom(plannedTask: PlannedTask): any {
   } = plannedTask;
 
   return {
+    type: DOC_TYPE,
     ...runnableTask,
     planningType,
     schedulerType,
