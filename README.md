@@ -499,19 +499,6 @@ The only (advised) way to create a ReadyRunnableTaskBuilder from within a TaskGr
 - **No support for foreground tasks in the middle of a task chain**. If one of your tasks requires foreground execution and depends on another task that does not require it, it will not be executed in the foreground. This happens because currently we do not back-propagate the foreground execution setting (but it is something planned). As a temporal fix, if a task could make a foreground task to be executed, declare the first task as a foreground task too.
 - **No support for event-driven foreground tasks** We have yet to evaluate if this is a common scenario. If you feel like this is a must-have functionality, please open an issue or comment on an existing one related to the topic. A quick workaround is to schedule the task in 1 minute by the time the event gets triggered.
 
-## Known issues
-
-### nanoSQL2
-
-If your application depends on [nanoSQL 2](https://www.npmjs.com/package/@nano-sql/adapter-sqlite-nativescript) for data persistence, you should check which database is in use (and change it, if applicable) before running a query against your database. You can do it as follows:
-
-```ts
-if (nSQL().selectedDB !== dbName) {
-  nSQL().useDatabase(dbName);
-}
-nSQL(tableName).query(...);
-```
-
 ## Plugin authors
 
 <a href="https://github.com/agonper" title="Alberto González Pérez">
