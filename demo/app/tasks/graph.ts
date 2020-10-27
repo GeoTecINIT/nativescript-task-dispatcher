@@ -9,6 +9,10 @@ class DemoTaskGraph implements TaskGraph {
         on: EventListenerGenerator,
         run: RunnableTaskDescriptor
     ): Promise<void> {
+        on("startEvent", run("fastTask"));
+        on("startEvent", run("mediumTask"));
+        on("startEvent", run("slowTask"));
+
         on(
             "startEvent",
             run("fastTask", { triggeredBy: "schedule" })

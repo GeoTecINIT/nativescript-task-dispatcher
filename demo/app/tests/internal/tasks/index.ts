@@ -1,9 +1,6 @@
 import { Task } from "nativescript-task-dispatcher/internal/tasks/task";
 import { SimpleTask } from "nativescript-task-dispatcher/internal/tasks/simple-task";
 
-import { TaskCancelManager } from "nativescript-task-dispatcher/internal/tasks/cancel-manager";
-import { PlannedTask } from "nativescript-task-dispatcher/internal/tasks/planner/planned-task";
-
 export const testTasks: Array<Task> = [
     new SimpleTask("dummyTask", async ({ log }) => log("Dummy Task executed!")),
     new SimpleTask(
@@ -46,16 +43,3 @@ export const testTasks: Array<Task> = [
         outputEventNames: ["pingReceived"],
     }),
 ];
-
-export function createTaskCancelManagerMock(): TaskCancelManager {
-    const cancelManager = {
-        init() {
-            return Promise.resolve();
-        },
-        add(plannedTask: PlannedTask) {
-            return null;
-        },
-    };
-
-    return cancelManager as TaskCancelManager;
-}
