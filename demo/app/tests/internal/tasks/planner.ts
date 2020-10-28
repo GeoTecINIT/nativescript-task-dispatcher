@@ -15,6 +15,7 @@ import {
     PlanningType,
     SchedulerType,
 } from "nativescript-task-dispatcher/internal/tasks/planner/planned-task";
+import { TaskPlannerParallelizer } from "nativescript-task-dispatcher/internal/tasks/planner/parallelizer";
 import { createPlannedTaskStoreMock } from "../persistence";
 import { createTaskCancelManagerMock } from "./mocks";
 import { TaskNotFoundError } from "nativescript-task-dispatcher/internal/tasks/provider";
@@ -26,11 +27,13 @@ describe("Task planner", () => {
     const taskRunner = createTaskRunnerMock();
     const taskStore = createPlannedTaskStoreMock();
     const cancelManager = createTaskCancelManagerMock();
+    const parallelizer = createTaskPlannerParallelizerMock();
     const taskPlanner = new TaskPlanner(
         taskScheduler,
         taskRunner,
         taskStore,
-        cancelManager
+        cancelManager,
+        parallelizer
     );
 
     const dummyEvent: DispatchableEvent = {
@@ -75,6 +78,7 @@ describe("Task planner", () => {
             Promise.resolve(immediatePlannedTask)
         );
         spyOn(cancelManager, "add");
+        spyOn(parallelizer, "spawnChildEvent").and.callFake((evt) => evt);
         dummyCallback = jasmine.createSpy();
     });
 
@@ -185,4 +189,12 @@ function createTaskRunnerMock(): TaskRunner {
             return Promise.resolve(null);
         },
     };
+}
+
+export function createTaskPlannerParallelizerMock(): TaskPlannerParallelizer {
+    return {
+        spawnChildEvent(parent: DispatchableEvent): DispatchableEvent {
+            return null;
+        },
+    } as TaskPlannerParallelizer;
 }

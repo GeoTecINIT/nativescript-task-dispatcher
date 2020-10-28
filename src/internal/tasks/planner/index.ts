@@ -11,34 +11,42 @@ import {
   PlannedTasksStore,
 } from "../../persistence/planned-tasks-store";
 import { TaskCancelManager, taskCancelManager } from "../cancel-manager";
+import { taskGraphBrowser } from "../graph/browser";
 
 import { RunnableTask } from "../runnable-task";
 import { DispatchableEvent } from "../../events";
-import { PlannedTask } from "./planned-task";
 
+import { PlannedTask } from "./planned-task";
 import { checkIfTaskExists } from "../provider";
 import { TaskChain, TaskResultStatus } from "../task-chain";
+import { TaskPlannerParallelizer } from "./parallelizer";
 
 export class TaskPlanner {
   constructor(
     private taskScheduler?: TaskScheduler,
     private taskRunner: TaskRunner = new InstantTaskRunner(plannedTasksDB),
     private taskStore: PlannedTasksStore = plannedTasksDB,
-    private cancelManager: TaskCancelManager = taskCancelManager
+    private cancelManager: TaskCancelManager = taskCancelManager,
+    private parallelizer: TaskPlannerParallelizer = new TaskPlannerParallelizer(
+      taskGraphBrowser
+    )
   ) {}
 
   async plan(
     runnableTask: RunnableTask,
-    dispatchableEvent?: DispatchableEvent
+    dispatchableEvent: DispatchableEvent
   ): Promise<PlannedTask> {
+    const invocationEvent = this.parallelizer.spawnChildEvent(
+      dispatchableEvent
+    );
     try {
       checkIfTaskExists(runnableTask.name);
 
       return await (runnableTask.interval > 0 || runnableTask.startAt !== -1
-        ? this.planScheduled(runnableTask, dispatchableEvent)
-        : this.planImmediate(runnableTask, dispatchableEvent));
+        ? this.planScheduled(runnableTask, invocationEvent)
+        : this.planImmediate(runnableTask, invocationEvent));
     } catch (err) {
-      emitTaskChainFinished(dispatchableEvent, err);
+      emitTaskChainFinished(invocationEvent, err);
       throw err;
     }
   }
