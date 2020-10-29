@@ -29,6 +29,7 @@ class DemoTaskGraph implements TaskGraph {
         );
 
         on("slowTaskFinished", run("mediumTask"));
+        on("slowTaskFinished", run("fastTask"));
         on("mediumTaskFinished", run("fastTask", { triggeredBy: "event" }));
     }
 }
