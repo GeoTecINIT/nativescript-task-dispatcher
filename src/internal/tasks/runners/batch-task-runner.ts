@@ -9,12 +9,15 @@ import {
   emit,
 } from "../../events";
 import { SingleTaskRunner } from "./single-task-runner";
+import { getLogger, Logger } from "../../utils/logger";
 
 export class BatchTaskRunner {
-  private taskRunner: SingleTaskRunner;
+  private readonly taskRunner: SingleTaskRunner;
+  private readonly logger: Logger;
 
   constructor(taskStore: PlannedTasksStore) {
     this.taskRunner = new SingleTaskRunner(taskStore);
+    this.logger = getLogger("BatchTaskRunner");
   }
 
   async run(
@@ -45,7 +48,9 @@ export class BatchTaskRunner {
         );
       }
     });
-
+    this.logger.info(
+      `Child event (name=${startEvent.name}, id=${startEvent.id}) spawned (invocationId=${batchStartEvent.id})`
+    );
     return this.taskRunner.run(plannedTask, startEvent);
   }
 }
