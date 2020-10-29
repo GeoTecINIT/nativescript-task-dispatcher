@@ -2,6 +2,8 @@ import { Common, ConfigParams } from "./task-dispatcher.common";
 
 import { Task } from "./tasks";
 import { TaskGraph } from "./tasks/graph";
+import { taskGraph } from "./internal/tasks/graph/loader";
+import { taskGraphBrowser } from "./internal/tasks/graph/browser";
 
 import { setTaskSchedulerCreator } from "./internal/tasks/schedulers/time-based/common";
 import { getAndroidTaskScheduler } from "./internal/tasks/schedulers/time-based/android";
@@ -12,6 +14,9 @@ import { getAlarmReceiver } from "./internal/tasks/schedulers/time-based/android
 import { getAlarmRunnerService } from "./internal/tasks/schedulers/time-based/android/alarms/alarm/runner-service.android";
 import { getWatchDogReceiver } from "./internal/tasks/schedulers/time-based/android/alarms/watchdog/receiver.android";
 import { getTaskChainRunnerService } from "./internal/tasks/schedulers/event-driven/android/runner-service.android";
+import { getPowerSavingsManager } from "./internal/tasks/schedulers/time-based/android/alarms/power-savings-manager.android";
+
+const BATTERY_OPTIMIZATIONS_THRESHOLD = 15 * 60;
 
 class TaskDispatcher extends Common {
   public init(
@@ -27,7 +32,38 @@ class TaskDispatcher extends Common {
 
   public isReady() {
     getAndroidTaskScheduler().setup();
+    if (this.requiresDisablingBatteryOptimizations()) {
+      return Promise.resolve(false);
+    }
     return super.isReady();
+  }
+
+  prepare(): Promise<void> {
+    if (this.requiresDisablingBatteryOptimizations()) {
+      this.requestToDisableBatteryOptimizations();
+    }
+    return super.prepare();
+  }
+
+  private requiresDisablingBatteryOptimizations(): boolean {
+    if (
+      taskGraphBrowser.any(
+        (task) =>
+          task.interval !== 0 &&
+          task.interval <= BATTERY_OPTIMIZATIONS_THRESHOLD
+      )
+    ) {
+      return !getPowerSavingsManager().areDisabled();
+    }
+    return false;
+  }
+
+  private requestToDisableBatteryOptimizations() {
+    const manager = getPowerSavingsManager();
+    if (manager.areDisabled()) {
+      return;
+    }
+    manager.requestDeactivation();
   }
 
   private wireUpNativeComponents() {

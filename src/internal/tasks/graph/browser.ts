@@ -25,6 +25,27 @@ export class TaskGraphBrowser {
     return this.entries.get(invocationEvent);
   }
 
+  getUniques(): Array<RunnableTask> {
+    const uniques = new Set<RunnableTask>();
+    for (let runnableTasks of this.entries.values()) {
+      for (let runnableTask of runnableTasks) {
+        uniques.add(runnableTask);
+      }
+    }
+    return [...uniques];
+  }
+
+  any(matcher: (runnableTask: LinkedRunnableTask) => boolean): boolean {
+    for (let runnableTask of this.getUniques()) {
+      const instance = this.taskProvider(runnableTask.name);
+      const matches = matcher({ ...runnableTask, instance });
+      if (matches) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   depict(): Array<GraphEntry> {
     const rootEvents = this.getRootEvents();
     return rootEvents.map((eventName) => ({
@@ -103,4 +124,8 @@ export interface GraphEntry {
 
 export interface GraphTask extends RunnableTask {
   outputs: Array<GraphEntry>;
+}
+
+export interface LinkedRunnableTask extends RunnableTask {
+  instance: Task;
 }

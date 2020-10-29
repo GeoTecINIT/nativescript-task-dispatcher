@@ -138,6 +138,35 @@ describe("Task graph browser", () => {
         expect(tasks[2]).toBe(entries[2].runnableTask);
     });
 
+    it("returns no task when the given event name triggers none", () => {
+        for (let entry of entries) {
+            browser.addEntry(entry.launchEvent, entry.runnableTask);
+        }
+        const tasks = browser.getTriggeredBy("stopEvent");
+        expect(tasks.length).toBe(0);
+    });
+
+    it("allows to obtain a unique set of tasks that will run at some moment, even with different configs", () => {
+        for (let entry of entries) {
+            browser.addEntry(entry.launchEvent, entry.runnableTask);
+        }
+        const tasks = browser.getUniques();
+        expect(tasks.length).toBe(5);
+        expect(tasks).toEqual(entries.map((entry) => entry.runnableTask));
+    });
+
+    it("allows to check if any added entry matches a certain criteria", () => {
+        for (let entry of entries) {
+            browser.addEntry(entry.launchEvent, entry.runnableTask);
+        }
+        const matches = browser.any(
+            (runnableTask) =>
+                runnableTask.interval !== 0 && runnableTask.interval <= 15 * 60
+        );
+        expect(matches).toBeTrue();
+        expect(taskProvider).toHaveBeenCalledTimes(2);
+    });
+
     it("allows to depict the given task entries in a structured way", () => {
         for (let entry of entries) {
             browser.addEntry(entry.launchEvent, entry.runnableTask);
