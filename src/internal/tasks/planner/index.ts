@@ -58,7 +58,7 @@ export class TaskPlanner {
     const existedBefore = await this.taskStore.get(runnableTask);
     const plannedTask = await this.taskRunner.run(
       runnableTask,
-      dispatchableEvent // FIXME: What happens if dispatchable event is undefined?
+      dispatchableEvent
     );
     if (!existedBefore) {
       this.cancelManager.add(plannedTask);
