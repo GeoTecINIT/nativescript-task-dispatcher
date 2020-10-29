@@ -3,7 +3,7 @@ import { TaskGraphBrowser } from "nativescript-task-dispatcher/internal/tasks/gr
 import { RunnableTask } from "nativescript-task-dispatcher/internal/tasks/runnable-task";
 import { RunnableTaskBuilderImpl } from "nativescript-task-dispatcher/internal/tasks/runnable-task/builder";
 import { GraphEntry } from "nativescript-task-dispatcher/internal/tasks/graph/browser";
-import { testTasks } from "./index";
+import { testTasks } from "../index";
 
 describe("Task graph browser", () => {
     let taskProvider: (taskName: string) => Task;

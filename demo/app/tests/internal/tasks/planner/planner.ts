@@ -16,8 +16,8 @@ import {
     SchedulerType,
 } from "nativescript-task-dispatcher/internal/tasks/planner/planned-task";
 import { TaskPlannerParallelizer } from "nativescript-task-dispatcher/internal/tasks/planner/parallelizer";
-import { createPlannedTaskStoreMock } from "../persistence";
-import { createTaskCancelManagerMock } from "./mocks";
+import { createPlannedTaskStoreMock } from "../../persistence";
+import { createTaskCancelManagerMock } from "../mocks";
 import { TaskNotFoundError } from "nativescript-task-dispatcher/internal/tasks/provider";
 import { TaskRunner } from "nativescript-task-dispatcher/internal/tasks/schedulers/immediate/instant-task-runner";
 import { now } from "nativescript-task-dispatcher/internal/utils/time";

@@ -12,7 +12,7 @@ import {
 import {
     createTaskCancelManagerMock,
     createTaskGraphBrowserMock,
-} from "./mocks";
+} from "../mocks";
 
 describe("Task graph loader", () => {
     const errorMsg = "Task is not ready";
