@@ -8,9 +8,11 @@ import {
   TaskDispatcherEvent,
 } from "../../events";
 import { TaskChain, TaskResultStatus } from "../task-chain";
+import { getLogger, Logger } from "../../utils/logger";
 
 export class TaskPlannerParallelizer {
   private readonly triggerData: Map<string, EventRiseData>;
+  private logger: Logger;
 
   constructor(private graphBrowser: TaskGraphBrowser) {
     this.triggerData = new Map<string, EventRiseData>();
@@ -40,7 +42,9 @@ export class TaskPlannerParallelizer {
     childTasks.eventIds.add(childEvent.id);
 
     this.setupTaskFinalizationSink(childEvent.id, triggerId);
-
+    this.getLogger().info(
+      `Child event (name=${childEvent.name}, id=${childEvent.id}) spawned (invocationId=${parent.id})`
+    );
     return childEvent;
   }
 
@@ -76,14 +80,12 @@ export class TaskPlannerParallelizer {
       if (evt.id !== eventId) {
         return;
       }
-      console.log(
-        `Parallelizer | Done: EID (${eventId}), LID (${listenerId}), EVT (${JSON.stringify(
-          evt
-        )})`
-      );
-      // For some unknown reason event callback has to be unregistered outside the event callback,
-      // otherwise an internal error rises on the emitter.
-      setTimeout(() => off(TaskDispatcherEvent.TaskChainFinished, listenerId));
+
+      // For some unknown reason event callback has to be unregistered outside itself,
+      // otherwise an internal error rises on the emitter. Moreover, last callback gets called twice
+      // although event is only emitted once (seems a SDK bug).
+      off(TaskDispatcherEvent.TaskChainFinished, listenerId);
+
       if (!this.triggerData.has(triggerId)) {
         return;
       }
@@ -99,13 +101,20 @@ export class TaskPlannerParallelizer {
         if (!didTimedOut) {
           off(TaskDispatcherEvent.TaskExecutionTimedOut, triggerData.timeoutId);
         }
+        this.triggerData.delete(triggerId);
         TaskChain.finalize(
           parentId,
           didTimedOut ? TaskResultStatus.Cancelled : TaskResultStatus.Ok
         );
       }
     });
-    console.log(`Parallelizer | Setup: EID (${eventId}), LID (${listenerId})`);
+  }
+
+  private getLogger(): Logger {
+    if (!this.logger) {
+      this.logger = getLogger("TaskPlannerParallelizer");
+    }
+    return this.logger;
   }
 }
 
