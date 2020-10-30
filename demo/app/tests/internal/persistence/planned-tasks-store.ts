@@ -197,8 +197,8 @@ describe("Planned Tasks Store", () => {
 
         const cancellationEvents = await store.getAllCancelEvents();
         expect(cancellationEvents.length).toBe(2);
-        expect(cancellationEvents.indexOf("cancelEvent") !== -1);
-        expect(cancellationEvents.indexOf("otherEvent") !== -1);
+        expect(cancellationEvents.indexOf("cancelEvent")).not.toBe(-1);
+        expect(cancellationEvents.indexOf("otherEvent")).not.toBe(-1);
     });
 
     it("gets stored tasks with the same cancelEvent", async () => {

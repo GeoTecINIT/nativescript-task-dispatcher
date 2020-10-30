@@ -499,19 +499,6 @@ The only (advised) way to create a ReadyRunnableTaskBuilder from within a TaskGr
 - **No support for scheduled tasks and event-driven tasks on iOS**. We currently cannot commit to an estimated time until this limitation gets addressed.
 - **No support for event-driven foreground tasks** We have yet to evaluate if this is a common scenario. If you feel like this is a must-have functionality, please open an issue or comment on an existing one related to the topic. A quick workaround is to schedule the task in 1 minute by the time the event gets triggered.
 
-## Known issues
-
-### nanoSQL2
-
-If your application depends on [nanoSQL 2](https://www.npmjs.com/package/@nano-sql/adapter-sqlite-nativescript) for data persistence, you should check which database is in use (and change it, if applicable) before running a query against your database. You can do it as follows:
-
-```ts
-if (nSQL().selectedDB !== dbName) {
-  nSQL().useDatabase(dbName);
-}
-nSQL(tableName).query(...);
-```
-
 ## Plugin authors
 
 <a href="https://github.com/agonper" title="Alberto González Pérez">
