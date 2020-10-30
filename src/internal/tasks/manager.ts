@@ -1,7 +1,7 @@
 import { PlannedTask, PlanningType } from "./planner/planned-task";
 import { PlannedTasksStore } from "../persistence/planned-tasks-store";
-import { getTask } from "./provider";
 import { now } from "../utils/time";
+import { ForegroundChecker } from "./foreground-checker";
 
 export class TaskManager {
   private _allTasks: Array<PlannedTask>;
@@ -9,6 +9,7 @@ export class TaskManager {
   constructor(
     private planningType: PlanningType,
     private plannedTasksStore: PlannedTasksStore,
+    private foregroundChecker: ForegroundChecker,
     private intervalOffset: number,
     private currentTime = now()
   ) {}
@@ -21,11 +22,15 @@ export class TaskManager {
 
   async requiresForeground(): Promise<boolean> {
     const tasksToRun = await this.tasksToRun();
-    const allRunInBackground = tasksToRun.every((plannedTask) =>
-      getTask(plannedTask.name).runsInBackground()
-    );
-
-    return !allRunInBackground;
+    for (let task of tasksToRun) {
+      const requiresForeground = this.foregroundChecker.requiresForegroundThroughChain(
+        task.name
+      );
+      if (requiresForeground) {
+        return true;
+      }
+    }
+    return false;
   }
 
   async willContinue(): Promise<boolean> {

@@ -2,6 +2,7 @@ import { TaskManager } from "../../../../../manager";
 import { AlarmManager } from "../abstract-alarm-manager.android";
 import { AndroidAlarmManager } from "./manager.android";
 import { plannedTasksDB } from "../../../../../../persistence/planned-tasks-store";
+import { ForegroundChecker } from "../../../../../foreground-checker";
 import { createAlarmRunnerServiceIntent } from "../../intents.android";
 import { PlanningType } from "../../../../../planner/planned-task";
 import { Logger, getLogger } from "../../../../../../utils/logger";
@@ -27,6 +28,7 @@ export class AlarmReceiver
     this.taskManager = new TaskManager(
       PlanningType.Scheduled,
       plannedTasksDB,
+      new ForegroundChecker(),
       this.timeOffset,
       this.currentTime
     );

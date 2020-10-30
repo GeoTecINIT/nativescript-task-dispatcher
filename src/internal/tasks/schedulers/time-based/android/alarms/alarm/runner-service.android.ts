@@ -20,6 +20,7 @@ import { TaskManager } from "../../../../../manager";
 import { PlanningType } from "../../../../../planner/planned-task";
 import { Logger, getLogger } from "../../../../../../utils/logger";
 import { now } from "../../../../../../utils/time";
+import { ForegroundChecker } from "../../../../../foreground-checker";
 
 const MIN_TIMEOUT = 60000;
 const TIMEOUT_EVENT_OFFSET = 5000;
@@ -38,6 +39,7 @@ export class AlarmRunnerService
   private wakeLock: android.os.PowerManager.WakeLock;
   private timeoutId: number;
   private taskStore: PlannedTasksStore;
+  private foregroundChecker: ForegroundChecker;
 
   private logger: Logger;
 
@@ -53,6 +55,7 @@ export class AlarmRunnerService
 
     this.wakeLock = alarmRunnerWakeLock(nativeService);
     this.taskStore = plannedTasksDB;
+    this.foregroundChecker = new ForegroundChecker();
 
     this.logger = getLogger("AlarmRunnerService");
     this.logger.debug("onCreate called");
@@ -152,6 +155,7 @@ export class AlarmRunnerService
     return new TaskManager(
       PlanningType.Scheduled,
       this.taskStore,
+      this.foregroundChecker,
       this.timeOffset,
       this.currentTime
     );
