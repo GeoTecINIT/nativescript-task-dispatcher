@@ -497,7 +497,6 @@ The only (advised) way to create a ReadyRunnableTaskBuilder from within a TaskGr
 ## Limitations
 
 - **No support for scheduled tasks and event-driven tasks on iOS**. We currently cannot commit to an estimated time until this limitation gets addressed.
-- **No support for foreground tasks in the middle of a task chain**. If one of your tasks requires foreground execution and depends on another task that does not require it, it will not be executed in the foreground. This happens because currently we do not back-propagate the foreground execution setting (but it is something planned). As a temporal fix, if a task could make a foreground task to be executed, declare the first task as a foreground task too.
 - **No support for event-driven foreground tasks** We have yet to evaluate if this is a common scenario. If you feel like this is a must-have functionality, please open an issue or comment on an existing one related to the topic. A quick workaround is to schedule the task in 1 minute by the time the event gets triggered.
 
 ## Known issues
