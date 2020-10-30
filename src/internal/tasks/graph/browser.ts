@@ -35,7 +35,7 @@ export class TaskGraphBrowser {
     return [...uniques];
   }
 
-  any(matcher: (runnableTask: LinkedRunnableTask) => boolean): boolean {
+  any(matcher: QueryMatcher): boolean {
     for (let runnableTask of this.getUniques()) {
       const instance = this.taskProvider(runnableTask.name);
       const matches = matcher({ ...runnableTask, instance });
@@ -44,6 +44,19 @@ export class TaskGraphBrowser {
       }
     }
     return false;
+  }
+
+  anyFrom(eventName: string, matcher: QueryMatcher): boolean {
+    const memory = new Map<string, boolean>();
+    try {
+      return this.memoizedAnyFrom(eventName, matcher, memory);
+    } catch (err) {
+      if (err instanceof RangeError) {
+        throw new Error("Task graphs with cycles are not supported");
+      } else {
+        throw err;
+      }
+    }
   }
 
   depict(): Array<GraphEntry> {
@@ -82,6 +95,35 @@ export class TaskGraphBrowser {
     return [...rootEvents];
   }
 
+  private memoizedAnyFrom(
+    eventName: string,
+    matcher: QueryMatcher,
+    memory: Map<string, boolean>
+  ): boolean {
+    if (!this.entries.has(eventName)) {
+      return false;
+    }
+    if (memory.has(eventName)) {
+      return memory.get(eventName);
+    }
+
+    const runnableTasks = this.entries.get(eventName);
+    for (let runnableTask of runnableTasks) {
+      const instance = this.taskProvider(runnableTask.name);
+      const matches = matcher({ ...runnableTask, instance });
+      if (matches) {
+        return true;
+      }
+      for (let outputEvent of instance.outputEventNames) {
+        const childMatches = this.memoizedAnyFrom(outputEvent, matcher, memory);
+        if (childMatches) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   private memoizedWalk(
     eventName: string,
     memory: Map<string, Array<GraphTask>>
@@ -116,6 +158,8 @@ export class TaskGraphBrowser {
 }
 
 export const taskGraphBrowser = new TaskGraphBrowser();
+
+type QueryMatcher = (runnableTask: LinkedRunnableTask) => boolean;
 
 export interface GraphEntry {
   trigger: string;

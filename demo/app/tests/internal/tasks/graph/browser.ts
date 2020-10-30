@@ -46,6 +46,12 @@ describe("Task graph browser", () => {
                 .build(),
         },
         {
+            launchEvent: "patataSliced",
+            runnableTask: new RunnableTaskBuilderImpl("dummyForegroundTask", {})
+                .now()
+                .build(),
+        },
+        {
             launchEvent: "pingEmitted",
             runnableTask: new RunnableTaskBuilderImpl("pongTask", {})
                 .now()
@@ -68,7 +74,18 @@ describe("Task graph browser", () => {
                                     outputs: [
                                         {
                                             trigger: "patataSliced",
-                                            tasks: [],
+                                            tasks: [
+                                                {
+                                                    ...entries[4].runnableTask,
+                                                    outputs: [
+                                                        {
+                                                            trigger:
+                                                                "dummyForegroundTaskFinished",
+                                                            tasks: [],
+                                                        },
+                                                    ],
+                                                },
+                                            ],
                                         },
                                     ],
                                 },
@@ -87,7 +104,18 @@ describe("Task graph browser", () => {
                                     outputs: [
                                         {
                                             trigger: "patataSliced",
-                                            tasks: [],
+                                            tasks: [
+                                                {
+                                                    ...entries[4].runnableTask,
+                                                    outputs: [
+                                                        {
+                                                            trigger:
+                                                                "dummyForegroundTaskFinished",
+                                                            tasks: [],
+                                                        },
+                                                    ],
+                                                },
+                                            ],
                                         },
                                     ],
                                 },
@@ -110,7 +138,7 @@ describe("Task graph browser", () => {
             trigger: "pingEmitted",
             tasks: [
                 {
-                    ...entries[4].runnableTask,
+                    ...entries[5].runnableTask,
                     outputs: [
                         {
                             trigger: "pingReceived",
@@ -151,7 +179,7 @@ describe("Task graph browser", () => {
             browser.addEntry(entry.launchEvent, entry.runnableTask);
         }
         const tasks = browser.getUniques();
-        expect(tasks.length).toBe(5);
+        expect(tasks.length).toBe(6);
         expect(tasks).toEqual(entries.map((entry) => entry.runnableTask));
     });
 
@@ -167,13 +195,25 @@ describe("Task graph browser", () => {
         expect(taskProvider).toHaveBeenCalledTimes(2);
     });
 
+    it("allows to walk the graph from an event to evaluate a condition to be met by the tasks depending on it", () => {
+        for (let entry of entries) {
+            browser.addEntry(entry.launchEvent, entry.runnableTask);
+        }
+        const matches = browser.anyFrom(
+            "startEvent",
+            (task) => !task.instance.runsInBackground()
+        );
+        expect(matches).toBeTrue();
+        expect(taskProvider).toHaveBeenCalledTimes(3);
+    });
+
     it("allows to depict the given task entries in a structured way", () => {
         for (let entry of entries) {
             browser.addEntry(entry.launchEvent, entry.runnableTask);
         }
         const graphPath = browser.depict();
         expect(graphPath).toEqual(expectedPath);
-        expect(taskProvider).toHaveBeenCalledTimes(10);
+        expect(taskProvider).toHaveBeenCalledTimes(12);
     });
 
     it("allows to walk the task graph from a given event name", () => {
@@ -182,7 +222,7 @@ describe("Task graph browser", () => {
         }
         const graphPath = browser.walkFrom("startEvent");
         expect(graphPath).toEqual(expectedPath[0].tasks);
-        expect(taskProvider).toHaveBeenCalledTimes(4);
+        expect(taskProvider).toHaveBeenCalledTimes(5);
     });
 
     it("returns an empty task list when the given event is unknown", () => {
