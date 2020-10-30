@@ -21,13 +21,19 @@ export function createTaskCancelManagerMock(): TaskCancelManager {
 export function createTaskGraphBrowserMock(): TaskGraphBrowser {
     return {
         addEntry(invocationEvent: string, runnableTask: RunnableTask) {},
+        getTriggeredBy(invocationEvent: string): Array<RunnableTask> {
+            return [];
+        },
+        any(matcher: any) {
+            return false;
+        },
+        anyFrom(eventName: string, matcher: any) {
+            return false;
+        },
         depict(): Array<GraphEntry> {
             return [];
         },
         walkFrom(eventName: string): Array<GraphTask> {
-            return [];
-        },
-        getTriggeredBy(invocationEvent: string): Array<RunnableTask> {
             return [];
         },
     } as TaskGraphBrowser;
