@@ -1,12 +1,13 @@
 <Page
-    navigatingTo="onNavigatingTo" 
+    navigatingTo="onNavigatingTo"
     xmlns="http://schemas.nativescript.org/tns.xsd">
-    
+
     <ActionBar>
         <Label text="Home"></Label>
     </ActionBar>
 
-    <GridLayout>
-        <!-- Add your page content here -->
-    </GridLayout>
+    <StackLayout verticalAlignment="center" horizontalAlignment="center" class="m-30">
+        <Label text="Check your IDE log window :D" class="h2"/>
+        <Label text="You can safely close the app, it will continue working in the background" textWrap="true" class="h4"/>
+    </StackLayout>
 </Page>

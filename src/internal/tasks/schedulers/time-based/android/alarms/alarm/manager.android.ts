@@ -1,7 +1,10 @@
 import { android as androidApp } from "tns-core-modules/application/application";
 import { createAlarmReceiverIntent } from "../../intents.android";
 import { AbstractAlarmManager } from "../abstract-alarm-manager.android";
-import { PowerSavingsManager } from "../power-savings-manager.android";
+import {
+  getPowerSavingsManager,
+  PowerSavingsManager,
+} from "../power-savings-manager.android";
 import { getLogger } from "../../../../../../utils/logger";
 import { planningTimestamp } from "../../../planning-timestamp";
 import { now } from "../../../../../../utils/time";
@@ -13,7 +16,7 @@ export class AndroidAlarmManager extends AbstractAlarmManager {
     osAlarmManager = androidApp.context.getSystemService(
       android.content.Context.ALARM_SERVICE
     ) as android.app.AlarmManager,
-    private powerManager = new PowerSavingsManager(),
+    private powerManager: PowerSavingsManager = getPowerSavingsManager(),
     private sdkVersion = android.os.Build.VERSION.SDK_INT
   ) {
     super(

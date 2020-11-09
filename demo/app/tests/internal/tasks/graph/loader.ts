@@ -9,7 +9,10 @@ import {
     ReadyRunnableTaskBuilder,
     RunnableTaskBuilderImpl,
 } from "nativescript-task-dispatcher/internal/tasks/runnable-task/builder";
-import { createTaskCancelManagerMock } from ".";
+import {
+    createTaskCancelManagerMock,
+    createTaskGraphBrowserMock,
+} from "../mocks";
 
 describe("Task graph loader", () => {
     const errorMsg = "Task is not ready";
@@ -54,8 +57,9 @@ describe("Task graph loader", () => {
     ) => number;
     let describedTaskRunner: RunnableTaskDescriptor;
     let taskProvider: (taskName: string) => Task;
-    let graphLoader: TaskGraphLoader;
     const cancelManager = createTaskCancelManagerMock();
+    const graphBrowser = createTaskGraphBrowserMock();
+    let graphLoader: TaskGraphLoader;
 
     beforeEach(() => {
         eventListenerCreator = jasmine
@@ -81,9 +85,11 @@ describe("Task graph loader", () => {
             describedTaskRunner,
             (_: string) => null,
             taskProvider,
-            cancelManager
+            cancelManager,
+            graphBrowser
         );
         spyOn(cancelManager, "init");
+        spyOn(graphBrowser, "addEntry");
         spyOn(acquireData, "prepare").and.returnValue(Promise.resolve());
         spyOn(acquireOtherData, "prepare").and.returnValue(Promise.resolve());
     });
@@ -107,6 +113,7 @@ describe("Task graph loader", () => {
             undefined
         );
         expect(cancelManager.init).toHaveBeenCalled();
+        expect(graphBrowser.addEntry).toHaveBeenCalledTimes(3);
     });
 
     it("returns that is not ready when at least one task is not", async () => {

@@ -6,6 +6,7 @@ import {
     SchedulerType,
 } from "nativescript-task-dispatcher/internal/tasks/planner/planned-task";
 import { createPlannedTaskStoreMock } from "../persistence";
+import { ForegroundChecker } from "nativescript-task-dispatcher/internal/tasks/foreground-checker";
 import { TaskManager } from "nativescript-task-dispatcher/internal/tasks/manager";
 import { uuid } from "nativescript-task-dispatcher/internal/utils/uuid";
 import { now } from "nativescript-task-dispatcher/internal/utils/time";
@@ -15,6 +16,7 @@ describe("Task manager", () => {
 
     const offset = 30000; // The half of alarm scheduler's fastest triggering frequency
     const plannedTasksStore = createPlannedTaskStoreMock();
+    const foregroundChecker = createForegroundCheckerMock();
     let taskPlanner: TaskManager;
 
     const stdInterval = 60000;
@@ -125,8 +127,12 @@ describe("Task manager", () => {
         taskPlanner = new TaskManager(
             PlanningType.Scheduled,
             plannedTasksStore,
+            foregroundChecker,
             offset,
             currentTime
+        );
+        spyOn(foregroundChecker, "requiresForegroundThroughChain").and.callFake(
+            (taskName) => taskName === "dummyForegroundTask"
         );
     });
 
@@ -233,6 +239,7 @@ describe("Tasks manager next interval", () => {
     const minute = 60000;
     const initialTime = now();
     const plannedTasksStore = createPlannedTaskStoreMock();
+    const foregroundChecker = createForegroundCheckerMock();
     let taskPlanner: TaskManager;
 
     const task1Minutes = new PlannedTask(
@@ -495,6 +502,7 @@ describe("Tasks manager next interval", () => {
             taskPlanner = new TaskManager(
                 PlanningType.Scheduled,
                 plannedTasksStore,
+                foregroundChecker,
                 minute / 2,
                 initialTime + test.currentMinute * minute
             );
@@ -506,3 +514,11 @@ describe("Tasks manager next interval", () => {
         });
     });
 });
+
+function createForegroundCheckerMock(): ForegroundChecker {
+    return {
+        requiresForegroundThroughChain(taskName: string): boolean {
+            return true;
+        },
+    } as ForegroundChecker;
+}

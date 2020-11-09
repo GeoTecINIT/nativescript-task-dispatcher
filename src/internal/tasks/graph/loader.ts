@@ -1,14 +1,15 @@
 import { TaskGraph, RunnableTaskDescriptor } from ".";
 import { Task, TaskParams } from "../task";
+import { Logger, getLogger } from "../../utils/logger";
+import { getTask, checkIfTaskExists } from "../provider";
+import { TaskCancelManager, taskCancelManager } from "../cancel-manager";
+import { taskGraphBrowser, TaskGraphBrowser } from "./browser";
 import { on } from "../../events";
 import { run } from "..";
-import { getTask, checkIfTaskExists } from "../provider";
 import {
   RunnableTaskBuilder,
   ReadyRunnableTaskBuilder,
 } from "../runnable-task/builder";
-import { TaskCancelManager, taskCancelManager } from "../cancel-manager";
-import { Logger, getLogger } from "../../utils/logger";
 
 type TaskEventBinder = (
   eventName: string,
@@ -28,7 +29,8 @@ export class TaskGraphLoader {
     private runnableTaskDescriptor: RunnableTaskDescriptor = run,
     private taskVerifier: TaskVerifier = checkIfTaskExists,
     private taskProvider: TaskProvider = getTask,
-    private cancelManager: TaskCancelManager = taskCancelManager
+    private cancelManager: TaskCancelManager = taskCancelManager,
+    private graphBrowser: TaskGraphBrowser = taskGraphBrowser
   ) {
     this.graphTasks = new Set();
   }
@@ -92,6 +94,7 @@ export class TaskGraphLoader {
     eventName: string,
     taskBuilder: ReadyRunnableTaskBuilder
   ) {
+    this.graphBrowser.addEntry(eventName, taskBuilder.build());
     this.taskEventBinder(eventName, taskBuilder);
   }
 

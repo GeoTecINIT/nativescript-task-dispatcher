@@ -68,7 +68,9 @@ export abstract class Task {
       this.getLogger().error(
         `Execution failed with params ${JSON.stringify(
           taskParams
-        )} and invocation event ${JSON.stringify(invocationEvent)}: ${err}`
+        )} and invocation event ${JSON.stringify(invocationEvent)}: ${
+          err.stack ? err.stack : err
+        }`
       );
 
       this.emitEndEvent(TaskResultStatus.Error, err);

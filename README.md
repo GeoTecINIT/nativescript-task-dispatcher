@@ -41,7 +41,7 @@ Here **_> 1 minute tasks' scheduler_** and **_Immediate tasks' scheduler_** take
 
 ### Android
 
-Plugin supports devices running Android 4.2 Jelly Bean (SDK 17) to Android 10 Q (SDK 29). Given that this plugin supports last Android 10 changes in foreground services, **Android Build Tools 29.x.x+ is required**.
+Plugin supports devices running Android 4.4 KitKat (SDK 19) to Android 10 Q (SDK 29). Given that this plugin supports last Android 10 changes in foreground services, **Android Build Tools 29.x.x+ is required**.
 
 ### iOS
 
@@ -221,7 +221,9 @@ class DemoTaskGraph implements TaskGraph {
     on("startEvent", run("slowTask").every(4, "minutes").cancelOn("stopEvent"));
 
     // Event-driven tasks
-    on("slowTaskFinished", run("mediumTask"));
+    on("slowTaskFinished", run("fastTask"));
+    on("slowTaskFinished", run("mediumTask")); // An event can trigger the execution of multiple tasks
+
     on("mediumTaskFinished", run("fastTask"));
 
     // Example about how to run incrementalTask
@@ -241,7 +243,7 @@ Explanation of the task graph:
 - _After 1 minute_ **fastTask** runs immediately and logs its message through the console
 - _After 2 minutes_ **fast and medium tasks** run. **fastTask** runs immediately, **mediumTask** takes 2 seconds to run. After **mediumTask** finishes, **fastTask** runs again. Then, the device goes to sleep.
 - _After 3 minutes_ **fastTask** runs again
-- _After 4 minutes_ **fast, medium and slow tasks** run. **fastTask** runs immediately, **mediumTask** takes 2 seconds to run and **slowTask** takes 30 seconds to run. After **mediumTask** finishes, **fastTask** runs again. After **slowTask** finishes, **mediumTask** runs again and takes 2 seconds to run, after those 2 seconds, **fastTask** runs for a third time in this task chain. Then, the device goes to sleep.
+- _After 4 minutes_ **fast, medium and slow tasks** run. **fastTask** runs immediately, **mediumTask** takes 2 seconds to run and **slowTask** takes 30 seconds to run. After **mediumTask** finishes, **fastTask** runs again. After **slowTask** finishes, **fastTask** and **mediumTask** run again, the latter takes 2 seconds to run, after those 2 seconds, **fastTask** runs for a fourth time in this task chain. Then, the device goes to sleep.
 - And so on, _until the external event "stopEvent" gets triggered_. By this time, all scheduled tasks get cancelled and no task runs from here, due the event driven nature of the task graph.
 
 As you can see, task graphs can get as complicated as you want (or need, for your application). There are some [limitations](#limitations) though.
@@ -495,8 +497,6 @@ The only (advised) way to create a ReadyRunnableTaskBuilder from within a TaskGr
 ## Limitations
 
 - **No support for scheduled tasks and event-driven tasks on iOS**. We currently cannot commit to an estimated time until this limitation gets addressed.
-- **Event-driven tasks can only run sequentially (one depending on the output of the previous one), in contrast scheduled tasks can run in parallel.** To put it simple _an event cannot spawn the execution of multiple tasks at the same time._ We are aware of that this might pose severe constraints for certain setups. That's why solving this limitation is one of our priorities.
-- **No support for foreground tasks in the middle of a task chain**. If one of your tasks requires foreground execution and depends on another task that does not require it, it will not be executed in the foreground. This happens because currently we do not back-propagate the foreground execution setting (but it is something planned). As a temporal fix, if a task could make a foreground task to be executed, declare the first task as a foreground task too.
 - **No support for event-driven foreground tasks** We have yet to evaluate if this is a common scenario. If you feel like this is a must-have functionality, please open an issue or comment on an existing one related to the topic. A quick workaround is to schedule the task in 1 minute by the time the event gets triggered.
 
 ## Plugin authors

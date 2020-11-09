@@ -49,7 +49,18 @@ export class InternalEventManager {
       object: this.notificationCenter,
       data: { ...dispatchableEvent },
     };
-    this.notificationCenter.notify<InternalEventData>(internalEventData);
+    try {
+      this.notificationCenter.notify<InternalEventData>(internalEventData);
+    } catch (err) {
+      if (err instanceof TypeError) {
+        // Notify seems not to be "async"-safe, and sometimes looses (undefined) some already-removed
+        // callbacks during the event notification process. After throughout testing, this error is
+        // known to have no impact on the expected functionality (registered callbacks are anyway
+        // getting notified), that is why it is being discarded. Further investigation is needed, though
+        return;
+      }
+      throw err;
+    }
   }
 
   hasListeners(eventName: string): boolean {

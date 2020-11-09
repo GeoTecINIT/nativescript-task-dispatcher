@@ -42,3 +42,11 @@ export class PowerSavingsManager {
     return this.powerManager.isIgnoringBatteryOptimizations(this.appPackage);
   }
 }
+
+let powerSavingsManager: PowerSavingsManager;
+export function getPowerSavingsManager(): PowerSavingsManager {
+  if (!powerSavingsManager) {
+    powerSavingsManager = new PowerSavingsManager();
+  }
+  return powerSavingsManager;
+}
