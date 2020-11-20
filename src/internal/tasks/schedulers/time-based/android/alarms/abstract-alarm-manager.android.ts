@@ -8,7 +8,6 @@ export interface AlarmManager {
 }
 
 export abstract class AbstractAlarmManager implements AlarmManager {
-  private pendingIntent: android.app.PendingIntent;
 
   constructor(
     protected osAlarmManager: android.app.AlarmManager,
@@ -17,14 +16,9 @@ export abstract class AbstractAlarmManager implements AlarmManager {
   ) {}
 
   get alarmUp(): boolean {
-    return (
-      android.app.PendingIntent.getBroadcast(
-        androidApp.context,
-        0,
-        this.receiverIntent,
+    return this.getPendingIntent(
         android.app.PendingIntent.FLAG_NO_CREATE
-      ) !== null
-    );
+    ) !== null
   }
 
   abstract set(interval?: number): void;
@@ -36,20 +30,15 @@ export abstract class AbstractAlarmManager implements AlarmManager {
     const pendingIntent = this.getPendingIntent();
     this.osAlarmManager.cancel(pendingIntent);
     pendingIntent.cancel();
-    this.pendingIntent = null;
     this.logger.info("Alarm has been cancelled");
   }
 
-  protected getPendingIntent(): android.app.PendingIntent {
-    if (!this.pendingIntent) {
-      this.pendingIntent = android.app.PendingIntent.getBroadcast(
+  protected getPendingIntent(flag?: number): android.app.PendingIntent {
+    return android.app.PendingIntent.getBroadcast(
         androidApp.context,
         0,
         this.receiverIntent,
-        0
-      );
-    }
-
-    return this.pendingIntent;
+        flag ? flag : 0
+    );
   }
 }
