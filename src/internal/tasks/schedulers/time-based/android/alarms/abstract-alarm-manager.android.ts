@@ -8,8 +8,6 @@ export interface AlarmManager {
 }
 
 export abstract class AbstractAlarmManager implements AlarmManager {
-  private pendingIntent: android.app.PendingIntent;
-
   constructor(
     protected osAlarmManager: android.app.AlarmManager,
     private receiverIntent: android.content.Intent,
@@ -18,12 +16,7 @@ export abstract class AbstractAlarmManager implements AlarmManager {
 
   get alarmUp(): boolean {
     return (
-      android.app.PendingIntent.getBroadcast(
-        androidApp.context,
-        0,
-        this.receiverIntent,
-        android.app.PendingIntent.FLAG_NO_CREATE
-      ) !== null
+      this.getPendingIntent(android.app.PendingIntent.FLAG_NO_CREATE) !== null
     );
   }
 
@@ -36,20 +29,15 @@ export abstract class AbstractAlarmManager implements AlarmManager {
     const pendingIntent = this.getPendingIntent();
     this.osAlarmManager.cancel(pendingIntent);
     pendingIntent.cancel();
-    this.pendingIntent = null;
     this.logger.info("Alarm has been cancelled");
   }
 
-  protected getPendingIntent(): android.app.PendingIntent {
-    if (!this.pendingIntent) {
-      this.pendingIntent = android.app.PendingIntent.getBroadcast(
-        androidApp.context,
-        0,
-        this.receiverIntent,
-        0
-      );
-    }
-
-    return this.pendingIntent;
+  protected getPendingIntent(flag?: number): android.app.PendingIntent {
+    return android.app.PendingIntent.getBroadcast(
+      androidApp.context,
+      0,
+      this.receiverIntent,
+      typeof flag === "undefined" ? 0 : flag
+    );
   }
 }
