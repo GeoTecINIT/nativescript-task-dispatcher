@@ -8,7 +8,6 @@ export interface AlarmManager {
 }
 
 export abstract class AbstractAlarmManager implements AlarmManager {
-
   constructor(
     protected osAlarmManager: android.app.AlarmManager,
     private receiverIntent: android.content.Intent,
@@ -16,9 +15,9 @@ export abstract class AbstractAlarmManager implements AlarmManager {
   ) {}
 
   get alarmUp(): boolean {
-    return this.getPendingIntent(
-        android.app.PendingIntent.FLAG_NO_CREATE
-    ) !== null
+    return (
+      this.getPendingIntent(android.app.PendingIntent.FLAG_NO_CREATE) !== null
+    );
   }
 
   abstract set(interval?: number): void;
@@ -35,10 +34,10 @@ export abstract class AbstractAlarmManager implements AlarmManager {
 
   protected getPendingIntent(flag?: number): android.app.PendingIntent {
     return android.app.PendingIntent.getBroadcast(
-        androidApp.context,
-        0,
-        this.receiverIntent,
-        flag ? flag : 0
+      androidApp.context,
+      0,
+      this.receiverIntent,
+      typeof flag === "undefined" ? 0 : flag
     );
   }
 }
