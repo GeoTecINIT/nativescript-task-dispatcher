@@ -1,1 +1,5 @@
-export { DispatchableEvent, EventData } from "../internal/events";
+export {
+  DispatchableEvent,
+  EventData,
+  TaskDispatcherEvent,
+} from "../internal/events";
