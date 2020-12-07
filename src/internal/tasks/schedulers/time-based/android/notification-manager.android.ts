@@ -1,6 +1,7 @@
 import { ad } from "tns-core-modules/utils/utils";
 
 import { createAppLaunchIntent } from "./intents.android";
+import { getLogger, Logger } from "../../../../utils/logger";
 
 // Member numbers are notification unique ids, only the first one is needed
 export enum AndroidNotification {
@@ -15,17 +16,20 @@ function notificationChannels(
     const getString = createStringFetcher(context);
     const NotificationManagerCompat =
       androidx.core.app.NotificationManagerCompat;
-    _notificationChannels = new Map([
-      [
-        AndroidNotification.LocationUsage,
-        {
-          id: "LOCATION_USAGE",
-          name: getString("task_dispatcher_channel_name"),
-          description: getString("task_dispatcher_channel_description"),
-          priority: NotificationManagerCompat.IMPORTANCE_LOW,
-        },
-      ],
-    ]);
+    _notificationChannels = new Map<AndroidNotification, NotificationChannel>();
+
+    try {
+      _notificationChannels.set(AndroidNotification.LocationUsage, {
+        id: "LOCATION_USAGE",
+        name: getString("task_dispatcher_channel_name"),
+        description: getString("task_dispatcher_channel_description"),
+        priority: NotificationManagerCompat.IMPORTANCE_LOW,
+      });
+    } catch (e) {
+      logger().debug(
+        `No strings set for ${AndroidNotification.LocationUsage} channel. Skipping...`
+      );
+    }
   }
 
   return _notificationChannels;
@@ -45,6 +49,12 @@ export function createNotification(
   context: android.content.Context,
   type: AndroidNotification
 ): android.app.Notification {
+  if (!notificationChannels(context).has(type)) {
+    throw new Error(
+      `Translation strings had not been setup for ${AndroidNotification[type]} notification type. Please follow setup instructions.`
+    );
+  }
+
   let notificationBuilder: androidx.core.app.NotificationCompat.Builder;
   switch (type) {
     case AndroidNotification.LocationUsage:
@@ -119,4 +129,12 @@ interface NotificationChannel {
 function createStringFetcher(context: android.content.Context) {
   return (key: string) =>
     context.getResources().getString(ad.resources.getStringId(key));
+}
+
+let _logger: Logger;
+function logger(): Logger {
+  if (!_logger) {
+    _logger = getLogger("NotificationManager");
+  }
+  return _logger;
 }
