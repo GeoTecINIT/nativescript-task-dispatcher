@@ -34,6 +34,9 @@ export class TaskChainRunnerService
     this.nativeService = nativeService;
 
     this.wakeLock = taskChainRunnerWakeLock(nativeService);
+    this.wakeLock.setReferenceCounted(false);
+    this.wakeLock.acquire();
+
     this.timeoutIds = new Set();
     this.taskChainCount = 0;
     this.killed = false;

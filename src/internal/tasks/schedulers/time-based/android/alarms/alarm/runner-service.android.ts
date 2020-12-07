@@ -54,6 +54,9 @@ export class AlarmRunnerService
     this.inForeground = false;
 
     this.wakeLock = alarmRunnerWakeLock(nativeService);
+    this.wakeLock.acquire();
+    this.wakeLock.setReferenceCounted(false);
+
     this.taskStore = plannedTasksDB;
     this.foregroundChecker = new ForegroundChecker();
 
