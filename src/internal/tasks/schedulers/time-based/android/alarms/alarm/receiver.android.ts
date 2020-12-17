@@ -7,8 +7,9 @@ import { createAlarmRunnerServiceIntent } from "../../intents.android";
 import { PlanningType } from "../../../../../planner/planned-task";
 import { Logger, getLogger } from "../../../../../../utils/logger";
 import { now } from "../../../../../../utils/time";
+import { lastRecurrentRun } from "../../../../../runners/last-recurrent-run";
 
-const MIN_INTERVAL = 60000;
+const MIN_INTERVAL = 59000;
 
 export class AlarmReceiver
   implements es.uji.geotec.taskdispatcher.alarms.AlarmReceiverDelegate {
@@ -20,6 +21,7 @@ export class AlarmReceiver
   private logger: Logger;
 
   onReceive(context: android.content.Context, intent: android.content.Intent) {
+    lastRecurrentRun.updateLast();
     this.logger = getLogger("AlarmReceiver");
     this.logger.info("Alarm triggered");
 
