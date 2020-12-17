@@ -27,7 +27,6 @@ export class SingleTaskRunner {
       ? lastRecurrentRun.timeSince()
       : 0;
 
-    this.logger.debug(`Time from trigger until execution: ${lastRunOffset}`);
     await this.taskStore.updateLastRun(id, now() - lastRunOffset);
 
     try {
