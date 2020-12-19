@@ -5,6 +5,7 @@ import { Task, TaskParams } from "../task";
 import { DispatchableEvent, on, TaskDispatcherEvent, off } from "../../events";
 import { Logger, getLogger } from "../../utils/logger";
 import { now } from "../../utils/time";
+import { lastRecurrentRun } from "./last-recurrent-run";
 
 const FAILURE_THRESHOLD = 3;
 
@@ -22,7 +23,11 @@ export class SingleTaskRunner {
     const { name, id, params } = plannedTask;
     const task = getTask(name);
 
-    await this.taskStore.updateLastRun(id, now());
+    const lastRunOffset = plannedTask.recurrent
+      ? lastRecurrentRun.timeSince()
+      : 0;
+
+    await this.taskStore.updateLastRun(id, now() - lastRunOffset);
 
     try {
       const parameterizedTask = new ParameterizedTask(task, params, startEvent);

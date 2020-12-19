@@ -105,15 +105,12 @@ export class AndroidAlarmScheduler {
     const allTasks = await this.plannedTaskStore.getAllSortedByNextRun(
       PlanningType.Scheduled
     );
-    const currentMillis = now();
     if (allTasks.length === 1) {
       this.alarmManager.cancel();
       this.watchdogManager.cancel();
     } else if (
-      allTasks[0].nextRun(currentMillis) ===
-        possibleExisting.nextRun(currentMillis) &&
-      allTasks[1].nextRun(currentMillis) !==
-        possibleExisting.nextRun(currentMillis)
+      allTasks[0].id === possibleExisting.id &&
+      !areExecutedByTheSameAlarm(allTasks[1], possibleExisting)
     ) {
       this.alarmManager.set(calculateAlarmInterval(allTasks[1]));
     }
@@ -126,4 +123,15 @@ function calculateAlarmInterval(plannedTask: PlannedTask): number {
   const nextRun = plannedTask.nextRun();
 
   return nextRun > MIN_ALARM_INTERVAL ? nextRun : MIN_ALARM_INTERVAL;
+}
+
+function areExecutedByTheSameAlarm(
+  pt1: PlannedTask,
+  pt2: PlannedTask
+): boolean {
+  const currentTime = now();
+  const nextRunDiff = Math.abs(
+    pt1.nextRun(currentTime) - pt2.nextRun(currentTime)
+  );
+  return nextRunDiff < MIN_ALARM_INTERVAL / 2;
 }

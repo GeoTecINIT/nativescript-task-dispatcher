@@ -31,6 +31,7 @@ describe("Android Alarm Scheduler", () => {
     let lowerFreqTask: RunnableTask;
     let higherFreqTask: RunnableTask;
     let equalFreqTask: RunnableTask;
+    let similarNextRunTask: RunnableTask;
 
     let expectedTask: PlannedTask;
     let expectedDelayedTask: PlannedTask;
@@ -38,6 +39,7 @@ describe("Android Alarm Scheduler", () => {
     let lowerFreqPT: PlannedTask;
     let higherFreqPT: PlannedTask;
     let equalFreqPT: PlannedTask;
+    let similarNextRunPT: PlannedTask;
 
     beforeEach(() => {
         currentMillis = now();
@@ -50,7 +52,7 @@ describe("Android Alarm Scheduler", () => {
         };
         dummyDelayedTask = {
             ...dummyTask,
-            startAt: currentMillis + 75000,
+            startAt: currentMillis + 100000,
         };
         closeDelayedTask = {
             ...dummyTask,
@@ -68,6 +70,11 @@ describe("Android Alarm Scheduler", () => {
             ...dummyTask,
             name: "patata",
         };
+        similarNextRunTask = {
+            ...dummyTask,
+            interval: 180000,
+            name: "dummyIsItYou?",
+        };
 
         expectedTask = createPlannedTask(dummyTask);
         expectedDelayedTask = createPlannedTask(dummyDelayedTask);
@@ -76,6 +83,8 @@ describe("Android Alarm Scheduler", () => {
         higherFreqPT = createPlannedTask(higherFreqTask);
         equalFreqPT = createPlannedTask(equalFreqTask);
         equalFreqPT.createdAt = expectedTask.createdAt;
+        similarNextRunPT = createPlannedTask(similarNextRunTask);
+        similarNextRunPT.createdAt = expectedTask.createdAt - 59000;
 
         spyOn(taskStore, "insert").and.returnValue(Promise.resolve());
         spyOn(taskStore, "delete").and.returnValue(Promise.resolve());
@@ -258,7 +267,7 @@ describe("Android Alarm Scheduler", () => {
         expect(taskStore.delete).toHaveBeenCalledWith(lowerFreqPT.id);
     });
 
-    it("removes a task with the same frequency than the one with the highest frequency", async () => {
+    it("removes a task with the same frequency than the one with the highest frequency, without rescheduling", async () => {
         spyOn(taskStore, "get")
             .withArgs(equalFreqPT.id)
             .and.returnValue(Promise.resolve(equalFreqPT));
@@ -273,6 +282,40 @@ describe("Android Alarm Scheduler", () => {
         expect(watchdog.cancel).not.toHaveBeenCalled();
         expect(watchdog.set).not.toHaveBeenCalled();
         expect(taskStore.delete).toHaveBeenCalledWith(equalFreqPT.id);
+    });
+
+    it("removes the task with the highest frequency having a similar frequency task, without rescheduling", async () => {
+        spyOn(taskStore, "get")
+            .withArgs(expectedTask.id)
+            .and.returnValue(Promise.resolve(expectedTask));
+        spyOn(taskStore, "getAllSortedByNextRun").and.returnValue(
+            Promise.resolve([expectedTask, similarNextRunPT])
+        );
+
+        await androidAlarm.cancel(expectedTask.id);
+
+        expect(manager.cancel).not.toHaveBeenCalled();
+        expect(manager.set).not.toHaveBeenCalled();
+        expect(watchdog.cancel).not.toHaveBeenCalled();
+        expect(watchdog.set).not.toHaveBeenCalled();
+        expect(taskStore.delete).toHaveBeenCalledWith(expectedTask.id);
+    });
+
+    it("removes a task with a similar frequency than the one with the highest frequency, without rescheduling", async () => {
+        spyOn(taskStore, "get")
+            .withArgs(similarNextRunPT.id)
+            .and.returnValue(Promise.resolve(similarNextRunPT));
+        spyOn(taskStore, "getAllSortedByNextRun").and.returnValue(
+            Promise.resolve([expectedTask, similarNextRunPT])
+        );
+
+        await androidAlarm.cancel(similarNextRunPT.id);
+
+        expect(manager.cancel).not.toHaveBeenCalled();
+        expect(manager.set).not.toHaveBeenCalled();
+        expect(watchdog.cancel).not.toHaveBeenCalled();
+        expect(watchdog.set).not.toHaveBeenCalled();
+        expect(taskStore.delete).toHaveBeenCalledWith(similarNextRunPT.id);
     });
 
     it("removes the only remaining task and cancels the alarm", async () => {
