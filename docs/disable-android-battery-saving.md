@@ -28,7 +28,7 @@ add a way to disable de *Auto-launch* setting. We are investigating if it can be
 
 > In summary, if your app needs to run in background or trigger alarms, make sure to tell your users to add your app to the battery optimizer white list and to allow it to start in background (*auto-launch* setting).
 
-### Special considerations
+## Special considerations
 Samsung limits by default scheduled jobs to a minimum interval of 5 minutes if screen's device is off. For example,
 if you set up a task to be executed in 2 minutes, it will be scheduled to run in 5 minutes if the device screen is off.
 
