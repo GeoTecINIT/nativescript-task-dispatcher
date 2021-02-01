@@ -27,3 +27,13 @@ Although it does not always works on every OEM version, it's a nice tool that de
 add a way to disable de *Auto-launch* setting. We are investigating if it can be integrated into this plugin.
 
 > In summary, if your app needs to run in background or trigger alarms, make sure to tell your users to add your app to the battery optimizer white list and to allow it to start in background (*auto-launch* setting).
+
+### Special considerations
+Samsung limits by default scheduled jobs to a minimum interval of 5 minutes if screen's device is off. For example,
+if you set up a task to be executed in 2 minutes, it will be scheduled to run in 5 minutes if the device screen is off.
+
+This behaviour can be avoided with one simple trick: just add the keyword **alarm**/**alert**/**clock** in our app package name
+(e.g. com.example.**alarm**.myapp, com.example.myapp**alert**, etc.).
+Packages containing these keywords are whitelisted by Samsung and are able run (apparently) without restrictions.
+
+It's something yet to be explored if other manufacturers act in the same way Samsung does, or if they have similar tricks.
