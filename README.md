@@ -2,7 +2,7 @@
 
 [![npm](https://img.shields.io/npm/v/nativescript-task-dispatcher.svg)](https://www.npmjs.com/package/nativescript-task-dispatcher)
 [![npm](https://img.shields.io/npm/dm/nativescript-task-dispatcher.svg)](https://www.npmjs.com/package/nativescript-task-dispatcher)
-[![Build Status](https://travis-ci.com/GeoTecINIT/nativescript-task-dispatcher.svg?token=cYMN5eetmCX8aPqFVaQb&branch=master)](https://travis-ci.com/GeoTecINIT/nativescript-task-dispatcher)
+[![Build Status](https://dev.azure.com/GeoTecINIT/nativescript-plugins/_apis/build/status/GeoTecINIT.nativescript-task-dispatcher?branchName=master)](https://dev.azure.com/GeoTecINIT/nativescript-plugins/_build/latest?definitionId=2&branchName=master)
 
 NativeScript Task Dispatcher is a NativeScript plugin aimed to ease the execution of mobile app's task definition and execution workflows in the background, regardless of whether the app is visible to the user or not.
 
