@@ -44,6 +44,7 @@ describe("Serialization toolkit", () => {
                 sAttr3: new Date(Date.now() + 120000),
             },
         ],
+        attr5: undefined,
     };
 
     const complexObject = new Flattenable(
@@ -86,5 +87,10 @@ describe("Serialization toolkit", () => {
     it("turns a complex object into a plain JavaScript object (flatten)", () => {
         const plainObject = flatten(complexObject);
         expect(plainObject).toEqual(expectedPlainObject);
+    });
+
+    it("turns an array of complex objects into an array of plan JavaScript objects (flatten array)", () => {
+        const plainArray = flatten([complexObject, complexObject]);
+        expect(plainArray).toEqual([expectedPlainObject, expectedPlainObject]);
     });
 });

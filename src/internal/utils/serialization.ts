@@ -1,7 +1,7 @@
-import * as sj from "serialize-javascript";
+import devalue from "devalue";
 
 export function serialize(data: any): string {
-  return sj(data, { ignoreFunctions: true });
+  return devalue(preprocessData(data));
 }
 
 export function deserialize(serializedData: string): any {
@@ -11,4 +11,14 @@ export function deserialize(serializedData: string): any {
 
 export function flatten(data: any): any {
   return deserialize(serialize(data));
+}
+
+function preprocessData(data: any): any {
+  if (Array.isArray(data)) {
+    return data.map((elem) => preprocessData(elem));
+  }
+  if (typeof data === "object") {
+    return { ...data };
+  }
+  return data;
 }
