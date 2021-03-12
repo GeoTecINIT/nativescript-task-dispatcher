@@ -17,7 +17,7 @@ function preprocessData(data: any): any {
   if (Array.isArray(data)) {
     return data.map((elem) => preprocessData(elem));
   }
-  if (typeof data === "object") {
+  if (typeof data === "object" && !(data instanceof Date)) {
     return { ...data };
   }
   return data;

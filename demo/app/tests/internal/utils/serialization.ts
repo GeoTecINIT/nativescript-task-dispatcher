@@ -93,4 +93,13 @@ describe("Serialization toolkit", () => {
         const plainArray = flatten([complexObject, complexObject]);
         expect(plainArray).toEqual([expectedPlainObject, expectedPlainObject]);
     });
+
+    it("leaves basic types unchanged when flattening them", () => {
+        expect(flatten(true)).toBe(true);
+        expect(flatten(0)).toBe(0);
+        expect(flatten(0.0)).toBe(0.0);
+        expect(flatten(new Date(1615545024000))).toEqual(
+            new Date(1615545024000)
+        );
+    });
 });
