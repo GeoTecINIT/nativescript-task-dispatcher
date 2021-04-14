@@ -1,4 +1,4 @@
-import { android as androidApp } from "tns-core-modules/application/application";
+import { isAndroid } from "@nativescript/core";
 
 import {
     TaskNotFoundError,
@@ -15,7 +15,7 @@ describe("Task scheduler", () => {
     let scheduler: TaskScheduler;
 
     beforeEach(() => {
-        if (androidApp) {
+        if (isAndroid) {
             scheduler = new AndroidTaskScheduler();
         } else {
             // TODO: Set iOS scheduler here
