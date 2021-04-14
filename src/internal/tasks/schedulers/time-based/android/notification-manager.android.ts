@@ -1,4 +1,4 @@
-import { ad } from "tns-core-modules/utils/utils";
+import { Utils } from "@nativescript/core";
 
 import { createAppLaunchIntent } from "./intents.android";
 import { getLogger, Logger } from "../../../../utils/logger";
@@ -128,7 +128,7 @@ interface NotificationChannel {
 
 function createStringFetcher(context: android.content.Context) {
   return (key: string) =>
-    context.getResources().getString(ad.resources.getStringId(key));
+    context.getResources().getString(Utils.android.resources.getStringId(key));
 }
 
 let _logger: Logger;

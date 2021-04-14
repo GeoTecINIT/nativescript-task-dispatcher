@@ -1,7 +1,7 @@
-import { android as androidApp } from "tns-core-modules/application/application";
+import { isAndroid } from "@nativescript/core";
 
 export function uuid() {
-  if (androidApp) {
+  if (isAndroid) {
     return java.util.UUID.randomUUID().toString();
   } else {
     return NSUUID.UUID().UUIDString.toLowerCase();

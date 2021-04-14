@@ -24,7 +24,7 @@ export class TaskChainRunnerService
   private wakeLock: android.os.PowerManager.WakeLock;
 
   private executionStart: number;
-  private timeoutIds: Set<number>;
+  private timeoutIds: Set<NodeJS.Timeout>;
   private taskChainCount: number;
   private killed: boolean;
 
@@ -111,7 +111,7 @@ export class TaskChainRunnerService
 
   private prepareTaskChainExecution(
     params: TaskChainRunnerParams
-  ): [DispatchableEvent, number] {
+  ): [DispatchableEvent, NodeJS.Timeout] {
     const timeout = this.calculateTimeout();
 
     const launchEvent = createEvent(params.launchEvent, {
@@ -147,7 +147,7 @@ export class TaskChainRunnerService
 
   private startTaskChainExecution(
     launchEvent: DispatchableEvent,
-    timeoutId: number
+    timeoutId: NodeJS.Timeout
   ): Promise<void> {
     return new Promise((resolve) => {
       const listenerId = on(TaskDispatcherEvent.TaskChainFinished, (evt) => {

@@ -2,7 +2,7 @@ import {
   Observable,
   fromObject,
   EventData as NSEventData,
-} from "tns-core-modules/data/observable";
+} from "@nativescript/core";
 import { EventCallback } from "./event-receivers";
 import { DispatchableEvent } from "./events";
 

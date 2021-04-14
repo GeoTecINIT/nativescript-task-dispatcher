@@ -1,4 +1,4 @@
-import { android as androidApp } from "tns-core-modules/application/application";
+import { Application } from "@nativescript/core";
 import { Logger } from "../../../../../utils/logger";
 
 export interface AlarmManager {
@@ -34,7 +34,7 @@ export abstract class AbstractAlarmManager implements AlarmManager {
 
   protected getPendingIntent(flag?: number): android.app.PendingIntent {
     return android.app.PendingIntent.getBroadcast(
-      androidApp.context,
+      Application.android.context,
       0,
       this.receiverIntent,
       typeof flag === "undefined" ? 0 : flag
