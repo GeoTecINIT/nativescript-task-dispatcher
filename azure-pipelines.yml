@@ -7,7 +7,7 @@ trigger:
       - v*
 pr:
   - master
-  
+
 
 pool:
   vmImage: 'macos-latest'
@@ -19,7 +19,7 @@ steps:
   displayName: 'Install Node.js'
 
 - script: |
-    echo no | npm install -g nativescript@6.8.0
+    echo no | npm install -g nativescript@7
     tns usage-reporting disable
     tns error-reporting disable
   displayName: 'Install NativeScript CLI'
