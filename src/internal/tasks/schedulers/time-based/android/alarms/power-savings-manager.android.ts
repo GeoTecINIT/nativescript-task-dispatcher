@@ -1,4 +1,4 @@
-import { android as androidApp } from "tns-core-modules/application/application";
+import { Application } from "@nativescript/core";
 import { createSavingsDeactivationIntent } from "../intents.android";
 import { Logger, getLogger } from "../../../../../utils/logger";
 
@@ -8,13 +8,13 @@ export class PowerSavingsManager {
   private askedOnce: boolean;
 
   constructor(
-    private powerManager: android.os.PowerManager = androidApp.context.getSystemService(
+    private powerManager: android.os.PowerManager = Application.android.context.getSystemService(
       android.content.Context.POWER_SERVICE
     ),
     private skdVersion = android.os.Build.VERSION.SDK_INT
   ) {
     this.logger = getLogger("PowerSavingsManager");
-    this.appPackage = androidApp.context.getPackageName();
+    this.appPackage = Application.android.context.getPackageName();
   }
 
   // TODO: Evaluate what to do with devices not running Android Stock layer
@@ -23,7 +23,7 @@ export class PowerSavingsManager {
       return;
     }
 
-    if (!androidApp.foregroundActivity) {
+    if (!Application.android.foregroundActivity) {
       this.logger.warn("Battery savings can not be enabled in background");
 
       return;
@@ -31,7 +31,7 @@ export class PowerSavingsManager {
 
     this.askedOnce = true;
     const intent = createSavingsDeactivationIntent(this.appPackage);
-    androidApp.foregroundActivity.startActivity(intent);
+    Application.android.foregroundActivity.startActivity(intent);
   }
 
   areDisabled(): boolean {

@@ -1,4 +1,4 @@
-import { android as androidApp } from "tns-core-modules/application/application";
+import { Application } from "@nativescript/core";
 import { unpackAlarmRunnerServiceIntent } from "../../intents.android";
 import {
   AndroidNotification,
@@ -37,7 +37,7 @@ export class AlarmRunnerService
   private inForeground: boolean;
 
   private wakeLock: android.os.PowerManager.WakeLock;
-  private timeoutId: number;
+  private timeoutId: NodeJS.Timeout;
   private taskStore: PlannedTasksStore;
   private foregroundChecker: ForegroundChecker;
 
@@ -261,7 +261,7 @@ function alarmRunnerWakeLock(
 let _alarmRunnerService: AlarmRunnerService;
 export function getAlarmRunnerService(): AlarmRunnerService {
   if (!_alarmRunnerService) {
-    setupNotificationChannels(androidApp.context);
+    setupNotificationChannels(Application.android.context);
     _alarmRunnerService = new AlarmRunnerService();
   }
   return _alarmRunnerService;

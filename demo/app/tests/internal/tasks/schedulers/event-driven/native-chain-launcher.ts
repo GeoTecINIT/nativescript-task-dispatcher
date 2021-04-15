@@ -1,4 +1,4 @@
-import { android as androidApp } from "tns-core-modules/application/application";
+import { isAndroid } from "@nativescript/core";
 
 import { setTasks } from "nativescript-task-dispatcher/internal/tasks/provider";
 import { testTasks } from "../..";
@@ -26,13 +26,13 @@ describe("Native task chain launcher", () => {
     let taskScheduler: TaskScheduler;
 
     beforeAll(() => {
-        if (androidApp) {
+        if (isAndroid) {
             wireUpTaskChainRunnerService();
         }
     });
 
     beforeEach(() => {
-        if (androidApp) {
+        if (isAndroid) {
             taskChainLauncher = new AndroidTaskChainLauncher();
             taskScheduler = new AndroidTaskScheduler();
         } else {

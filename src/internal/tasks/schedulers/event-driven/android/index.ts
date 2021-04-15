@@ -1,4 +1,4 @@
-import { android as androidApp } from "tns-core-modules/application/application";
+import { Application } from "@nativescript/core";
 
 import { TaskChainLauncher } from "..";
 import { EventData } from "../../../../events";
@@ -6,7 +6,7 @@ import { createTaskChainRunnerServiceIntent } from "./intents.android";
 
 export class AndroidTaskChainLauncher implements TaskChainLauncher {
   launch(launchEvent: string, eventData?: EventData, eventId?: string): void {
-    const context = androidApp.context;
+    const context = Application.android.context;
     const startTaskChainRunnerService = createTaskChainRunnerServiceIntent(
       context,
       {
