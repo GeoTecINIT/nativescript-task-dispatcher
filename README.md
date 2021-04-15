@@ -49,11 +49,18 @@ Plugin supports devices running Android 4.4 KitKat (SDK 19) to Android 10 Q (SDK
 
 ## Installation
 
-Run the following command in your project's root folder:
+Run the following command in your project's root folder.
 
+NS7+:
 ```javascript
 tns plugin add nativescript-task-dispatcher
 ```
+
+NS6:
+```javascript
+tns plugin add nativescript-task-dispatcher@1.1.4
+```
+
 
 ### Android-specific steps
 
