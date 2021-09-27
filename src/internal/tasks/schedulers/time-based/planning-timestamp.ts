@@ -5,11 +5,11 @@ const PREVIOUS_PLANNING_TIMESTAMP = "PREVIOUS_PLANNING_TIMESTAMP";
 const CURRENT_PLANNING_TIMESTAMP = "CURRENT_PLANNING_TIMESTAMP";
 
 class PlanningTimestamp {
-  private _previous: number = ApplicationSettings.getNumber(
+  private _previous: number = this.getNumber(
     PREVIOUS_PLANNING_TIMESTAMP,
     -1
   );
-  private _current: number = ApplicationSettings.getNumber(
+  private _current: number = this.getNumber(
     CURRENT_PLANNING_TIMESTAMP,
     -1
   );
@@ -27,8 +27,18 @@ class PlanningTimestamp {
     const newCurrent = now();
     this._previous = previousCurrent;
     this._current = newCurrent;
-    ApplicationSettings.setNumber(PREVIOUS_PLANNING_TIMESTAMP, previousCurrent);
-    ApplicationSettings.setNumber(CURRENT_PLANNING_TIMESTAMP, newCurrent);
+    this.setNumber(PREVIOUS_PLANNING_TIMESTAMP, previousCurrent);
+    this.setNumber(CURRENT_PLANNING_TIMESTAMP, newCurrent);
+  }
+
+  private getNumber(key: string, defaultValue: number): number {
+    const stringValue = ApplicationSettings.getString(key, null);
+
+    return stringValue !== null ? parseFloat(stringValue) : defaultValue;
+  }
+
+  private setNumber(key: string, value: number): void {
+    ApplicationSettings.setString(key, value.toString());
     ApplicationSettings.flush();
   }
 }
