@@ -34,7 +34,7 @@ class PlanningTimestamp {
   private getNumber(key: string, defaultValue: number): number {
     const stringValue = ApplicationSettings.getString(key, null);
 
-    return stringValue !== null ? parseFloat(stringValue) : defaultValue;
+    return stringValue !== null ? parseInt(stringValue) : defaultValue;
   }
 
   private setNumber(key: string, value: number): void {
