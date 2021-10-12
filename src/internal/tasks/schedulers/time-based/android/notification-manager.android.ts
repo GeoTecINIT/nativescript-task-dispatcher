@@ -129,7 +129,7 @@ function createStringFetcher(context: android.content.Context) {
 function createIconFetcher(context: android.content.Context) {
   const getDrawableId = createDrawableIdFetcher(context);
   return (key?: string): number => {
-    let icon: number;
+    let icon = 0;
     if (key && key.indexOf(Utils.RESOURCE_PREFIX) === 0) {
       icon = getDrawableId(key.substr(Utils.RESOURCE_PREFIX.length));
     }
