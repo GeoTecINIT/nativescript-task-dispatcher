@@ -102,14 +102,9 @@ function initializeNotificationBuilder(
   title: string,
   content: string
 ) {
+  const getIcon = createIconFetcher(context);
   const { id, priority } = notificationChannels(context).get(type);
-  const iconId = context
-    .getResources()
-    .getIdentifier(
-      "icon",
-      "drawable",
-      context.getApplicationInfo().packageName
-    );
+  const iconId = getIcon();
 
   const getString = createStringFetcher(context);
   return new androidx.core.app.NotificationCompat.Builder(context, id)
@@ -127,8 +122,36 @@ interface NotificationChannel {
 }
 
 function createStringFetcher(context: android.content.Context) {
-  return (key: string) =>
+  return (key: string): string =>
     context.getResources().getString(Utils.android.resources.getStringId(key));
+}
+
+function createIconFetcher(context: android.content.Context) {
+  const getDrawableId = createDrawableIdFetcher(context);
+  return (key?: string): number => {
+    let icon = 0;
+    if (key && key.indexOf(Utils.RESOURCE_PREFIX) === 0) {
+      icon = getDrawableId(key.substr(Utils.RESOURCE_PREFIX.length));
+    }
+    if (icon === 0 && android.os.Build.VERSION.SDK_INT >= 21) {
+      icon = getDrawableId("ic_stat_notify_silhouette");
+    }
+    if (icon === 0) {
+      icon = getDrawableId("ic_stat_notify");
+    }
+    if (icon === 0) {
+      icon = context.getApplicationInfo().icon;
+    }
+    return icon;
+  };
+}
+
+function createDrawableIdFetcher(context: android.content.Context) {
+  const resources = context.getResources();
+  const packageName = context.getApplicationInfo().packageName;
+  return (key: string): number => {
+    return resources.getIdentifier(key, "drawable", packageName);
+  };
 }
 
 let _logger: Logger;
