@@ -3,24 +3,26 @@
   "license": "SEE LICENSE IN <your-license-filename>",
   "repository": "<fill-your-repository-here>",
   "dependencies": {
-    "@nativescript/core": "~7.3.0",
+    "@nativescript/core": "~8.2.0",
     "@nativescript/theme": "~2.3.0",
-    "@nativescript/unit-test-runner": "^1.0.2",
+    "@nativescript/unit-test-runner": "~3.0.0",
     "nativescript-task-dispatcher": "file:../src"
   },
   "devDependencies": {
-    "@nativescript/android": "7.0.1",
-    "@nativescript/ios": "7.2.0",
-    "@nativescript/webpack": "~3.0.0",
-    "@types/jasmine": "3.6.9",
-    "karma": "6.3.16",
+    "@jsdevtools/coverage-istanbul-loader": "3.0.5",
+    "@nativescript/android": "~8.2.0",
+    "@nativescript/ios": "~8.2.0",
+    "@nativescript/webpack": "~5.0.0",
+    "@types/jasmine": "4.0.0",
+    "karma": "6.3.17",
+    "karma-coverage": "2.2.0",
     "karma-jasmine": "4.0.1",
     "karma-junit-reporter": "2.0.1",
     "karma-nativescript-launcher": "0.4.0",
-    "karma-webpack": "3.0.5",
+    "nyc": "15.1.0",
     "typescript": "~4.5.5"
   },
   "gitHead": "2250137db8c1e0bd0eb543e8e4563cb71480c00d",
   "readme": "NativeScript Application",
-  "main": "app.js"
+  "main": "./app/app.ts"
 }
