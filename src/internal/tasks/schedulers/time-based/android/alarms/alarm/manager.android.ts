@@ -1,4 +1,4 @@
-import { Application } from "@nativescript/core";
+import { Utils } from "@nativescript/core";
 import { createAlarmReceiverIntent } from "../../intents.android";
 import { AbstractAlarmManager } from "../abstract-alarm-manager.android";
 import {
@@ -13,15 +13,17 @@ const BATTERY_SAVINGS_THRESHOLD = 15 * 60 * 1000;
 
 export class AndroidAlarmManager extends AbstractAlarmManager {
   constructor(
-    osAlarmManager = Application.android.context.getSystemService(
-      android.content.Context.ALARM_SERVICE
-    ) as android.app.AlarmManager,
+    osAlarmManager = Utils.android
+      .getApplicationContext()
+      .getSystemService(
+        android.content.Context.ALARM_SERVICE
+      ) as android.app.AlarmManager,
     private powerManager: PowerSavingsManager = getPowerSavingsManager(),
     private sdkVersion = android.os.Build.VERSION.SDK_INT
   ) {
     super(
       osAlarmManager,
-      createAlarmReceiverIntent(Application.android.context),
+      createAlarmReceiverIntent(Utils.android.getApplicationContext()),
       getLogger("AndroidAlarmManager")
     );
   }

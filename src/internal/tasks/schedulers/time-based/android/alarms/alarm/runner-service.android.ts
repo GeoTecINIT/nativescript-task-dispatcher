@@ -1,4 +1,4 @@
-import { Application } from "@nativescript/core";
+import { Utils } from "@nativescript/core";
 import { unpackAlarmRunnerServiceIntent } from "../../intents.android";
 import {
   AndroidNotification,
@@ -261,7 +261,7 @@ function alarmRunnerWakeLock(
 let _alarmRunnerService: AlarmRunnerService;
 export function getAlarmRunnerService(): AlarmRunnerService {
   if (!_alarmRunnerService) {
-    setupNotificationChannels(Application.android.context);
+    setupNotificationChannels(Utils.android.getApplicationContext());
     _alarmRunnerService = new AlarmRunnerService();
   }
   return _alarmRunnerService;

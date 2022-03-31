@@ -1,4 +1,4 @@
-import { Application } from "@nativescript/core";
+import { Utils } from "@nativescript/core";
 import { Logger } from "../../../../../utils/logger";
 
 export interface AlarmManager {
@@ -8,7 +8,7 @@ export interface AlarmManager {
 }
 
 export abstract class AbstractAlarmManager implements AlarmManager {
-  constructor(
+  protected constructor(
     protected osAlarmManager: android.app.AlarmManager,
     private receiverIntent: android.content.Intent,
     protected logger: Logger
@@ -41,7 +41,7 @@ export abstract class AbstractAlarmManager implements AlarmManager {
         ? android.app.PendingIntent.FLAG_IMMUTABLE
         : 0;
     return android.app.PendingIntent.getBroadcast(
-      Application.android.context,
+      Utils.android.getApplicationContext(),
       0,
       this.receiverIntent,
       typeof flags === "undefined" ? defaultFlags : flags

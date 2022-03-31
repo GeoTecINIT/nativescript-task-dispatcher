@@ -1,4 +1,4 @@
-import { Application } from "@nativescript/core";
+import { Utils } from "@nativescript/core";
 import { AbstractAlarmManager } from "../abstract-alarm-manager.android";
 import { createWatchdogReceiverIntent } from "../../intents.android";
 import { getLogger } from "../../../../../../utils/logger";
@@ -8,13 +8,15 @@ const WATCHDOG_INTERVAL = 15 * 60 * 1000;
 
 export class WatchdogManager extends AbstractAlarmManager {
   constructor(
-    osAlarmManager = Application.android.context.getSystemService(
-      android.content.Context.ALARM_SERVICE
-    ) as android.app.AlarmManager
+    osAlarmManager = Utils.android
+      .getApplicationContext()
+      .getSystemService(
+        android.content.Context.ALARM_SERVICE
+      ) as android.app.AlarmManager
   ) {
     super(
       osAlarmManager,
-      createWatchdogReceiverIntent(Application.android.context),
+      createWatchdogReceiverIntent(Utils.android.getApplicationContext()),
       getLogger("WatchdogManager")
     );
   }

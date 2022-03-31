@@ -1,20 +1,20 @@
-import { Application } from "@nativescript/core";
+import { Application, Utils } from "@nativescript/core";
 import { createSavingsDeactivationIntent } from "../intents.android";
 import { Logger, getLogger } from "../../../../../utils/logger";
 
 export class PowerSavingsManager {
   private logger: Logger;
-  private appPackage: string;
+  private readonly appPackage: string;
   private askedOnce: boolean;
 
   constructor(
-    private powerManager: android.os.PowerManager = Application.android.context.getSystemService(
-      android.content.Context.POWER_SERVICE
-    ),
+    private powerManager: android.os.PowerManager = Utils.android
+      .getApplicationContext()
+      .getSystemService(android.content.Context.POWER_SERVICE),
     private skdVersion = android.os.Build.VERSION.SDK_INT
   ) {
     this.logger = getLogger("PowerSavingsManager");
-    this.appPackage = Application.android.context.getPackageName();
+    this.appPackage = Utils.android.getApplicationContext().getPackageName();
   }
 
   // TODO: Evaluate what to do with devices not running Android Stock layer
