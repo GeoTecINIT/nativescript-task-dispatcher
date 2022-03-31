@@ -10,7 +10,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
     <application>
-        <receiver android:name=".BootReceiver">
+        <receiver android:name=".BootReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
