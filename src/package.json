@@ -54,6 +54,7 @@
   "devDependencies": {
     "@nativescript/core": "~8.2.0",
     "@nativescript/types": "~8.2.0",
+    "@types/node": "^17.0.23",
     "prompt": "^1.0.0",
     "rimraf": "^2.6.3",
     "semver": "^5.6.0",
