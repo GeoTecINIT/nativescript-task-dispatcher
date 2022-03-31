@@ -18,7 +18,7 @@
     "karma-junit-reporter": "2.0.1",
     "karma-nativescript-launcher": "0.4.0",
     "karma-webpack": "3.0.5",
-    "typescript": "~3.9.0"
+    "typescript": "~4.5.5"
   },
   "gitHead": "2250137db8c1e0bd0eb543e8e4563cb71480c00d",
   "readme": "NativeScript Application",

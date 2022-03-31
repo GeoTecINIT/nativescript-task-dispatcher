@@ -1,1 +1,1 @@
-export { TimeUnit, toSeconds } from "../internal/utils/time-converter";
+export * from "../internal/utils/time-converter";
