@@ -1,10 +1,10 @@
 import { PlannedTask, PlanningType } from "../tasks/planner/planned-task";
 import { RunnableTask } from "../tasks/runnable-task";
 import {
-  Couchbase,
+  CouchBase,
   QueryLogicalOperator,
   QueryMeta,
-} from "nativescript-couchbase-plugin";
+} from "@triniwiz/nativescript-couchbase";
 import { now } from "../utils/time";
 
 const DB_NAME = "task-dispatcher";
@@ -25,10 +25,10 @@ export interface PlannedTasksStore {
 }
 
 class PlannedTaskDBStore implements PlannedTasksStore {
-  private readonly database: Couchbase;
+  private readonly database: CouchBase;
 
   constructor() {
-    this.database = new Couchbase(DB_NAME);
+    this.database = new CouchBase(DB_NAME);
   }
 
   async insert(plannedTask: PlannedTask): Promise<void> {
@@ -185,14 +185,8 @@ class PlannedTaskDBStore implements PlannedTasksStore {
 }
 
 function runnableTaskFrom(plannedTask: PlannedTask): RunnableTask {
-  const {
-    name,
-    startAt,
-    interval,
-    recurrent,
-    params,
-    cancelEvent,
-  } = plannedTask;
+  const { name, startAt, interval, recurrent, params, cancelEvent } =
+    plannedTask;
 
   return {
     name,
