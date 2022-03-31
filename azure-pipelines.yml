@@ -15,13 +15,19 @@ pool:
 steps:
 - task: NodeTool@0
   inputs:
-    versionSpec: '10.x'
+    versionSpec: '16.x'
   displayName: 'Install Node.js'
 
+- task: JavaToolInstaller@0
+  inputs:
+    versionSpec: '11'
+    jdkArchitectureOption: 'x64'
+    jdkSourceOption: 'PreInstalled'
+
 - script: |
-    echo no | npm install -g nativescript@7
-    tns usage-reporting disable
-    tns error-reporting disable
+    echo no | npm install -g nativescript
+    ns usage-reporting disable
+    ns error-reporting disable
   displayName: 'Install NativeScript CLI'
 
 - script: |
@@ -33,17 +39,17 @@ steps:
 - script: |
     cd demo
     npm install
-    tns build android --bundle --env.uglify --env.snapshot
+    ns build android --bundle --env.uglify --env.snapshot
   displayName: 'Build'
 
 - script: |
     ./ci-tools/wait-for-emulator.sh
     cd demo
-    tns test android --watch false --justlaunch
+    ns test android --watch false --justlaunch
   displayName: 'Test'
 
 - task: PublishTestResults@2
   condition: succeededOrFailed()
   inputs:
     testResultsFormat: 'JUnit'
-    testResultsFiles: 'demo/test-reports/**/report.xml'
+    testResultsFiles: 'demo/app/test-reports/**/report.xml'
