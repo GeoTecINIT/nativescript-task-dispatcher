@@ -63,7 +63,9 @@ export function createNotification(
         context,
         0,
         appLaunchIntent,
-        0
+        android.os.Build.VERSION.SDK_INT >= 23
+          ? android.app.PendingIntent.FLAG_IMMUTABLE
+          : 0
       );
       notificationBuilder = initializeNotificationBuilder(
         context,
