@@ -68,6 +68,11 @@ module.exports = function (config) {
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
     singleRun: false,
+
+    junitReporter: {
+      outputDir: "test-reports",
+      outputFile: "report.xml",
+    },
   };
 
   if (config._NS && config._NS.env && config._NS.env.codeCoverage) {
