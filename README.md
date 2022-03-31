@@ -41,7 +41,7 @@ Here **_> 1 minute tasks' scheduler_** and **_Immediate tasks' scheduler_** take
 
 ### Android
 
-Plugin supports devices running Android 4.4 KitKat (SDK 19) to Android 10 Q (SDK 29). Given that this plugin supports last Android 10 changes in foreground services, **Android Build Tools 29.x.x+ is required**.
+Plugin supports devices running Android 5.1 Lollipop (SDK 22) to Android 10 Q (SDK 29). Given that this plugin supports last Android 10 changes in foreground services, **Android Build Tools 29.x.x+ is required**.
 
 ### iOS
 
