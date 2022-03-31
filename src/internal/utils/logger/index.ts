@@ -2,6 +2,8 @@ import { Logger } from "./common";
 import { DevLogger } from "./dev";
 import { ProdLogger } from "./prod";
 
+export * from "./common";
+
 let loggingEnabled = false;
 
 function createLogger(tag: string): Logger {
@@ -30,6 +32,3 @@ export function setLoggerCreator(creator: LoggerCreator) {
 export function getLogger(tag: string): Logger {
   return loggerCreator(tag);
 }
-
-// FIXME: The export should be an interface in order to not to force developers to extend our logger
-export { Logger, AbstractLogger } from "./common";
