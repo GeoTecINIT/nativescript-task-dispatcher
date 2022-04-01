@@ -24,7 +24,18 @@ export function createOsAlarmManagerMock(): android.app.AlarmManager {
         cancel(p0: android.app.PendingIntent): void {
             return;
         },
+        canScheduleExactAlarms(): boolean {
+            return true;
+        },
     };
 
     return alarmManager as android.app.AlarmManager;
+}
+
+export function createOsForegroundActivityMock(): android.app.Activity {
+    const foregroundActivity = {
+        startActivity(param: android.content.Intent) {},
+    };
+
+    return foregroundActivity as android.app.Activity;
 }
