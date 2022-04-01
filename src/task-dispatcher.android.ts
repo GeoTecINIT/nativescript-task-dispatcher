@@ -2,7 +2,6 @@ import { Common, ConfigParams } from "./task-dispatcher.common";
 
 import { Task } from "./tasks";
 import { TaskGraph } from "./tasks/graph";
-import { taskGraph } from "./internal/tasks/graph/loader";
 import { taskGraphBrowser } from "./internal/tasks/graph/browser";
 
 import { setTaskSchedulerCreator } from "./internal/tasks/schedulers/time-based/common";
@@ -15,6 +14,7 @@ import { getAlarmRunnerService } from "./internal/tasks/schedulers/time-based/an
 import { getWatchDogReceiver } from "./internal/tasks/schedulers/time-based/android/alarms/watchdog/receiver.android";
 import { getTaskChainRunnerService } from "./internal/tasks/schedulers/event-driven/android/runner-service.android";
 import { getPowerSavingsManager } from "./internal/tasks/schedulers/time-based/android/alarms/power-savings-manager.android";
+import { getExactAlarmPermsManager } from "./internal/tasks/schedulers/time-based/android/alarms/exact-alarm-perms-manager.android";
 
 const BATTERY_OPTIMIZATIONS_THRESHOLD = 15 * 60;
 
@@ -35,12 +35,19 @@ class TaskDispatcher extends Common {
     if (this.requiresDisablingBatteryOptimizations()) {
       return Promise.resolve(false);
     }
+    if (!getExactAlarmPermsManager().isGranted()) {
+      return Promise.resolve(false);
+    }
     return super.isReady();
   }
 
-  prepare(): Promise<void> {
+  async prepare(): Promise<void> {
     if (this.requiresDisablingBatteryOptimizations()) {
-      this.requestToDisableBatteryOptimizations();
+      await this.requestToDisableBatteryOptimizations();
+    }
+    const exactAlarmPermsManager = getExactAlarmPermsManager();
+    if (!exactAlarmPermsManager.isGranted()) {
+      await exactAlarmPermsManager.request();
     }
     return super.prepare();
   }
@@ -58,12 +65,12 @@ class TaskDispatcher extends Common {
     return false;
   }
 
-  private requestToDisableBatteryOptimizations() {
+  private async requestToDisableBatteryOptimizations() {
     const manager = getPowerSavingsManager();
     if (manager.areDisabled()) {
       return;
     }
-    manager.requestDeactivation();
+    await manager.requestDeactivation();
   }
 
   private wireUpNativeComponents() {
