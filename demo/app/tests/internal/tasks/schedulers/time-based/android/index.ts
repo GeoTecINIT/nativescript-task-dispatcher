@@ -39,3 +39,7 @@ export function createOsForegroundActivityMock(): android.app.Activity {
 
     return foregroundActivity as android.app.Activity;
 }
+
+export function isSdkBelow(version: number) {
+    return android && android.os.Build.VERSION.SDK_INT < version;
+}
