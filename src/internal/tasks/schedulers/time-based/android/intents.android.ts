@@ -31,6 +31,13 @@ export function createSavingsDeactivationIntent(appPackage: string) {
   );
 }
 
+export function createScheduleExactAlarmPermRequestIntent(appPackage: string) {
+  return new android.content.Intent(
+    android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+    android.net.Uri.parse(`package:${appPackage}`)
+  );
+}
+
 const ARS_RUN_IN_FOREGROUND = "foreground";
 const ARS_TIME_OFFSET = "time-offset";
 const ARS_INVOCATION_TIME = "invocation-time";
