@@ -1,6 +1,6 @@
 {
   "name": "nativescript-task-dispatcher",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "description": "NativeScript-based mobile background task scheduler and dispatcher",
   "main": "task-dispatcher",
   "typings": "index.d.ts",
