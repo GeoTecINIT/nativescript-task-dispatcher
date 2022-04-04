@@ -1,4 +1,4 @@
-import { Application } from "@nativescript/core";
+import { Utils } from "@nativescript/core";
 import { Logger } from "../../../../../utils/logger";
 
 export interface AlarmManager {
@@ -8,16 +8,19 @@ export interface AlarmManager {
 }
 
 export abstract class AbstractAlarmManager implements AlarmManager {
-  constructor(
+  protected constructor(
     protected osAlarmManager: android.app.AlarmManager,
     private receiverIntent: android.content.Intent,
     protected logger: Logger
   ) {}
 
   get alarmUp(): boolean {
-    return (
-      this.getPendingIntent(android.app.PendingIntent.FLAG_NO_CREATE) !== null
-    );
+    const PendingIntent = android.app.PendingIntent;
+    const flags =
+      android.os.Build.VERSION.SDK_INT >= 23
+        ? PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE
+        : PendingIntent.FLAG_NO_CREATE;
+    return this.getPendingIntent(flags) !== null;
   }
 
   abstract set(interval?: number): void;
@@ -32,12 +35,16 @@ export abstract class AbstractAlarmManager implements AlarmManager {
     this.logger.info("Alarm has been cancelled");
   }
 
-  protected getPendingIntent(flag?: number): android.app.PendingIntent {
+  protected getPendingIntent(flags?: number): android.app.PendingIntent {
+    const defaultFlags =
+      android.os.Build.VERSION.SDK_INT >= 23
+        ? android.app.PendingIntent.FLAG_IMMUTABLE
+        : 0;
     return android.app.PendingIntent.getBroadcast(
-      Application.android.context,
+      Utils.android.getApplicationContext(),
       0,
       this.receiverIntent,
-      typeof flag === "undefined" ? 0 : flag
+      typeof flags === "undefined" ? defaultFlags : flags
     );
   }
 }
