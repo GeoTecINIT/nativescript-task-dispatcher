@@ -1,7 +1,9 @@
 import { Application, Utils } from "@nativescript/core";
 import { createSavingsDeactivationIntent } from "../intents.android";
 import { Logger, getLogger } from "../../../../../utils/logger";
-import { waitForActivityResume } from "./perm-request-common";
+import { fireInMs, waitForActivityResume } from "./perm-request-common";
+
+const MS_TO_UPDATE = 1000;
 
 export class PowerSavingsManager {
   private logger: Logger;
@@ -47,6 +49,9 @@ export class PowerSavingsManager {
     visibleActivity.startActivity(intent);
 
     await activityResume;
+
+    // In certain phones the savings update is not immediate
+    await fireInMs(MS_TO_UPDATE);
 
     if (!this.areDisabled()) {
       throw new Error(
