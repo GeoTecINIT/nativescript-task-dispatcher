@@ -26,7 +26,7 @@ export abstract class Task {
 
   private _logger: Logger;
 
-  protected constructor(name: string, taskConfig: TaskConfig = {}) {
+  constructor(name: string, taskConfig: TaskConfig = {}) {
     this._name = name;
     this._inQueue = new Set();
     this._executionHistory = new Set();
