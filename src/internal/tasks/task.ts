@@ -109,7 +109,10 @@ export abstract class Task {
     }
     this._inQueue.clear();
 
-    if (this._cancelFunctions.has(this._invocationEvent.id)) {
+    if (
+      this._invocationEvent &&
+      this._cancelFunctions.has(this._invocationEvent.id)
+    ) {
       const cancelFunction = this._cancelFunctions.get(
         this._invocationEvent.id
       );
@@ -175,7 +178,9 @@ export abstract class Task {
    */
   protected log(message: any) {
     this.getLogger().info(
-      `${message} (invocationId=${this._invocationEvent.id})`
+      `${message} (invocationId=${
+        this._invocationEvent ? this._invocationEvent.id : "??"
+      })`
     );
   }
 
