@@ -1,4 +1,5 @@
 import { DispatchableEvent, emit, hasListeners } from "../events";
+import AwaitLock from "await-lock";
 import { Logger, getLogger } from "../utils/logger";
 import { TaskChain, TaskResultStatus } from "./task-chain";
 import { now } from "../utils/time";
@@ -17,16 +18,20 @@ export abstract class Task {
   private _taskParams: TaskParams;
   private _invocationEvent: DispatchableEvent;
 
-  private _name: string;
-  private _executionHistory: Set<string>;
-  private _cancelFunctions: Map<string, CancelFunction>;
+  private readonly _name: string;
+  private readonly _inQueue: Set<string>;
+  private readonly _executionHistory: Set<string>;
+  private readonly _cancelFunctions: Map<string, CancelFunction>;
+  private readonly _executionLock: AwaitLock;
 
   private _logger: Logger;
 
   constructor(name: string, taskConfig: TaskConfig = {}) {
     this._name = name;
+    this._inQueue = new Set();
     this._executionHistory = new Set();
     this._cancelFunctions = new Map();
+    this._executionLock = new AwaitLock();
 
     this.configureTask(taskConfig);
   }
@@ -40,14 +45,16 @@ export abstract class Task {
     taskParams: TaskParams,
     invocationEvent: DispatchableEvent
   ): Promise<void> {
-    if (this._invocationEvent && !this.isDone()) {
-      this.cancelParallelInvocation(taskParams, invocationEvent);
-
-      return;
-    }
+    this._inQueue.add(invocationEvent.id);
+    await this._executionLock.acquireAsync();
 
     this._taskParams = taskParams;
     this._invocationEvent = invocationEvent;
+
+    if (this.isDone()) {
+      this._executionLock.release();
+      return;
+    }
 
     this.log(
       `Run triggered by ${invocationEvent.name} event ${
@@ -57,6 +64,7 @@ export abstract class Task {
       }`
     );
 
+    let executionError: Error;
     try {
       await this.checkIfCanRun();
       const outcome = await this.onRun(taskParams, invocationEvent);
@@ -74,10 +82,14 @@ export abstract class Task {
       );
 
       this.emitEndEvent(TaskResultStatus.Error, err);
-      throw err;
+      executionError = err;
     }
 
     this.removeCancelFunction();
+    this._inQueue.delete(this._invocationEvent.id);
+    this._executionLock.release();
+
+    if (executionError) throw executionError;
   }
 
   /**
@@ -92,7 +104,10 @@ export abstract class Task {
    * executed. Finishes the task chain and gracefully cancels the task through onCancel.
    */
   cancel(): void {
-    this.emitEndEvent(TaskResultStatus.Cancelled);
+    for (const id of this._inQueue) {
+      this.emitEndEvent(TaskResultStatus.Cancelled, undefined, id);
+    }
+    this._inQueue.clear();
 
     if (this._cancelFunctions.has(this._invocationEvent.id)) {
       const cancelFunction = this._cancelFunctions.get(
@@ -189,22 +204,6 @@ export abstract class Task {
           ? taskConfig.outputEventNames
           : [`${this.name}Finished`],
     };
-  }
-
-  private cancelParallelInvocation(
-    taskParams: TaskParams,
-    invocationEvent: DispatchableEvent
-  ) {
-    this.getLogger().warn(
-      `Multiple executions of a task cannot run concurrently. Warning triggered with: params=${JSON.stringify(
-        taskParams
-      )} and invocationEvent=${JSON.stringify(invocationEvent)}`
-    );
-
-    const reason = new Error(
-      "Concurrent Execution: Executing multiple instances of a task concurrently is not allowed"
-    );
-    this.emitEndEvent(TaskResultStatus.Cancelled, reason, invocationEvent.id);
   }
 
   private processTaskOutcome(outcome: void | TaskOutcome) {

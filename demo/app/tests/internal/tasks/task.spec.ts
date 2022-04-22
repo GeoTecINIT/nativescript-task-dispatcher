@@ -7,6 +7,7 @@ import {
     DispatchableEvent,
 } from "nativescript-task-dispatcher/internal/events";
 import { SimpleTask } from "nativescript-task-dispatcher/internal/tasks/simple-task";
+import { listenToEventTrigger } from "nativescript-task-dispatcher/testing/events";
 
 describe("Task", () => {
     let startEvent: DispatchableEvent;
@@ -70,6 +71,7 @@ describe("Task", () => {
 
     let eventCallback: EventCallback;
     let secondaryCallback: EventCallback;
+    const tasksToRunSequentially = 5;
 
     beforeEach(() => {
         startEvent = createEvent(TaskDispatcherEvent.TaskExecutionStarted, {
@@ -210,5 +212,66 @@ describe("Task", () => {
     it("is able to be configured for foreground execution", async () => {
         const runsInBackground = foregroundDumbTask.runsInBackground();
         expect(runsInBackground).toBeFalsy();
+    });
+
+    it("runs multiple times sequentially", async () => {
+        const runPromises = [];
+        const eventAwaiters = [];
+        for (let i = 0; i < tasksToRunSequentially; i++) {
+            const sequentialEvent = createEvent(
+                TaskDispatcherEvent.TaskExecutionStarted
+            );
+            const finishedSequentially = listenToEventTrigger(
+                dumbTaskEndEvtName,
+                sequentialEvent.id
+            );
+
+            const runPromise = dumbTask.run({}, sequentialEvent);
+
+            runPromises.push(runPromise);
+            eventAwaiters.push(finishedSequentially);
+        }
+
+        await Promise.all(runPromises);
+
+        await Promise.all(eventAwaiters);
+    });
+
+    it("cancellation affects the running task and those awaiting their execution", async () => {
+        const runPromises = [];
+        const eventAwaiters = [];
+        for (let i = 0; i < tasksToRunSequentially; i++) {
+            const sequentialEvent = createEvent(
+                TaskDispatcherEvent.TaskExecutionStarted
+            );
+            const timedOut = listenToEventTrigger(
+                TaskDispatcherEvent.TaskChainFinished,
+                sequentialEvent.id
+            );
+
+            const runPromise = timeoutTask.run({}, sequentialEvent);
+
+            runPromises.push(runPromise);
+            eventAwaiters.push(timedOut);
+        }
+
+        const timeoutPromise = new Promise<void>((resolve) => {
+            setTimeout(() => {
+                for (let i = 0; i < tasksToRunSequentially; i++) {
+                    timeoutTask.cancel();
+                }
+                resolve();
+            }, 100);
+        });
+
+        await Promise.all(runPromises);
+
+        await timeoutPromise;
+
+        const results = await Promise.all(eventAwaiters);
+
+        for (const result of results) {
+            expect(result).toEqual({ result: { status: "cancelled" } });
+        }
     });
 });
