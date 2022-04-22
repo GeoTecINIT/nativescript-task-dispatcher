@@ -226,9 +226,9 @@ describe("Task", () => {
                 sequentialEvent.id
             );
 
-            dumbTask.run({}, sequentialEvent);
+            const runPromise = dumbTask.run({}, sequentialEvent);
 
-            runPromises.push(runPromises);
+            runPromises.push(runPromise);
             eventAwaiters.push(finishedSequentially);
         }
 
@@ -249,9 +249,9 @@ describe("Task", () => {
                 sequentialEvent.id
             );
 
-            timeoutTask.run({}, sequentialEvent);
+            const runPromise = timeoutTask.run({}, sequentialEvent);
 
-            runPromises.push(runPromises);
+            runPromises.push(runPromise);
             eventAwaiters.push(timedOut);
         }
 
