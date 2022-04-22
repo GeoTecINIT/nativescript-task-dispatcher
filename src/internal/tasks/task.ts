@@ -52,7 +52,7 @@ export abstract class Task {
     this._invocationEvent = invocationEvent;
 
     if (this.isDone()) {
-      this.finishExecution();
+      this._executionLock.release();
       return;
     }
 
@@ -86,7 +86,8 @@ export abstract class Task {
     }
 
     this.removeCancelFunction();
-    this.finishExecution();
+    this._inQueue.delete(this._invocationEvent.id);
+    this._executionLock.release();
 
     if (executionError) throw executionError;
   }
@@ -106,6 +107,7 @@ export abstract class Task {
     for (const id of this._inQueue) {
       this.emitEndEvent(TaskResultStatus.Cancelled, undefined, id);
     }
+    this._inQueue.clear();
 
     if (this._cancelFunctions.has(this._invocationEvent.id)) {
       const cancelFunction = this._cancelFunctions.get(
@@ -287,11 +289,6 @@ export abstract class Task {
 
   private removeCancelFunction() {
     this._cancelFunctions.delete(this._invocationEvent.id);
-  }
-
-  private finishExecution() {
-    this._inQueue.delete(this._invocationEvent.id);
-    this._executionLock.release();
   }
 
   private getLogger() {

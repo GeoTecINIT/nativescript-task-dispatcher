@@ -255,9 +255,18 @@ describe("Task", () => {
             eventAwaiters.push(timedOut);
         }
 
-        setTimeout(() => timeoutTask.cancel(), 100);
+        const timeoutPromise = new Promise<void>((resolve) => {
+            setTimeout(() => {
+                for (let i = 0; i < tasksToRunSequentially; i++) {
+                    timeoutTask.cancel();
+                }
+                resolve();
+            }, 100);
+        });
 
         await Promise.all(runPromises);
+
+        await timeoutPromise;
 
         const results = await Promise.all(eventAwaiters);
 
