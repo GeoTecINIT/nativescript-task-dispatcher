@@ -8,15 +8,15 @@ import { AndroidTaskChainLauncher } from "nativescript-task-dispatcher/internal/
 import { TaskScheduler } from "nativescript-task-dispatcher/internal/tasks/schedulers/time-based";
 import { AndroidTaskScheduler } from "nativescript-task-dispatcher/internal/tasks/schedulers/time-based/android";
 
-import {
-    on,
-    TaskDispatcherEvent,
-    off,
-} from "nativescript-task-dispatcher/internal/events";
+import { on, off } from "nativescript-task-dispatcher/internal/events";
 import { run } from "nativescript-task-dispatcher/internal/tasks";
 import { RunnableTask } from "nativescript-task-dispatcher/internal/tasks/runnable-task";
 import { plannedTasksDB } from "nativescript-task-dispatcher/internal/persistence/planned-tasks-store";
 import { setTaskSchedulerCreator } from "../../../../../../../src/internal/tasks/schedulers/time-based/common";
+import {
+    createEvent,
+    listenToEventTrigger,
+} from "nativescript-task-dispatcher/testing/events";
 
 const MILLIS_BETWEEN = 100;
 
@@ -43,9 +43,9 @@ describe("Native task chain launcher", () => {
     });
 
     it("runs a single task dependant on a launch event", async () => {
-        const chainId = "simpleTaskChain";
-        const chainFinished = createTaskChainFinishedListener(chainId);
         const [launchEventName, listenerId] = createSimpleTaskChain();
+        const chainId = createEvent(launchEventName).id;
+        const chainFinished = listenToEventTrigger(launchEventName, chainId);
 
         taskChainLauncher.launch(launchEventName, {}, chainId);
         await chainFinished;
@@ -54,57 +54,55 @@ describe("Native task chain launcher", () => {
     });
 
     it("runs a task chain composed by multiple tasks bootstrapped by a launch event", async () => {
-        const chainId = "advancedTaskChain";
-        const chainFinished = createTaskChainFinishedListener(chainId);
         const [
-            launchEvent,
+            launchEventName,
             launchListenerId,
             intermediateEvent,
             intermediateListenerId,
         ] = createAdvancedTaskChain();
+        const chainId = createEvent(launchEventName).id;
+        const chainFinished = listenToEventTrigger(launchEventName, chainId);
 
-        taskChainLauncher.launch(launchEvent, {}, chainId);
+        taskChainLauncher.launch(launchEventName, {}, chainId);
         await chainFinished;
 
-        off(launchEvent, launchListenerId);
+        off(launchEventName, launchListenerId);
         off(intermediateEvent, intermediateListenerId);
     });
 
     it("runs two task chains in parallel if they fit in the same time window", async () => {
-        const simpleChainId = "anotherSimpleTaskChain";
-        const simpleChainFinished = createTaskChainFinishedListener(
+        const [simpleLaunchEventName, simpleListenerId] =
+            createSimpleTaskChain();
+        const simpleChainId = createEvent(simpleLaunchEventName).id;
+        const simpleChainFinished = listenToEventTrigger(
+            simpleLaunchEventName,
             simpleChainId
         );
-        const [
-            simpleLaunchEventName,
-            simpleListenerId,
-        ] = createSimpleTaskChain();
 
-        const advancedChainId = "anotherAdvancedTaskChain";
-        const advancedChainFinished = createTaskChainFinishedListener(
-            advancedChainId
-        );
         const [
-            launchEvent,
+            launchEventName,
             launchListenerId,
             intermediateEvent,
             intermediateListenerId,
         ] = createAdvancedTaskChain();
+        const advancedChainId = createEvent(launchEventName).id;
+        const advancedChainFinished = listenToEventTrigger(
+            launchEventName,
+            advancedChainId
+        );
 
         taskChainLauncher.launch(simpleLaunchEventName, {}, simpleChainId);
-        taskChainLauncher.launch(launchEvent, {}, advancedChainId);
+        taskChainLauncher.launch(launchEventName, {}, advancedChainId);
 
         await Promise.all([simpleChainFinished, advancedChainFinished]);
         off(simpleLaunchEventName, simpleListenerId);
-        off(launchEvent, launchListenerId);
+        off(launchEventName, launchListenerId);
         off(intermediateEvent, intermediateListenerId);
     });
 
     it("schedules a task in time as a reaction to an external event", async () => {
-        const [
-            launchEventName,
-            runnableDeferredTask,
-        ] = createDeferredTaskChain();
+        const [launchEventName, runnableDeferredTask] =
+            createDeferredTaskChain();
 
         taskChainLauncher.launch(launchEventName, {});
         await milliseconds(500);
@@ -169,17 +167,6 @@ function createDeferredTaskChain(): [string, RunnableTask] {
             params: {},
         },
     ];
-}
-
-function createTaskChainFinishedListener(chainId: string): Promise<void> {
-    return new Promise((resolve) => {
-        const listenerId = on(TaskDispatcherEvent.TaskChainFinished, (evt) => {
-            if (evt.id === chainId) {
-                off(TaskDispatcherEvent.TaskChainFinished, listenerId);
-                resolve();
-            }
-        });
-    });
 }
 
 function milliseconds(millis: number): Promise<void> {
