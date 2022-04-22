@@ -23,6 +23,7 @@ import { now } from "../../../../../../utils/time";
 import { ForegroundChecker } from "../../../../../foreground-checker";
 
 const MIN_TIMEOUT = 60000;
+const MAX_TIMEOUT = 180000;
 const TIMEOUT_EVENT_OFFSET = 5000;
 
 export class AlarmRunnerService
@@ -193,7 +194,7 @@ export class AlarmRunnerService
   private async calculateTimeout(taskPlanner: TaskManager) {
     const nextExecutionTime = await taskPlanner.nextInterval();
 
-    return Math.max(nextExecutionTime, MIN_TIMEOUT);
+    return Math.min(Math.max(nextExecutionTime, MIN_TIMEOUT), MAX_TIMEOUT);
   }
 
   private getExpirationTimestamp(timeout: number): number {
